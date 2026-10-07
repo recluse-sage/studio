@@ -1,0 +1,57 @@
+.stack {
+  max-width: 880px;
+}
+
+.pageTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.7rem;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.pageSub {
+  color: var(--oasis-text-secondary);
+  margin: 4px 0 0;
+}
+
+.card {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  min-width: 600px;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--oasis-border);
+}
+
+.table thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--oasis-text-muted);
+}
+
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tool {
+  font-weight: 650;
+  color: var(--oasis-text);
+}
+
+.date {
+  white-space: nowrap;
+  color: var(--oasis-text-secondary);
+}

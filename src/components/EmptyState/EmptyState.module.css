@@ -1,0 +1,32 @@
+.box {
+  border: 1px dashed var(--oasis-border-strong);
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-surface);
+  padding: 24px 20px;
+  text-align: left;
+}
+
+.box[data-compact="true"] {
+  padding: 16px;
+}
+
+.title {
+  margin: 0;
+  font-weight: 650;
+  font-size: 1rem;
+  color: var(--oasis-text);
+}
+
+.description {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--oasis-text-secondary);
+}
+
+.action {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

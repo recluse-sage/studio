@@ -1,0 +1,52 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--oasis-border);
+  background: var(--oasis-surface);
+  color: var(--oasis-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--oasis-text-muted);
+  flex: none;
+}
+
+.badge[data-tone="open"],
+.badge[data-tone="success"] {
+  background: var(--oasis-success-soft);
+  border-color: var(--oasis-accent-border);
+  color: var(--oasis-text);
+}
+
+.badge[data-tone="open"] .dot,
+.badge[data-tone="success"] .dot {
+  background: var(--oasis-accent);
+}
+
+.badge[data-tone="busy"],
+.badge[data-tone="warning"] {
+  background: var(--oasis-warning-soft);
+  border-color: var(--oasis-border-strong);
+  color: var(--oasis-text);
+}
+
+.badge[data-tone="busy"] .dot,
+.badge[data-tone="warning"] .dot {
+  background: var(--oasis-warning);
+}
+
+.badge[data-tone="closed"] {
+  background: var(--oasis-surface-2);
+  color: var(--oasis-text-muted);
+}

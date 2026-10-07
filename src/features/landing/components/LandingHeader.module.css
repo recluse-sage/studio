@@ -1,0 +1,127 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--oasis-header-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--oasis-border);
+}
+
+.inner {
+  max-width: var(--oasis-max-width);
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  min-height: var(--oasis-touch-min);
+}
+
+.mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+  font-family: var(--oasis-font-display);
+  font-size: 18px;
+  flex: none;
+}
+
+.brandText {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--oasis-text);
+}
+
+.desktopNav {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  margin-inline: auto;
+}
+
+.link {
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--oasis-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 550;
+  min-height: var(--oasis-touch-min);
+  display: inline-flex;
+  align-items: center;
+}
+
+.link:hover {
+  background: var(--oasis-surface);
+  color: var(--oasis-text);
+}
+
+.actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cta {
+  display: none;
+}
+
+.burger {
+  border: 1px solid var(--oasis-border);
+  border-radius: 10px;
+  background: var(--oasis-surface);
+}
+
+.mobileNav {
+  border-top: 1px solid var(--oasis-border);
+  padding: 8px 20px 16px;
+  display: grid;
+  gap: 2px;
+  background: var(--oasis-bg);
+}
+
+.mobileLink,
+.mobileCta {
+  display: flex;
+  align-items: center;
+  min-height: var(--oasis-touch-min);
+  padding: 10px 4px;
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--oasis-text);
+  border-bottom: 1px solid var(--oasis-border);
+}
+
+.mobileCta {
+  color: var(--oasis-accent);
+  border-bottom: 0;
+}
+
+@media (min-width: 860px) {
+  .desktopNav {
+    display: flex;
+  }
+  .cta {
+    display: inline-flex;
+  }
+  .burger {
+    display: none;
+  }
+  .mobileNav {
+    display: none;
+  }
+}

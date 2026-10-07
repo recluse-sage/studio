@@ -1,0 +1,50 @@
+.stack {
+  max-width: 880px;
+}
+
+.pageTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.7rem;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.pageSub {
+  color: var(--oasis-text-secondary);
+  margin: 4px 0 0;
+}
+
+.checkbox {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--oasis-accent);
+}
+
+.checkLabel {
+  font-size: 0.94rem;
+  font-weight: 550;
+  color: var(--oasis-text);
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.rowCard {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+}
+
+.business {
+  color: var(--oasis-text);
+}
+
+.muted {
+  color: var(--oasis-text-secondary);
+}
+
+.note {
+  color: var(--oasis-text);
+  line-height: 1.55;
+}

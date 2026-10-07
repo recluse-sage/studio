@@ -1,0 +1,11 @@
+# robots.txt for Oasis.dev
+# Crawler hygiene only. Auth is the security boundary, not this file.
+# Admin and private APIs rely on Cloudflare Access plus Worker 401/403,
+# no public links, no sitemap entries, and a noindex header on admin HTML.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# BEGIN OASIS GENERATED SITEMAP
+# END OASIS GENERATED SITEMAP

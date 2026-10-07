@@ -1,0 +1,41 @@
+.wrap {
+  max-width: 44rem;
+  margin: 0;
+}
+
+.wrap[data-align="center"] {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--oasis-accent);
+  font-weight: 700;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--oasis-text);
+  text-wrap: balance;
+}
+
+.description {
+  margin: 12px 0 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--oasis-text-secondary);
+  text-wrap: pretty;
+}
+
+.extra {
+  margin-top: 16px;
+}

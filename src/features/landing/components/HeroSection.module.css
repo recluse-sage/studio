@@ -1,0 +1,154 @@
+.hero {
+  background: var(--oasis-bg);
+  border-bottom: 1px solid var(--oasis-border);
+}
+
+.inner {
+  max-width: var(--oasis-max-width);
+  margin: 0 auto;
+  padding: 40px 20px 32px;
+  display: grid;
+  gap: 28px;
+}
+
+.copy {
+  max-width: 36rem;
+}
+
+.title {
+  margin: 16px 0 0;
+  font-family: var(--oasis-font-display);
+  font-size: clamp(2rem, 1.4rem + 4vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--oasis-text);
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 16px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--oasis-text-secondary);
+  text-wrap: pretty;
+}
+
+.ctaRow {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.primary {
+  background: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+  border: 1px solid var(--oasis-accent);
+}
+
+.secondary {
+  border-color: var(--oasis-border-strong);
+  color: var(--oasis-text);
+  background: transparent;
+}
+
+.checks {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  color: var(--oasis-text-secondary);
+}
+
+.checkIcon {
+  background: var(--oasis-accent-soft);
+  color: var(--oasis-accent);
+  border: 1px solid var(--oasis-accent-border);
+  font-size: 13px;
+}
+
+.card {
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-lg);
+  background: var(--oasis-surface);
+  box-shadow: var(--oasis-card-shadow);
+  padding: 20px;
+}
+
+.cardEyebrow {
+  margin: 0;
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--oasis-text-muted);
+}
+
+.cardList {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.cardList li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.step {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--oasis-bg);
+  border: 1px solid var(--oasis-border-strong);
+  color: var(--oasis-text);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.cardTitle {
+  margin: 0;
+  font-weight: 650;
+  color: var(--oasis-text);
+  font-size: 0.95rem;
+}
+
+.cardText {
+  margin: 2px 0 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.92rem;
+}
+
+.cardFoot {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--oasis-border);
+  color: var(--oasis-text-secondary);
+  font-size: 0.9rem;
+}
+
+@media (min-width: 860px) {
+  .inner {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 40px;
+    align-items: start;
+    padding: 72px 24px 56px;
+  }
+  .ctaRow {
+    flex-direction: row;
+    align-items: center;
+  }
+  .card {
+    padding: 24px;
+    position: sticky;
+    top: 84px;
+  }
+}

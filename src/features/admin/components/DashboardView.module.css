@@ -1,0 +1,150 @@
+.stack {
+  max-width: 880px;
+}
+
+.pageTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.7rem;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.pageSub {
+  color: var(--oasis-text-secondary);
+  margin: 4px 0 0;
+}
+
+.card {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+}
+
+.eyebrow {
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--oasis-text-muted);
+  margin: 0;
+}
+
+.nextWindow {
+  color: var(--oasis-text);
+}
+
+.muted {
+  color: var(--oasis-text-secondary);
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.countGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+.countCard {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+}
+
+.countNum {
+  font-size: 1.7rem;
+  font-weight: 750;
+  line-height: 1;
+  color: var(--oasis-text);
+  margin: 0;
+}
+
+.countLabel {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--oasis-text-secondary);
+}
+
+.emptyWrap {
+  margin-top: 14px;
+}
+
+.tableWrap {
+  margin-top: 12px;
+  border: 1px solid var(--oasis-border);
+  border-radius: 10px;
+  background: var(--oasis-surface-raised);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  min-width: 560px;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid var(--oasis-border);
+  vertical-align: top;
+}
+
+.table thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--oasis-text-muted);
+}
+
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cellMain {
+  display: block;
+  font-weight: 650;
+  color: var(--oasis-text);
+}
+
+.cellSub {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--oasis-text-muted);
+}
+
+.cellClamp {
+  display: block;
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cellDate {
+  white-space: nowrap;
+  color: var(--oasis-text-secondary);
+  font-size: 0.85rem;
+}
+
+.noteForm {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.noteLabel {
+  font-weight: 650;
+  font-size: 0.9rem;
+  color: var(--oasis-text);
+}
+
+@media (min-width: 640px) {
+  .countGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

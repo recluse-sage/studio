@@ -1,0 +1,47 @@
+.stack {
+  max-width: 720px;
+}
+
+.pageTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.7rem;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.pageSub {
+  color: var(--oasis-text-secondary);
+  margin: 4px 0 0;
+}
+
+.card {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 650;
+  font-size: 0.9rem;
+  color: var(--oasis-text);
+}
+
+.row {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 680px) {
+  .row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

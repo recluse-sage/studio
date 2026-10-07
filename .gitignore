@@ -1,0 +1,13 @@
+node_modules/
+build/
+dist/
+.dev.vars
+.env
+.env.*
+!.dev.vars.example
+!.env.example
+.react-router/
+.wrangler/
+wrangler/
+.dev/
+.qa-artifacts/

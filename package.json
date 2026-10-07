@@ -1,0 +1,44 @@
+{
+  "name": "oasis-dev",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Oasis.dev central app: public landing, private admin, and API on Cloudflare Workers with React Router Framework Mode.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "react-router dev",
+    "build": "react-router build",
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "preview": "vite preview",
+    "sitemap": "node scripts/generate-sitemap.mjs",
+    "test:server": "vitest run --config vitest.config.ts",
+    "cf:dev": "wrangler dev",
+    "cf:types": "wrangler types --include-runtime=false"
+  },
+  "dependencies": {
+    "@mantine/core": "^8.3.0",
+    "@mantine/hooks": "^8.3.0",
+    "jose": "^6.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router": "^7.9.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.12.0",
+    "@cloudflare/workers-types": "^5.0.0",
+    "@react-router/dev": "^7.9.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0",
+    "vite-tsconfig-paths": "^5.1.0",
+    "vitest": "^5.0.3",
+    "wrangler": "^4.0.0"
+  },
+  "overrides": {
+    "sharp": "0.35.5"
+  }
+}

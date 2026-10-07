@@ -1,0 +1,77 @@
+/* Oasis base. Minimal global rules. Component detail lives in CSS Modules. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+}
+
+body {
+  background: var(--oasis-bg);
+  color: var(--oasis-text);
+  font-family: var(--oasis-font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+/* Visible keyboard focus everywhere. No decorative motion. */
+:focus-visible {
+  outline: 3px solid var(--oasis-focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Comfortable touch targets for primary controls and nav. */
+button,
+a[role="button"],
+input[type="submit"],
+.mantine-Button-root,
+.mantine-NavLink-root,
+.mantine-Anchor-root {
+  min-height: var(--oasis-touch-min);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  max-width: 100%;
+}
+
+/* Prevent horizontal scroll in admin tables on small screens. */
+.oasis-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Screen reader only helper for semantic labels and status text. */
+.oasis-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

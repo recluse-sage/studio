@@ -1,0 +1,67 @@
+.stack {
+  max-width: 720px;
+}
+
+.pageTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.7rem;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.pageSub {
+  color: var(--oasis-text-secondary);
+  margin: 4px 0 0;
+}
+
+.card {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+}
+
+.cardTitle {
+  font-size: 1.05rem;
+  margin: 0 0 12px;
+  color: var(--oasis-text);
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 650;
+  font-size: 0.9rem;
+  color: var(--oasis-text);
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.noteCard {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+}
+
+.date {
+  color: var(--oasis-text-muted);
+}
+
+.noteTitle {
+  color: var(--oasis-text);
+  margin-top: 4px;
+}
+
+.noteBody {
+  color: var(--oasis-text-secondary);
+  margin-top: 4px;
+  line-height: 1.55;
+}

@@ -1,0 +1,9 @@
+# Local Worker vars for `wrangler dev`. Copy to .dev.vars for local runs.
+# Keep all values blank until provisioned. Never commit .dev.vars or real secrets.
+PUBLIC_SITE_URL=""
+ACCESS_TEAM_DOMAIN=""
+ACCESS_AUD=""
+TURNSTILE_SECRET_KEY=""
+RESEND_API_KEY=""
+OWNER_EMAIL=""
+FROM_EMAIL=""

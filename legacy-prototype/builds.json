@@ -1,0 +1,19 @@
+[
+  {
+    "business": "Lena Nails",
+    "problem": "Same recurring booking question, answered over and over by DM",
+    "link": "for-lena-nails/",
+    "status": "live",
+    "proof": ""
+  }
+  // --- TEMPLATE (copy, uncomment, fill in) ---
+  // {
+  //   "business": "",
+  //   "problem": "",
+  //   "link": "for-[business]/",
+  //   "status": "building",
+  //   "proof": ""
+  // }
+  // status must be one of: live | building | quiet
+  // proof: optional full https:// link (screenshot, post, message). Leave "" if none.
+]

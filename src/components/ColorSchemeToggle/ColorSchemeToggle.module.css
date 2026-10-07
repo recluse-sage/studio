@@ -1,0 +1,11 @@
+.toggle {
+  border-color: var(--oasis-border);
+  color: var(--oasis-text-secondary);
+  background: var(--oasis-surface);
+  border-radius: 10px;
+}
+
+.glyph {
+  font-size: 18px;
+  line-height: 1;
+}

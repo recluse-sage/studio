@@ -1,0 +1,68 @@
+.footer {
+  background: var(--oasis-bg);
+  border-top: 1px solid var(--oasis-border);
+}
+
+.inner {
+  max-width: var(--oasis-max-width);
+  margin: 0 auto;
+  padding: 32px 20px 40px;
+  display: grid;
+  gap: 18px;
+}
+
+.brand {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-size: 1.2rem;
+  color: var(--oasis-text);
+}
+
+.tagline {
+  margin: 6px 0 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.94rem;
+  max-width: 28rem;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--oasis-touch-min);
+  padding: 6px 10px;
+  color: var(--oasis-text-secondary);
+  text-decoration: none;
+  font-weight: 550;
+  font-size: 0.94rem;
+  border-radius: 8px;
+}
+
+.link:hover {
+  color: var(--oasis-text);
+  background: var(--oasis-surface);
+}
+
+.small {
+  margin: 0;
+  color: var(--oasis-text-muted);
+  font-size: 0.86rem;
+  border-top: 1px solid var(--oasis-border);
+  padding-top: 16px;
+}
+
+@media (min-width: 860px) {
+  .inner {
+    padding: 40px 24px 48px;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+  .small {
+    grid-column: 1 / -1;
+  }
+}

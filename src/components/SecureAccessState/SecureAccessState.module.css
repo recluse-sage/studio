@@ -1,0 +1,31 @@
+.wrap {
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-lg);
+  background: var(--oasis-surface);
+  padding: 24px 20px;
+  max-width: 560px;
+}
+
+.title {
+  font-family: var(--oasis-font-display);
+  font-size: 1.4rem;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.text {
+  color: var(--oasis-text-secondary);
+  font-size: 0.97rem;
+  margin: 0;
+}
+
+.note {
+  border: 1px solid var(--oasis-border);
+}
+
+@media (min-width: 768px) {
+  .wrap {
+    padding: 28px;
+  }
+}
