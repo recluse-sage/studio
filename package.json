@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "react-router dev",
-    "build": "react-router build",
+    "build": "node scripts/generate-sitemap.mjs && react-router build",
     "typecheck": "react-router typegen && tsc --noEmit",
     "preview": "vite preview",
     "sitemap": "node scripts/generate-sitemap.mjs",

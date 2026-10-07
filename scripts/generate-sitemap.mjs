@@ -1,7 +1,12 @@
 // Generates public/sitemap.xml only when PUBLIC_SITE_URL is set to a real URL.
+// PUBLIC_SITE_URL is the single public Build variable (Workers Builds dashboard,
+// shell env for local builds). VITE_PUBLIC_SITE_URL is derived from it in
+// vite.config.ts, so canonical tags and this sitemap always match.
+// Runs automatically before prerendering via `npm run build`.
 // Withheld by design until the owner sets the canonical domain.
 // Never includes /admin, /admin/*, or /api/*. Only public prerendered routes.
-// Usage: PUBLIC_SITE_URL="https://example.com" npm run sitemap
+// Usage: PUBLIC_SITE_URL="https://oasis-dev.oasishub.workers.dev" npm run build
+// To change the URL, update it in Workers Builds, then rebuild/redeploy.
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 
 const raw = (process.env.PUBLIC_SITE_URL || "").trim().replace(/\/$/, "");

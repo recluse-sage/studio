@@ -6,7 +6,7 @@ Root invariant: all Oasis.dev source, config, docs, tests, assets, templates, an
 
 ## Routes
 
-- `/` public, prerendered HTML, crawlable. Uses `LandingPage` from `src/features/landing/LandingPage.tsx`. Loader returns null availability and empty lists. Client hydrates via `fetchPublicAvailability`. Null means show no status strip or badge. No fake portfolio. Passes public `VITE_TURNSTILE_SITE_KEY` only, never the secret. Self canonical from `VITE_PUBLIC_SITE_URL` only when set, otherwise omitted.
+- `/` public, prerendered HTML, crawlable. Uses `LandingPage` from `src/features/landing/LandingPage.tsx`. Loader returns null availability and empty lists. Client hydrates via `fetchPublicAvailability`. Null means show no status strip or badge. No fake portfolio. Passes public `VITE_TURNSTILE_SITE_KEY` only, never the secret. Self canonical comes from the derived `VITE_PUBLIC_SITE_URL` (single source: `PUBLIC_SITE_URL` Build variable) only when set, otherwise omitted.
 - `/work` honest placeholder only. No grid, no examples, no proof. Out of sitemap with `noindex` until permissioned content exists. Short copy with a link back to intake.
 - `/admin/*` private owner only. Uses `AdminDashboard` from `src/features/admin/AdminDashboard.tsx`. All fetches run client side via `src/features/admin/api.ts`, never in SSR loaders. Never prerendered, never in sitemap, always `noindex`. Shows denied for 401 or 403, null availability when not configured, and no owner email on the client.
 - `/api/*` served by the Worker via `handleApiRequest(request, env)` from `src/server/worker.ts`. Unknown `/api/*` returns JSON 404, never an asset fallback.
@@ -33,26 +33,28 @@ Cloudflare Access must cover both `/admin` and `/admin/*`, plus the private API 
 
 ## Vars and secrets to provision later
 
-Vars in `wrangler.jsonc` (`PUBLIC_SITE_URL`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `OWNER_EMAIL`, `FROM_EMAIL`) are blank until set. Public Vite vars in `.env.example` (`VITE_PUBLIC_SITE_URL`, `VITE_TURNSTILE_SITE_KEY`) are blank until set. Secrets are never in repo:
+`PUBLIC_SITE_URL` is a public Build variable (Cloudflare Workers Builds dashboard for deploys, shell env for local builds), not a secret and not a runtime var. It is intentionally absent from `wrangler.jsonc` `vars` and `.dev.vars`. `VITE_PUBLIC_SITE_URL` is derived from it in `vite.config.ts`; do not set `VITE_` manually. Other vars in `wrangler.jsonc` (`ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `OWNER_EMAIL`, `FROM_EMAIL`) are blank until set. Public Vite vars in `.env.example` (`VITE_TURNSTILE_SITE_KEY`) are blank until set. Secrets are never in repo:
 
 - `TURNSTILE_SECRET_KEY` via `wrangler secret put`
 - `RESEND_API_KEY` via `wrangler secret put`
 
 Local blanks live in `.dev.vars.example` with no real values.
 
-SEO: `PUBLIC_SITE_URL` and `VITE_PUBLIC_SITE_URL` stay empty until the owner sets the real canonical domain. Sitemap and canonical output stay disabled until then. Run `PUBLIC_SITE_URL="https://your-real-domain" npm run sitemap` only after the domain is confirmed. `/work` stays out of the sitemap with `noindex`. Never list admin or api in the sitemap. Never hardcode a domain you do not own.
+SEO: `PUBLIC_SITE_URL` stays empty until the owner sets the canonical URL in Workers Builds. Sitemap and canonical output stay disabled while it is empty: `npm run build` runs `scripts/generate-sitemap.mjs` before prerendering, withholding `public/sitemap.xml` and the robots `Sitemap:` line, and `vite.config.ts` derives an empty `VITE_PUBLIC_SITE_URL` so `/` omits its self canonical. The selected host is `https://oasis-dev.oasishub.workers.dev` (Worker `oasis-dev` on the no-purchase account hostname `oasishub`). The build produces a matching canonical and sitemap from that one value. A custom domain is optional for later and never required for the initial deploy. To change the URL, update it in Workers Builds, then rebuild/redeploy. `/` stays prerendered and asset-first (see `run_worker_first` in `wrangler.jsonc`). `/work` stays out of the sitemap with `noindex`. Never list admin or api in the sitemap. Never hardcode a domain you do not own.
 
 ## Form status
 
-Do not claim the intake form sends successfully until Turnstile site key and secret, Resend key, owner and from email, D1, and Access are all configured. Without a site key the form shows a paused message. Without server secrets and D1 the submit fails safely with an error message.
+Intake stores every submission in D1 first, so the Admin inbox works with no custom domain. Email stays optional until a domain is ready: without Resend and address vars the submit still stores safely and shows a stored message. Turnstile site key and secret stay required before unpausing intake; without a site key the form shows a paused message. The Resend no-domain test sender only reaches its own account email, so it is optional and not general production email.
 
 ## Do not deploy yet
 
-No deploy before Domain, Access, and D1 setup are complete:
+No deploy before Access and D1 setup are complete. No custom domain purchase is required: the initial host is the account `workers.dev` hostname.
 
 - Replace D1 `database_id` and `RATE_LIMITER` `namespace_id` placeholders.
-- Set `PUBLIC_SITE_URL` to the real canonical URL.
+- Set `PUBLIC_SITE_URL` as a public Build variable in Workers Builds to `https://oasis-dev.oasishub.workers.dev` (Worker `oasis-dev` on account hostname `oasishub`), then rebuild/redeploy. Keep repo defaults blank until Cloudflare is configured. A custom domain stays optional for later and never blocks the initial deploy.
 - Confirm Access apps for `/admin`, `/admin/*`, and `/api/admin/*`.
-- Provision Turnstile, Resend, and owner email vars.
+- Provision Turnstile before unpausing intake. Resend and owner email vars stay optional until a domain is ready because the D1 inbox is the fallback.
+
+Account note: client sites initially use distinct Worker names under the same `oasishub` hostname. Each client gets a separate Worker and D1. Their data stays separate but account quotas are shared. Moving a client to its own Cloudflare account changes its URL. `oasis.pages.dev` and Pages stay out of the production path.
 
 Pricing note: Cloudflare, Resend, and related services have free tiers and paid limits that can change. Check current provider pricing before launch. This repo makes no no-cost claim.

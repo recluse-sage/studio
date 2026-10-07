@@ -1,6 +1,7 @@
 # Local Worker vars for `wrangler dev`. Copy to .dev.vars for local runs.
 # Keep all values blank until provisioned. Never commit .dev.vars or real secrets.
-PUBLIC_SITE_URL=""
+# PUBLIC_SITE_URL is build-time only (Workers Builds dashboard, shell env locally),
+# not a runtime var, so it is intentionally absent here.
 ACCESS_TEAM_DOMAIN=""
 ACCESS_AUD=""
 TURNSTILE_SECRET_KEY=""

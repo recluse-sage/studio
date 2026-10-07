@@ -35,10 +35,12 @@
     }
   ],
   "vars": {
-    // Public canonical base. Empty until the owner sets the real domain.
-    // Example after setup: "https://oasis.dev". Never hardcode a domain you do not own.
-    // Sitemap and canonical tags stay disabled while this is empty. See scripts/generate-sitemap.mjs.
-    "PUBLIC_SITE_URL": "",
+    // PUBLIC_SITE_URL is intentionally not a runtime var here. It is a public
+    // Build variable (Workers Builds dashboard, shell env locally), not a secret.
+    // vite.config.ts derives VITE_PUBLIC_SITE_URL from it at build time and
+    // scripts/generate-sitemap.mjs builds the sitemap from the same value.
+    // Change the URL in Workers Builds, then rebuild/redeploy.
+    // Example: "https://oasis-dev.oasishub.workers.dev".
     // Cloudflare Access team domain and app audience for the /admin shell and /api/admin/* APIs.
     // Backend vars use these exact names. Do not rename. Secrets go via wrangler secret put.
     "ACCESS_TEAM_DOMAIN": "",

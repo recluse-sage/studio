@@ -52,12 +52,29 @@ Share engineering, diverge composition, palette, type, and imagery.
 ## 6. Central platform versus client delivery
 
 - Central: one private repo plus one Worker project for Oasis.dev (landing, admin, API).
+  The Worker is currently named `oasis-dev` and will use
+  `https://oasis-dev.oasishub.workers.dev`. The `oasishub` workers.dev hostname
+  is the no-purchase host, so no custom domain purchase is required for the
+  initial deploy. A custom domain stays optional for later.
 - Per client: one repo plus one Worker project forked from the client template,
-  own database, own secrets, own domain when ready. Never co-mingle client data.
+  own database, own secrets. Client sites initially use distinct Worker names
+  under the same `oasishub` account hostname. Never co-mingle client data.
 - Clients 1 to 3 live under the Oasis Cloudflare account as separate projects.
-  High traffic clients move to their own account at handoff.
-- If a client cannot move DNS to Cloudflare nameservers, Workers custom domains are
-  blocked, so fall back to Pages or a proxy for that client.
+  High traffic clients move to their own account at handoff. Moving a client
+  to its own Cloudflare account changes its URL.
+- Each client gets a separate Worker and D1. Their data stays separate but
+  account quotas are shared.
+- Central `PUBLIC_SITE_URL` is a public Build variable, not a secret.
+  `VITE_PUBLIC_SITE_URL` is derived from it at build time for prerendered
+  canonical tags, and the sitemap is generated from the same value on each
+  build. Change the URL in Cloudflare Workers Builds, then rebuild/redeploy.
+  Example: `https://oasis-dev.oasishub.workers.dev`. Repo defaults stay blank
+  until Cloudflare is configured. `/` stays prerendered and asset-first.
+- If a client cannot move DNS to Cloudflare nameservers, it still stays on the
+  account workers.dev hostname. Custom domains stay optional and never block
+  the initial deploy. `oasis.pages.dev` and Pages stay out of the production
+  path. The old static prototype under `Personal/oasis.dev/legacy-prototype/`
+  stays archival only.
 
 ## 7. Stack (central app)
 
@@ -76,7 +93,11 @@ backend or real auth. Login screens and placeholder pages from it are not reused
 - Email: Resend. Resend is a transactional email sending API. When a form is
   submitted, the backend stores the row in D1, then calls Resend to email the owner.
   It is not a mailbox, CRM, or newsletter builder. Free tier: 3,000 per month,
-  max 100 per day, domain verification required. Alternative later: native
+  max 100 per day, domain verification required. With no custom domain, the D1
+  Admin inbox is the reliable fallback and submissions can be stored without
+  email. Turnstile remains required before unpausing intake. The Resend test
+  sender only works to its own account email and is optional, not general
+  production email. Alternative later: native
   Cloudflare Email Service (needs Workers Paid).
 - Spam: Turnstile plus honeypot plus 3 to 5 fields plus per IP rate limiting.
 - Usage: server side aggregate counters per tool per day (views, offline views,

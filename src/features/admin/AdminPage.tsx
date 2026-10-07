@@ -41,6 +41,7 @@ export type AdminPageProps = {
   ownerEmail?: string;
   intakeEndpoint?: string;
   adminBase?: string;
+  publicSiteUrl?: string;
   onRetry?: () => void;
   onSaveAvailability?: (value: AvailabilityState) => Promise<void> | void;
   onIntakeStatusChange?: (id: string, status: IntakeStatus) => Promise<void> | void;
@@ -82,6 +83,7 @@ export function AdminPage({
   ownerEmail,
   intakeEndpoint,
   adminBase,
+  publicSiteUrl = import.meta.env.VITE_PUBLIC_SITE_URL,
   onRetry,
   onSaveAvailability,
   onIntakeStatusChange,
@@ -205,7 +207,12 @@ export function AdminPage({
       ) : null}
 
       {view === "settings" ? (
-        <SettingsView ownerEmail={ownerEmail} intakeEndpoint={intakeEndpoint} adminBase={adminBase} />
+        <SettingsView
+          ownerEmail={ownerEmail}
+          intakeEndpoint={intakeEndpoint}
+          adminBase={adminBase}
+          publicSiteUrl={publicSiteUrl}
+        />
       ) : null}
     </AdminShell>
   );

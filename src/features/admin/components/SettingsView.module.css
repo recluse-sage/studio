@@ -61,6 +61,28 @@
   font-size: 0.9rem;
 }
 
+.urlValue {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.visitLink {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  font-weight: 650;
+}
+
+.stepsTitle {
+  margin-top: 16px;
+  margin-bottom: 6px;
+  color: var(--oasis-text);
+}
+
+.alert {
+  margin-top: 12px;
+}
+
 .muted {
   color: var(--oasis-text-secondary);
   margin-top: 12px;

@@ -6,10 +6,11 @@ import type { OasisEnv } from "../src/server/env.ts";
 // Worker env aligns with backend lane. Do not rename these names.
 // Backend owns: DB, RATE_LIMITER, ACCESS_TEAM_DOMAIN, ACCESS_AUD,
 // TURNSTILE_SECRET_KEY, RESEND_API_KEY, OWNER_EMAIL, FROM_EMAIL.
-// Worker adds: ASSETS (Static Assets binding) and PUBLIC_SITE_URL (optional).
+// Worker adds: ASSETS (Static Assets binding).
+// PUBLIC_SITE_URL is build-time only (see vite.config.ts and
+// scripts/generate-sitemap.mjs). The Worker never reads it at runtime.
 export interface Env extends OasisEnv {
   ASSETS: Fetcher;
-  PUBLIC_SITE_URL?: string;
 }
 
 declare module "react-router" {
