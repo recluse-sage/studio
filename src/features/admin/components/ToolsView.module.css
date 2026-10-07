@@ -24,12 +24,79 @@
   border-color: var(--oasis-border);
 }
 
+.checkCard {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+  border-left: 4px solid var(--oasis-accent);
+}
+
+.checkTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.05rem;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.checkCount {
+  font-family: var(--oasis-font-mono);
+  font-size: 0.82rem;
+  color: var(--oasis-text-secondary);
+  white-space: nowrap;
+}
+
+.checkList {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.checkRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  min-height: var(--oasis-touch-min);
+}
+
+.checkRow:hover {
+  background: var(--oasis-surface-2);
+}
+
+.checkRow[data-checked="true"] .checkLabel {
+  color: var(--oasis-text-secondary);
+}
+
+.checkBox {
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  flex: none;
+  accent-color: var(--oasis-accent);
+}
+
+.checkBox:focus-visible {
+  outline: 3px solid var(--oasis-focus-ring);
+  outline-offset: 2px;
+}
+
+.checkLabel {
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: var(--oasis-text);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
 .business {
   color: var(--oasis-text);
 }
 
 .muted {
   color: var(--oasis-text-secondary);
+  line-height: 1.55;
 }
 
 .note {

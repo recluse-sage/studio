@@ -4,45 +4,43 @@
   z-index: 20;
   background: var(--oasis-header-bg);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--oasis-border);
 }
 
 .inner {
   max-width: var(--oasis-max-width);
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 8px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
+  min-height: 64px;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  font-weight: 700;
   min-height: var(--oasis-touch-min);
+  text-decoration: none;
 }
 
-.mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--oasis-accent);
-  color: var(--oasis-accent-contrast);
+.wordmark {
   font-family: var(--oasis-font-display);
-  font-size: 18px;
-  flex: none;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+  color: var(--oasis-text);
+  line-height: 1;
 }
 
-.brandText {
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
-  color: var(--oasis-text);
+/* Green dot inside the wordmark. Static by design, no animation. */
+.dot {
+  color: var(--oasis-accent);
+}
+
+[data-mantine-color-scheme="dark"] .dot {
+  color: var(--oasis-accent);
 }
 
 .desktopNav {
@@ -58,10 +56,11 @@
   text-decoration: none;
   color: var(--oasis-text-secondary);
   font-size: 0.95rem;
-  font-weight: 550;
+  font-weight: 500;
   min-height: var(--oasis-touch-min);
   display: inline-flex;
   align-items: center;
+  transition: background-color 120ms ease, color 120ms ease;
 }
 
 .link:hover {
@@ -78,12 +77,18 @@
 
 .cta {
   display: none;
+  background: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+  border: 1px solid var(--oasis-accent);
+  font-weight: 600;
 }
 
 .burger {
   border: 1px solid var(--oasis-border);
   border-radius: 10px;
   background: var(--oasis-surface);
+  width: var(--oasis-touch-min);
+  height: var(--oasis-touch-min);
 }
 
 .mobileNav {

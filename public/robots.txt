@@ -8,4 +8,5 @@ Disallow: /admin
 Disallow: /api/
 
 # BEGIN OASIS GENERATED SITEMAP
+Sitemap: https://oasis-dev.oasishub.workers.dev/sitemap.xml
 # END OASIS GENERATED SITEMAP

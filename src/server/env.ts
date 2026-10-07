@@ -41,6 +41,39 @@ export function safeError(message: string, status = 400, code?: string): Respons
   return json(code ? { error: message, code } : { error: message }, status);
 }
 
+// Shared cache helpers. Admin JSON is always private no-store.
+// Public JSON is cacheable for 60 seconds. Use these helpers so cache
+// behavior stays consistent across handlers.
+
+export function adminJson(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "Cache-Control": "private, no-store",
+    },
+  });
+}
+
+export function adminError(message: string, status = 400, code?: string): Response {
+  // SECURITY: never include stack traces or secrets in API errors.
+  return adminJson(code ? { error: message, code } : { error: message }, status);
+}
+
+export function publicJson(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "Cache-Control": "public, max-age=60",
+    },
+  });
+}
+
+export function publicError(message: string, status = 400, code?: string): Response {
+  return publicJson(code ? { error: message, code } : { error: message }, status);
+}
+
 export function nowIso(): string {
   return new Date().toISOString();
 }

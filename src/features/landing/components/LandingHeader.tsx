@@ -23,10 +23,9 @@ export function LandingHeader({ intakeHref = "#intake", showAvailability = true 
     <header className={classes.header}>
       <div className={classes.inner}>
         <a href="#top" className={classes.brand} aria-label="Oasis home">
-          <span className={classes.mark} aria-hidden="true">
-            O
+          <span className={classes.wordmark} aria-hidden="true">
+            oasis<span className={classes.dot}>.</span>dev
           </span>
-          <span className={classes.brandText}>Oasis.dev</span>
         </a>
 
         <nav className={classes.desktopNav} aria-label="Primary">

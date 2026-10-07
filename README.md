@@ -6,8 +6,8 @@ Root invariant: all Oasis.dev source, config, docs, tests, assets, templates, an
 
 ## Routes
 
-- `/` public, prerendered HTML, crawlable. Uses `LandingPage` from `src/features/landing/LandingPage.tsx`. Loader returns null availability and empty lists. Client hydrates via `fetchPublicAvailability`. Null means show no status strip or badge. No fake portfolio. Passes public `VITE_TURNSTILE_SITE_KEY` only, never the secret. Self canonical comes from the derived `VITE_PUBLIC_SITE_URL` (single source: `PUBLIC_SITE_URL` Build variable) only when set, otherwise omitted.
-- `/work` honest placeholder only. No grid, no examples, no proof. Out of sitemap with `noindex` until permissioned content exists. Short copy with a link back to intake.
+- `/` public, prerendered HTML, crawlable. Uses `LandingPage` from `src/features/landing/LandingPage.tsx`. Loader returns null availability and empty lists. Client hydrates via `fetchPublicAvailability`. Null means show no status strip or badge. No fake portfolio. Clearly labeled sample concepts are allowed, but never presented as real client proof. Passes public `VITE_TURNSTILE_SITE_KEY` only, never the secret. Self canonical comes from the derived `VITE_PUBLIC_SITE_URL` (single source: `PUBLIC_SITE_URL` Build variable) only when set, otherwise omitted.
+- `/work` honest placeholder only. Work grid lists only approved real proof plus clearly labeled sample concepts. Each sample is labeled as a sample concept and never uses a real client name. Out of sitemap with `noindex` until at least one real approved proof exists. Sample concepts alone do not lift the noindex. Short copy with a link back to intake.
 - `/admin/*` private owner only. Uses `AdminDashboard` from `src/features/admin/AdminDashboard.tsx`. All fetches run client side via `src/features/admin/api.ts`, never in SSR loaders. Never prerendered, never in sitemap, always `noindex`. Shows denied for 401 or 403, null availability when not configured, and no owner email on the client.
 - `/api/*` served by the Worker via `handleApiRequest(request, env)` from `src/server/worker.ts`. Unknown `/api/*` returns JSON 404, never an asset fallback.
 
@@ -45,6 +45,14 @@ SEO: `PUBLIC_SITE_URL` stays empty until the owner sets the canonical URL in Wor
 ## Form status
 
 Intake stores every submission in D1 first, so the Admin inbox works with no custom domain. Email stays optional until a domain is ready: without Resend and address vars the submit still stores safely and shows a stored message. Turnstile site key and secret stay required before unpausing intake; without a site key the form shows a paused message. The Resend no-domain test sender only reaches its own account email, so it is optional and not general production email.
+
+## Backups
+
+D1 Time Travel is always on: 7 day point in time recovery on Free, 30 day on Paid, for recent history only. Longer history comes from R2 exports run by an isolated backup Worker in `backup-worker/` (own project `oasis-dev-backup`, own config, no shared bindings or routes with the app Worker). It runs daily on cron, posts a D1 export to a private R2 bucket, polls the job to completion, and verifies the objects landed. No public routes (`workers_dev` off, fetch returns 404), fail closed without its `CLOUDFLARE_API_TOKEN` secret, observability on. The private bucket keeps 90 days of exports via a 90 day expire lifecycle rule. Monthly restore drill: import the latest export into a throwaway D1 database, verify row counts, delete the throwaway, log the date in admin notes. Full runbook: `backup-worker/README.md`.
+
+## CI
+
+Checks-only workflow in `.github/workflows/ci.yml`, runs on push and pull request with Node 22: `npm ci`, typecheck, backup worker verify, server tests, build, sitemap, and a tokenless `wrangler deploy --dry-run`. It never deploys and sets no Cloudflare token.
 
 ## Do not deploy yet
 

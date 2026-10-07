@@ -75,6 +75,9 @@ Share engineering, diverge composition, palette, type, and imagery.
   the initial deploy. `oasis.pages.dev` and Pages stay out of the production
   path. The old static prototype under `Personal/oasis.dev/legacy-prototype/`
   stays archival only.
+- The backup Worker is a second project named `oasis-dev-backup` with no
+  public route (`workers_dev` off, fetch returns 404). It runs on cron only,
+  so it needs no hostname and never changes the client hostname policy above.
 
 ## 7. Stack (central app)
 
@@ -105,9 +108,17 @@ backend or real auth. Login screens and placeholder pages from it are not reused
 
 ## 9. Backup system
 
-GitHub holds all code history. D1 has hourly backups (24h) plus 30 day time travel.
-Scheduled job exports D1 to R2 weekly or daily with 30 to 90 day retention.
-Monthly restore test into a throwaway database, date logged in admin notes.
+GitHub holds all code history. D1 Time Travel is always on: 7 day point in
+time recovery on Free, 30 day on Paid. It covers recent history only. For
+longer history, a separate scheduled backup Worker (`backup-worker/`,
+project `oasis-dev-backup`) triggers a D1 export to a private R2 bucket,
+polls the export job to completion, and verifies the objects landed. The
+backup Worker has no public routes, fails closed without its API token, and
+runs with observability on. The private R2 bucket keeps 90 days of exports
+via a 90 day expire lifecycle rule. Monthly restore drill: import the latest
+export into a throwaway D1 database, verify row counts, delete the throwaway,
+and log the date in admin notes. Full runbook lives in
+`backup-worker/README.md`.
 Secrets live in Worker secrets plus one encrypted offline copy in a password manager.
 Never commit .dev.vars or secret files.
 
@@ -139,15 +150,22 @@ copy passes the copywriting clarity pass (clarity, not legal clearance). No usel
 content: public pages show status, title, one line, and the action. Working
 parameters stay in admin. Per product colors are chosen at build time, never one
 locked central accent. Inspiration sites are references only, never pixel copies.
+Sample concepts are always labeled as samples, never as client proof. See section 13.
 
 ## 13. First launch proof state
 
 - No completed business examples are available to show at launch.
 - Do not invent projects, screenshots, testimonials, client names, usage numbers,
   or case studies.
-- Do not show empty or fake portfolio cards. Add the homepage work grid only when
-  there is real work and permission to feature it. Until then, focus the page on
-  the service and the intake call to action.
+- Clearly labeled sample concepts are allowed for layout and demo, but never
+  presented as real client proof. Never present Jane Doe or any placeholder name
+  as a real client.
+- The work grid lists only approved real proof plus clearly labeled samples.
+  Each sample carries its sample concept label and never uses real business language.
+- /work stays noindex and out of the sitemap until at least one real approved
+  proof exists. Sample concepts alone do not lift the noindex.
+- Do not show empty or fake portfolio cards. Until real work with permission
+  exists, focus the page on the service and the intake call to action.
 
 ## 14. Single project root
 

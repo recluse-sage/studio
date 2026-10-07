@@ -1,0 +1,244 @@
+.section {
+  background: var(--oasis-bg);
+  border-top: 1px solid var(--oasis-border);
+}
+
+.inner {
+  max-width: var(--oasis-max-width);
+  margin: 0 auto;
+  padding: 56px 20px;
+  display: grid;
+  gap: 24px;
+}
+
+.carousel {
+  display: grid;
+  gap: 12px;
+}
+
+/* One slide visible. Track moves with transform only. */
+.viewport {
+  overflow: hidden;
+  border-radius: var(--oasis-radius-lg);
+}
+
+.track {
+  display: flex;
+  transition: transform 160ms ease;
+}
+
+.slideWrap {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+.slide {
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-lg);
+  background: var(--oasis-surface);
+  padding: 22px 20px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 220px;
+}
+
+.badges {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badgeProof,
+.badgeSample {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.badgeProof {
+  background: var(--oasis-accent-soft);
+  color: var(--oasis-accent);
+  border-color: var(--oasis-accent-border);
+}
+
+.badgeSample {
+  background: var(--oasis-warning-soft);
+  color: var(--oasis-warning);
+  border-color: var(--oasis-border-strong);
+}
+
+.slideTitle {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--oasis-text);
+}
+
+.slideBody {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.97rem;
+}
+
+.caption {
+  margin: 0;
+  font-family: var(--oasis-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--oasis-text-muted);
+}
+
+/* Controls meet 44px. Dots are real buttons with labels. */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav {
+  flex: none;
+  width: var(--oasis-touch-min);
+  height: var(--oasis-touch-min);
+  border-radius: 999px;
+  border: 1px solid var(--oasis-border-strong);
+  background: var(--oasis-surface-raised);
+  color: var(--oasis-text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 120ms ease, background-color 120ms ease, transform 120ms ease;
+}
+
+.nav:hover {
+  border-color: var(--oasis-accent);
+  background: var(--oasis-accent-soft);
+}
+
+.nav:active {
+  transform: translateY(1px);
+}
+
+.status {
+  margin: 0;
+  margin-right: auto;
+  font-family: var(--oasis-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--oasis-text-muted);
+  white-space: nowrap;
+}
+
+.dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dot {
+  width: var(--oasis-touch-min);
+  height: var(--oasis-touch-min);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.dot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--oasis-border-strong);
+  transform: translate(-50%, -50%);
+  transition: background-color 120ms ease, opacity 120ms ease;
+  opacity: 0.7;
+}
+
+.dot[data-active="true"]::after {
+  background: var(--oasis-accent);
+  opacity: 1;
+}
+
+.empty {
+  border: 1px dashed var(--oasis-border-strong);
+  border-radius: var(--oasis-radius-lg);
+  background: var(--oasis-surface);
+  padding: 24px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--oasis-text);
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.97rem;
+  max-width: 40rem;
+}
+
+.samplesHead {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.samplesTitle {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--oasis-text);
+}
+
+.samplesNote {
+  margin: 0;
+  color: var(--oasis-text-muted);
+  font-size: 0.92rem;
+  max-width: 40rem;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: 72px 24px;
+  }
+  .slide {
+    padding: 26px 24px;
+    min-height: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    transition: none;
+  }
+  .nav,
+  .dot::after {
+    transition: none;
+  }
+}

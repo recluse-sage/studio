@@ -53,6 +53,13 @@ export const AVAILABILITY_STATUSES = [
 ] as const;
 export const PROOF_PERMISSIONS = ["pending", "approved", "denied"] as const;
 
+export const PROOF_KINDS = [
+  "proof",
+  "sample-concept",
+  "ops-note",
+  "backup-drill",
+] as const;
+
 // Public intake allowlist. Any other key is treated as mass assignment.
 export const INTAKE_ALLOWED_FIELDS = [
   "businessName",
@@ -587,10 +594,11 @@ export function validateProofNoteInput(raw: unknown): {
     body: string | null;
     permissionStatus: string;
     relatedToolId: string | null;
+    kind: string;
   };
 } {
   if (!isRecord(raw)) return { ok: false, error: "Invalid note data." };
-  const allowed = ["title", "body", "permissionStatus", "relatedToolId"];
+  const allowed = ["title", "body", "permissionStatus", "relatedToolId", "kind"];
   if (findUnknownFields(raw, allowed).length > 0) {
     return { ok: false, error: "Invalid note data." };
   }
@@ -609,5 +617,50 @@ export function validateProofNoteInput(raw: unknown): {
         : null;
   if (!permissionStatus) return { ok: false, error: "Permission value is invalid." };
   const relatedToolId = cleanStr(raw.relatedToolId, 80);
-  return { ok: true, data: { title, body, permissionStatus, relatedToolId } };
+  const kind =
+    raw.kind === undefined || raw.kind === null || raw.kind === ""
+      ? "ops-note"
+      : typeof raw.kind === "string" &&
+          (PROOF_KINDS as readonly string[]).includes(raw.kind)
+        ? raw.kind
+        : null;
+  if (!kind) return { ok: false, error: "Kind value is invalid." };
+  return { ok: true, data: { title, body, permissionStatus, relatedToolId, kind } };
+}
+
+export function validateProofNotePatch(raw: unknown): {
+  ok: boolean;
+  error?: string;
+  data?: {
+    permissionStatus?: string;
+    kind?: string;
+  };
+} {
+  if (!isRecord(raw)) return { ok: false, error: "Invalid update." };
+  if (findUnknownFields(raw, ["permissionStatus", "kind"]).length > 0) {
+    return { ok: false, error: "Invalid update." };
+  }
+  const out: { permissionStatus?: string; kind?: string } = {};
+  if (raw.permissionStatus !== undefined) {
+    if (
+      typeof raw.permissionStatus !== "string" ||
+      !(PROOF_PERMISSIONS as readonly string[]).includes(raw.permissionStatus)
+    ) {
+      return { ok: false, error: "Permission value is invalid." };
+    }
+    out.permissionStatus = raw.permissionStatus;
+  }
+  if (raw.kind !== undefined) {
+    if (
+      typeof raw.kind !== "string" ||
+      !(PROOF_KINDS as readonly string[]).includes(raw.kind)
+    ) {
+      return { ok: false, error: "Kind value is invalid." };
+    }
+    out.kind = raw.kind;
+  }
+  if (out.permissionStatus === undefined && out.kind === undefined) {
+    return { ok: false, error: "Nothing to update." };
+  }
+  return { ok: true, data: out };
 }

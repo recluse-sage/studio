@@ -45,21 +45,27 @@ export function ServicesSection({ services }: ServicesSectionProps) {
           description="Pick the shape that fits. Every build starts with the same short intake."
         />
         <div className={classes.grid}>
-          {list.map((service) => (
-            <article key={service.id} className={classes.card} aria-labelledby={`${service.id}-title`}>
-              <h3 id={`${service.id}-title`} className={classes.cardTitle}>
-                {service.title}
-              </h3>
+          {list.map((service, position) => (
+            <a
+              key={service.id}
+              href={service.linkHref}
+              className={classes.card}
+            >
+              <span className={classes.cardIndex} aria-hidden="true">
+                {String(position + 1).padStart(2, "0")}
+              </span>
+              <h3 className={classes.cardTitle}>{service.title}</h3>
               <p className={classes.cardText}>{service.description}</p>
               <ul className={classes.points}>
                 {service.points.map((point) => (
                   <li key={point}>{point}</li>
                 ))}
               </ul>
-              <a href={service.linkHref} className={classes.cardLink}>
+              <span className={classes.cardLink}>
                 {service.linkLabel}
-              </a>
-            </article>
+                <span className={classes.arrow} aria-hidden="true">→</span>
+              </span>
+            </a>
           ))}
         </div>
       </div>

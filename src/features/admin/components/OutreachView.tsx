@@ -79,6 +79,26 @@ export function OutreachView({
 
   const visible = showNeedsReplyOnly ? items.filter((i) => i.needsReply ?? outreachNeedsReply(i.status)) : items;
 
+  const today = new Date().toISOString().slice(0, 10);
+  const queue = [...items]
+    .filter((i) => (i.needsReply ?? outreachNeedsReply(i.status)) || i.nextFollowUp)
+    .sort((a, b) => {
+      const aReply = (a.needsReply ?? outreachNeedsReply(a.status)) ? 0 : 1;
+      const bReply = (b.needsReply ?? outreachNeedsReply(b.status)) ? 0 : 1;
+      if (aReply !== bReply) return aReply - bReply;
+      if (a.nextFollowUp && b.nextFollowUp) return a.nextFollowUp.localeCompare(b.nextFollowUp);
+      if (a.nextFollowUp) return -1;
+      if (b.nextFollowUp) return 1;
+      return 0;
+    });
+
+  function dueLabel(row: OutreachRecord): string {
+    if (!row.nextFollowUp) return "No date set";
+    if (row.nextFollowUp < today) return `Overdue since ${row.nextFollowUp}`;
+    if (row.nextFollowUp === today) return "Due today";
+    return `Due ${row.nextFollowUp}`;
+  }
+
   function setField<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
     setFormError(null);
@@ -222,6 +242,61 @@ export function OutreachView({
           </label>
         </Group>
       ) : null}
+
+      <Card withBorder radius="lg" padding="lg" className={classes.queueCard}>
+        <Group justify="space-between" align="center" gap="sm">
+          <Title order={2} className={classes.queueTitle}>
+            Follow up queue
+          </Title>
+          <Text size="sm" className={classes.queueCount} aria-live="polite">
+            {queue.length === 0 ? "Queue is clear" : `${queue.length} waiting`}
+          </Text>
+        </Group>
+        <Text size="sm" className={classes.muted}>
+          Sorted by need and date. Update status in the list below after each contact.
+        </Text>
+        {queue.length === 0 ? (
+          <div className={classes.queueEmpty}>
+            <EmptyState
+              title="Queue is clear"
+              description="No follow ups are due. Add a business you contact to keep follow up in one place."
+            />
+          </div>
+        ) : (
+          <ol className={classes.queueList}>
+            {queue.slice(0, 6).map((row) => {
+              const overdue = Boolean(row.nextFollowUp && row.nextFollowUp < today);
+              return (
+                <li key={row.id} className={classes.queueRow}>
+                  <div className={classes.queueMain}>
+                    <Text fw={650} className={classes.business}>
+                      {row.businessName}
+                    </Text>
+                    <Text size="sm" className={classes.muted}>
+                      {dueLabel(row)}
+                      {row.channel ? ` by ${row.channel}` : ""}
+                    </Text>
+                  </div>
+                  <div className={classes.queueBadges}>
+                    {overdue ? (
+                      <Badge color="red" variant="light" size="sm">
+                        Overdue
+                      </Badge>
+                    ) : (
+                      <Badge color="yellow" variant="light" size="sm">
+                        Follow up
+                      </Badge>
+                    )}
+                    <Badge variant="light" color="gray" size="sm">
+                      {row.status}
+                    </Badge>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </Card>
 
       {visible.length === 0 ? (
         <EmptyState

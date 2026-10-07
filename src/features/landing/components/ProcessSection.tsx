@@ -1,4 +1,5 @@
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
+import { Reveal } from "./Reveal";
 import type { ProcessStep } from "../types";
 import classes from "./ProcessSection.module.css";
 
@@ -45,18 +46,25 @@ export function ProcessSection({ steps }: ProcessSectionProps) {
           description="No long calls to start. No jargon. You stay in control at each step."
         />
         <ol className={classes.list}>
-          {list.map((step) => (
-            <li key={step.id} className={classes.item}>
-              <span className={classes.index} aria-hidden="true">
-                {step.index}
-              </span>
-              <div>
-                <h3 className={classes.itemTitle}>{step.title}</h3>
-                <p className={classes.itemText}>{step.description}</p>
-              </div>
+          {list.map((step, position) => (
+            <li key={step.id} className={classes.row}>
+              <Reveal delay={Math.min(position, 3) * 70}>
+                <div className={classes.rowInner}>
+                  <span className={classes.index} aria-hidden="true">
+                    {step.index}
+                  </span>
+                  <div>
+                    <h3 className={classes.itemTitle}>{step.title}</h3>
+                    <p className={classes.itemText}>{step.description}</p>
+                  </div>
+                </div>
+              </Reveal>
             </li>
           ))}
         </ol>
+        <p className={classes.closer}>
+          Questions before you write? <a href="#intake" className={classes.closerLink}>Send the intake</a> and ask in one line.
+        </p>
       </div>
     </section>
   );

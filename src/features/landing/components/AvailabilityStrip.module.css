@@ -1,49 +1,36 @@
+/* Slim status banner. Rhythm and a divider, not a heavy card. */
 .section {
   background: var(--oasis-bg);
+  border-top: 1px solid var(--oasis-border);
 }
 
 .inner {
   max-width: var(--oasis-max-width);
   margin: 0 auto;
-  padding: 24px 20px;
-}
-
-.card {
-  border: 1px solid var(--oasis-border);
-  border-radius: var(--oasis-radius-lg);
-  background: var(--oasis-surface);
-  padding: 22px 20px;
+  padding: 32px 20px;
   display: grid;
-  gap: 16px;
+  gap: 14px;
+  justify-items: start;
 }
 
-.eyebrow {
-  margin: 0;
-  font-family: var(--oasis-font-mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--oasis-text-muted);
+.text {
+  display: grid;
+  gap: 6px;
 }
 
 .title {
-  margin: 6px 0 0;
+  margin: 0;
   font-family: var(--oasis-font-display);
-  font-size: 1.5rem;
-  line-height: 1.2;
+  font-weight: 600;
+  font-size: 1.4rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   color: var(--oasis-text);
-}
-
-.body {
-  display: grid;
-  gap: 10px;
-  align-content: start;
-  justify-items: start;
 }
 
 .window {
   margin: 0;
-  font-weight: 650;
+  font-weight: 600;
   color: var(--oasis-text);
 }
 
@@ -51,14 +38,16 @@
   margin: 0;
   color: var(--oasis-text-secondary);
   font-size: 0.95rem;
+  max-width: 40rem;
 }
 
 .link {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   min-height: var(--oasis-touch-min);
   color: var(--oasis-accent);
-  font-weight: 650;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -66,14 +55,14 @@
   text-decoration: underline;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 768px) {
   .inner {
-    padding: 32px 24px;
+    padding: 36px 24px;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
   }
-  .card {
-    grid-template-columns: 1fr 1.2fr;
-    gap: 28px;
-    padding: 28px;
-    align-items: start;
+  .link {
+    justify-self: end;
   }
 }

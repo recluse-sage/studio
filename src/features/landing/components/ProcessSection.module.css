@@ -1,3 +1,4 @@
+/* Process uses rhythm, not boxes. Open rows with dividers and space. */
 .section {
   background: var(--oasis-surface);
   border-top: 1px solid var(--oasis-border);
@@ -7,9 +8,9 @@
 .inner {
   max-width: var(--oasis-max-width);
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 56px 20px;
   display: grid;
-  gap: 24px;
+  gap: 32px;
 }
 
 .list {
@@ -17,56 +18,85 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 14px;
+  gap: 0;
 }
 
-.item {
+.row {
+  border-top: 1px solid var(--oasis-border);
+  padding: 22px 0;
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--oasis-border);
+}
+
+.rowInner {
   display: flex;
-  gap: 14px;
+  gap: 18px;
   align-items: flex-start;
-  border: 1px solid var(--oasis-border);
-  border-radius: var(--oasis-radius-md);
-  background: var(--oasis-surface-raised);
-  padding: 18px;
 }
 
 .index {
   font-family: var(--oasis-font-mono);
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   color: var(--oasis-accent);
-  border: 1px solid var(--oasis-accent-border);
-  background: var(--oasis-accent-soft);
-  border-radius: 8px;
-  padding: 4px 8px;
   flex: none;
+  padding-top: 3px;
+  min-width: 2.5ch;
 }
 
 .itemTitle {
   margin: 0;
-  font-size: 1.02rem;
+  font-family: var(--oasis-font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
   color: var(--oasis-text);
 }
 
 .itemText {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   color: var(--oasis-text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.97rem;
+  max-width: 38rem;
 }
 
-@media (min-width: 860px) {
+.closer {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.97rem;
+}
+
+.closerLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--oasis-touch-min);
+  color: var(--oasis-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.closerLink:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
   .inner {
-    padding: 64px 24px;
-    gap: 28px;
+    padding: 72px 24px;
   }
   .list {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    column-gap: 48px;
+  }
+  .row:nth-last-child(2) {
+    border-bottom: 1px solid var(--oasis-border);
   }
 }
 
-@media (min-width: 1100px) {
-  .list {
-    grid-template-columns: repeat(4, 1fr);
+@media (min-width: 1280px) {
+  .rowInner {
+    gap: 22px;
   }
 }

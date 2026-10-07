@@ -1,0 +1,37 @@
+{
+  // Isolated backup Worker config. Separate project from the app Worker.
+  // The app `wrangler.jsonc` (project `oasis-dev`) is untouched.
+  // Deploy with: wrangler deploy --config backup-worker/wrangler.jsonc
+  // Secret with: wrangler secret put CLOUDFLARE_API_TOKEN --config backup-worker/wrangler.jsonc
+  "$schema": "https://developers.cloudflare.com/schemas/wrangler.jsonc.json",
+  "name": "oasis-dev-backup",
+  "main": "backup.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // No public URL. Exports run from cron only; fetch returns 404.
+  "workers_dev": false,
+  "triggers": {
+    // Daily D1 export to R2 at 02:17 UTC.
+    "crons": ["17 2 * * *"]
+  },
+  "r2_buckets": [
+    {
+      // Private backup bucket. No public access, no custom domain.
+      // Set a 90 day expire lifecycle rule on this bucket (see backup-worker/README.md).
+      "binding": "BACKUP_BUCKET",
+      "bucket_name": "oasis-dev-backups"
+    }
+  ],
+  "vars": {
+    // Plain vars only. Fill before the first deploy. The API token is a
+    // secret and is never stored here.
+    "BACKUP_PREFIX": "d1-exports",
+    "BACKUP_R2_BUCKET": "oasis-dev-backups",
+    "CLOUDFLARE_ACCOUNT_ID": "6696ca851c18c8270812bb36c925f2a4",
+    "D1_DATABASE_ID": "8b599148-6416-4087-8c48-0c029b84e140"
+  },
+  // Secrets (never in this file):
+  // CLOUDFLARE_API_TOKEN via `wrangler secret put` (D1 export plus R2 write
+  // scope for the backup bucket only).
+  "observability": { "enabled": true }
+}

@@ -1,8 +1,10 @@
 // Phase-one API contract for UI integration.
 // Public: POST /api/intakes -> 201 IntakePublicResponse, 400, 429, 503.
-// Public: GET /api/public/availability -> 200 AvailabilityPublicResponse.
-// Private (Access JWT required): all /api/admin/* need Cf-Access-Jwt-Assertion.
-// GET /api/admin/overview -> 200 AdminOverviewResponse with outreachNeedingReply.
+// Public: GET /api/public/availability -> 200 AvailabilityPublicResponse, public max-age 60.
+// Public: GET /api/public/work-items -> 200 WorkItemsResponse with approved proof plus labeled samples only, kind on every item, public max-age 60.
+// Private (Access JWT required): all /api/admin/* need Cf-Access-Jwt-Assertion and return private no-store.
+// GET /api/admin/overview -> 200 AdminOverviewResponse with outreachNeedingReply, lastBackupDrillAt, overdueFollowUps.
+// GET /api/admin/system -> 200 AdminSystemResponse with presence booleans only, never secret values.
 // GET /api/admin/intakes?status=&limit=&offset= -> 200 PagedResponse IntakeRecord.
 // POST /api/admin/intakes manual entry, source admin-manual, no Turnstile.
 // PATCH /api/admin/intakes/:id {status} -> 200 {id, status}.
@@ -13,14 +15,18 @@
 // Tools include businessName, showcaseStatus, and isAvailable flag.
 // GET, PUT /api/admin/availability -> 200 AvailabilityAdminResponse.
 // GET /api/admin/usage?toolKey=&limit=&offset= -> 200 PagedResponse aggregates only.
-// GET, POST /api/admin/proof-notes -> 200 PagedResponse.
+// GET, POST /api/admin/proof-notes -> 200 PagedResponse with kind on every item. POST accepts optional kind, default ops-note.
+// PATCH /api/admin/proof-notes/:id permission transitions only, writes proof.update audit with before and after.
+// Proof kinds: proof, sample-concept, ops-note, backup-drill.
 // All list APIs return {items, total, limit, offset}.
 // Errors are always {error, code?} with no stack traces.
 
 export const API_ROUTES = {
   publicIntake: "POST /api/intakes",
   publicAvailability: "GET /api/public/availability",
+  publicWorkItems: "GET /api/public/work-items",
   overview: "GET /api/admin/overview",
+  system: "GET /api/admin/system",
   intakesList: "GET /api/admin/intakes",
   intakeManualCreate: "POST /api/admin/intakes",
   intakeUpdate: "PATCH /api/admin/intakes/:id",
@@ -35,4 +41,5 @@ export const API_ROUTES = {
   usageRead: "GET /api/admin/usage",
   proofList: "GET /api/admin/proof-notes",
   proofCreate: "POST /api/admin/proof-notes",
+  proofUpdate: "PATCH /api/admin/proof-notes/:id",
 } as const;

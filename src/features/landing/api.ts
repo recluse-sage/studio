@@ -3,10 +3,13 @@ import type {
   BusinessType,
   ContactMethod,
   IntakeFormValues,
+  WorkItem,
+  WorkItemKind,
 } from "./types";
 
 export const DEFAULT_INTAKE_ENDPOINT = "/api/intakes";
 export const DEFAULT_PUBLIC_AVAILABILITY_ENDPOINT = "/api/public/availability";
+export const DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT = "/api/public/work-items";
 
 export type EmailNotificationState = "pending" | "sent" | "failed";
 
@@ -138,6 +141,48 @@ export async function submitIntake(
   }
 }
 
+/**
+ * GET public work items. Returns approved real proof plus labeled samples.
+ * Every item carries kind so the UI can badge samples honestly.
+ * Returns an empty list when the request fails. Never invents proof.
+ */
+export async function fetchPublicWorkItems(
+  endpoint: string = DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT,
+  signal?: AbortSignal,
+): Promise<{ items: WorkItem[]; total: number }> {
+  const empty = { items: [], total: 0 };
+  try {
+    const res = await fetch(endpoint, { signal });
+    if (!res.ok) return empty;
+    const raw = (await res.json()) as {
+      items?: Array<Record<string, unknown>>;
+      total?: number;
+    };
+    if (!raw || !Array.isArray(raw.items)) return empty;
+    const items: WorkItem[] = [];
+    for (const r of raw.items) {
+      if (!r || typeof r !== "object") continue;
+      const kind: WorkItemKind =
+        r.kind === "proof" || r.kind === "sample-concept" ? r.kind : "sample-concept";
+      if (typeof r.id !== "string" || typeof r.title !== "string") continue;
+      // Only the two public kinds may render. Anything else is skipped so it
+      // can never appear as real proof or as an unlabeled sample.
+      if (r.kind !== "proof" && r.kind !== "sample-concept") continue;
+      items.push({
+        id: r.id,
+        title: r.title,
+        body: typeof r.body === "string" ? r.body : null,
+        kind,
+        relatedToolId: typeof r.relatedToolId === "string" ? r.relatedToolId : null,
+        createdAt: typeof r.createdAt === "string" ? r.createdAt : null,
+        updatedAt: typeof r.updatedAt === "string" ? r.updatedAt : null,
+      });
+    }
+    return { items, total: items.length };
+  } catch {
+    return empty;
+  }
+}
 /**
  * GET public availability. Exposes only status, label, nextWindow, note.
  * Returns null when capacity is not configured or the request fails.

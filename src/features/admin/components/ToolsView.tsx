@@ -58,6 +58,7 @@ export function ToolsView({
   onUpdate,
 }: ToolsViewProps) {
   const [showAdd, setShowAdd] = useState(false);
+  const [checks, setChecks] = useState<boolean[]>([false, false, false, false, false]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     businessName: "",
@@ -70,6 +71,19 @@ export function ToolsView({
     availabilityNote: "",
     showcaseStatus: "private" as ShowcaseStatus,
   });
+  const checklistItems = [
+    "Tool opens on a phone and loads without errors",
+    "Contact tap reaches the right number or handle",
+    "Availability note matches current capacity",
+    "Showcase permission stays private until approved",
+    "Backup check is logged in Proof Notes with the date",
+  ];
+  const checksDone = checks.filter(Boolean).length;
+  const checksComplete = checksDone === checklistItems.length;
+
+  function toggleCheck(index: number) {
+    setChecks((prev) => prev.map((v, i) => (i === index ? !v : v)));
+  }
   const [formError, setFormError] = useState<string | null>(null);
   const [createdOk, setCreatedOk] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
@@ -190,6 +204,49 @@ export function ToolsView({
           Publishing a business name, logo, or case study needs clear permission first. Keep showcase status private until the owner approves.
         </Text>
       </div>
+
+      <Card withBorder radius="lg" padding="lg" className={classes.checkCard}>
+        <Group justify="space-between" align="center" gap="sm">
+          <Title order={2} className={classes.checkTitle}>
+            Launch and backup checklist
+          </Title>
+          <Text size="sm" className={classes.checkCount} aria-live="polite">
+            {checksDone} of {checklistItems.length} checked
+          </Text>
+        </Group>
+        <Text size="sm" className={classes.muted}>
+          Run this before marking a tool active. Checks stay on this device and are not saved to the server.
+        </Text>
+        <ul className={classes.checkList}>
+          {checklistItems.map((label, index) => {
+            const id = `launch-check-${index}`;
+            const checked = checks[index];
+            return (
+              <li key={id} className={classes.checkRow} data-checked={checked ? "true" : "false"}>
+                <input
+                  id={id}
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleCheck(index)}
+                  className={classes.checkBox}
+                />
+                <label htmlFor={id} className={classes.checkLabel}>
+                  {label}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+        {checksComplete ? (
+          <Alert color="green" variant="light" role="status">
+            Checklist complete. You can mark the tool active when the work is done.
+          </Alert>
+        ) : (
+          <Text size="sm" className={classes.muted}>
+            Tip: log the backup check in Proof Notes with the date before launch.
+          </Text>
+        )}
+      </Card>
 
       {onCreate ? (
         <Card withBorder radius="md" padding="md" className={classes.rowCard}>

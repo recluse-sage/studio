@@ -8,9 +8,11 @@ import { AvailabilityView } from "./components/AvailabilityView";
 import { UsageView } from "./components/UsageView";
 import { ProofNotesView } from "./components/ProofNotesView";
 import { SettingsView } from "./components/SettingsView";
+import type { PlannerFacts } from "../../shared/planner";
 import type {
   AdminCounts,
   AdminIntakeCreateInput,
+  AdminSystemPresence,
   AdminViewId,
   AvailabilityState,
   DeniedStatus,
@@ -35,6 +37,7 @@ export type AdminPageProps = {
   tools?: ToolRecord[];
   usage: UsageRow[];
   proofNotes: ProofNote[];
+  system?: AdminSystemPresence | null;
   loading?: boolean;
   error?: string | null;
   denied?: DeniedStatus | null;
@@ -77,6 +80,7 @@ export function AdminPage({
   tools = [],
   usage,
   proofNotes,
+  system = null,
   loading = false,
   error = null,
   denied = null,
@@ -114,6 +118,22 @@ export function AdminPage({
     }
   }
 
+  const siteUrlConfigured = (publicSiteUrl ?? "").trim().length > 0;
+  const plannerFacts: PlannerFacts | undefined = system
+    ? {
+        d1Ok: system.d1Ok,
+        turnstileConfigured: system.turnstileConfigured,
+        accessConfigured: system.accessConfigured,
+        siteUrlConfigured,
+        lastBackupDrillAt: counts.lastBackupDrillAt ?? null,
+        newIntakes: counts.newIntakes,
+        overdueFollowUps: counts.overdueFollowUps ?? 0,
+        outreachNeedingReply: counts.outreachNeedingReply,
+        pendingProofNotes: proofNotes.filter((note) => note.permissionStatus === "pending").length,
+        availabilityConfigured: availability !== null,
+      }
+    : undefined;
+
   return (
     <AdminShell active={view} onNavigate={setView} counts={counts} ownerEmail={ownerEmail}>
       {view === "dashboard" ? (
@@ -121,12 +141,17 @@ export function AdminPage({
           availability={availability}
           counts={counts}
           recentIntakes={intakes}
+          outreach={outreach}
+          tools={tools}
+          proofNotes={proofNotes}
+          plannerFacts={plannerFacts}
           loading={loading}
           error={error}
           denied={denied}
           onRetry={onRetry}
           onSaveNote={onSaveProofNote ? handleDashboardNote : undefined}
           onViewIntake={() => setView("intake")}
+          onNavigate={setView}
         />
       ) : null}
 

@@ -20,9 +20,69 @@
 }
 
 .cardTitle {
+  font-family: var(--oasis-font-display);
   font-size: 1.05rem;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   color: var(--oasis-text);
+}
+
+.listTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.05rem;
+  margin: 8px 0 0;
+  color: var(--oasis-text);
+}
+
+.muted {
+  color: var(--oasis-text-secondary);
+  line-height: 1.55;
+}
+
+.sectionLabel {
+  margin: 16px 0 0;
+  color: var(--oasis-text);
+}
+
+.sampleGrid {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+
+.sampleCard {
+  border: 1px dashed var(--oasis-border-strong);
+  border-radius: 12px;
+  background: var(--oasis-surface-raised);
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.sampleFlag {
+  font-family: var(--oasis-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--oasis-text-muted);
+}
+
+.sampleNote {
+  color: var(--oasis-text-muted);
+  line-height: 1.5;
+}
+
+.studioEmpty {
+  margin-top: 10px;
+}
+
+.reviewCard {
+  border: 1px solid var(--oasis-border);
+  border-radius: 12px;
+  background: var(--oasis-surface-raised);
+  padding: 12px;
+  display: grid;
+  gap: 6px;
 }
 
 .form {
@@ -64,4 +124,10 @@
   color: var(--oasis-text-secondary);
   margin-top: 4px;
   line-height: 1.55;
+}
+
+@media (min-width: 640px) {
+  .sampleGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

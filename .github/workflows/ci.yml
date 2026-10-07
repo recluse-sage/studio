@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Backup worker verify
+        run: npm run backup:verify
+
+      - name: Server tests
+        run: npm run test:server
+
+      - name: Build
+        run: npm run build
+
+      - name: Sitemap
+        run: npm run sitemap
+
+      # Dry run only. No Cloudflare token is set here and nothing is deployed.
+      - name: Wrangler dry run
+        run: npx wrangler deploy --dry-run

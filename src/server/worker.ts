@@ -7,9 +7,11 @@ import {
   handleAdminOutreach,
   handleAdminOverview,
   handleAdminProofNotes,
+  handleAdminSystem,
   handleAdminTools,
   handleAdminUsage,
   handlePublicAvailability,
+  handlePublicWorkItems,
 } from "./handlers/admin.ts";
 
 // Single integration entry for the Worker entrypoint.
@@ -30,8 +32,14 @@ export async function handleApiRequest(
   if (path === "/api/public/availability") {
     return handlePublicAvailability(request, env);
   }
+  if (path === "/api/public/work-items") {
+    return handlePublicWorkItems(request, env);
+  }
   if (path === "/api/admin/overview") {
     return handleAdminOverview(request, env);
+  }
+  if (path === "/api/admin/system") {
+    return handleAdminSystem(request, env);
   }
   if (path.startsWith("/api/admin/availability")) {
     return handleAdminAvailability(request, env);

@@ -306,28 +306,30 @@ export function IntakeForm({
             />
           </div>
 
-          <div className={classes.field} id="intake-verification" tabIndex={-1}>
+          <div className={`${classes.field} ${classes.verify}`} id="intake-verification" tabIndex={-1}>
             <span className={classes.label} id="intake-verification-label">
-              Verification <span aria-hidden="true">*</span>
+              Verification <span aria-hidden="true" className={classes.required}>*</span>
             </span>
             {hasSiteKey ? (
-              <TurnstileWidget
-                key={widgetKey}
-                siteKey={siteKey}
-                onToken={(t) => {
-                  setToken(t);
-                  setTokenError(null);
-                }}
-                onExpired={() => setToken("")}
-                onError={() => setToken("")}
-              />
+              <div className={classes.turnstileBox}>
+                <TurnstileWidget
+                  key={widgetKey}
+                  siteKey={siteKey}
+                  onToken={(t) => {
+                    setToken(t);
+                    setTokenError(null);
+                  }}
+                  onExpired={() => setToken("")}
+                  onError={() => setToken("")}
+                />
+              </div>
             ) : (
-              <p role="status">
+              <p role="status" className={classes.verifyNote}>
                 Verification is not set up yet. Intake is paused until the owner adds a site key.
               </p>
             )}
             {tokenError ? (
-              <span role="alert">{tokenError}</span>
+              <span role="alert" className={classes.fieldError}>{tokenError}</span>
             ) : null}
           </div>
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import classes from "./TurnstileWidget.module.css";
 
 export type TurnstileWidgetHandle = {
   reset: () => void;
@@ -132,31 +133,32 @@ export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: Turnst
 
   if (!siteKey) {
     return (
-      <div role="status" aria-live="polite">
-        <p>Verification is not set up yet. Intake is paused until the owner adds a site key.</p>
+      <div role="status" aria-live="polite" className={classes.wrap}>
+        <p className={classes.note}>Verification is not set up yet. Intake is paused until the owner adds a site key.</p>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className={classes.wrap}>
       <div
         ref={boxRef}
         aria-label="Spam verification"
         aria-busy={loadState === "loading"}
       />
       {loadState === "loading" ? (
-        <p role="status" aria-live="polite">
+        <p role="status" aria-live="polite" className={classes.note}>
           Loading verification.
         </p>
       ) : null}
       {loadState === "failed" ? (
-        <p role="alert">
+        <p role="alert" className={classes.note}>
           Verification could not load. Check your connection and reload the page.
         </p>
       ) : null}
       <button
         type="button"
+        className={classes.reset}
         onClick={() => {
           onTokenRef.current("");
           handleReset();

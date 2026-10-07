@@ -1,0 +1,326 @@
+.section {
+  background: var(--oasis-surface);
+  border-top: 1px solid var(--oasis-border);
+  border-bottom: 1px solid var(--oasis-border);
+}
+
+.inner {
+  max-width: var(--oasis-max-width);
+  margin: 0 auto;
+  padding: 56px 20px;
+  display: grid;
+  gap: 24px;
+}
+
+/* Tab row scrolls sideways on small phones. Every tab meets 44px. */
+.tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+  flex: none;
+  min-height: var(--oasis-touch-min);
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--oasis-border-strong);
+  background: var(--oasis-surface-raised);
+  color: var(--oasis-text-secondary);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.tab:hover {
+  border-color: var(--oasis-accent);
+  color: var(--oasis-text);
+}
+
+.tab:active {
+  transform: translateY(1px);
+}
+
+.tab[data-active="true"] {
+  background: var(--oasis-accent);
+  border-color: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+}
+
+.panel {
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-xl);
+  background: var(--oasis-surface-raised);
+  box-shadow: var(--oasis-card-shadow);
+  padding: 22px 20px;
+  max-width: 760px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: oasis-tool-in 160ms ease both;
+}
+
+@keyframes oasis-tool-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool {
+  display: grid;
+  gap: 16px;
+}
+
+.toolIntro {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.97rem;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 0.93rem;
+  color: var(--oasis-text);
+}
+
+.input {
+  background: var(--oasis-bg);
+  border: 1px solid var(--oasis-border-strong);
+  border-radius: var(--oasis-radius-md);
+  color: var(--oasis-text);
+  min-height: var(--oasis-touch-min);
+  padding: 10px 14px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.input:focus {
+  border-color: var(--oasis-accent);
+  box-shadow: 0 0 0 3px var(--oasis-accent-soft);
+  outline: none;
+}
+
+.row {
+  display: grid;
+  gap: 16px;
+}
+
+.checkGroup,
+.quizGroup {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--oasis-touch-min);
+  padding: 8px 12px;
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-bg);
+  color: var(--oasis-text-secondary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.checkRow:hover {
+  border-color: var(--oasis-accent-border);
+}
+
+.checkRow input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  accent-color: var(--oasis-accent);
+}
+
+.quizRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.quizOption {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: var(--oasis-touch-min);
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-bg);
+  color: var(--oasis-text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.quizOption:has(input:checked) {
+  border-color: var(--oasis-accent);
+  background: var(--oasis-accent-soft);
+  color: var(--oasis-text);
+}
+
+.quizOption input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--oasis-accent);
+}
+
+.fieldError {
+  margin: 0;
+  color: var(--oasis-danger);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.check {
+  min-height: var(--oasis-touch-min);
+  padding: 10px 20px;
+  border-radius: var(--oasis-radius-md);
+  border: 1px solid var(--oasis-accent);
+  background: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+
+.check:hover {
+  background: var(--oasis-accent-strong);
+  border-color: var(--oasis-accent-strong);
+}
+
+.check:active {
+  transform: translateY(1px);
+}
+
+.reset {
+  min-height: var(--oasis-touch-min);
+  padding: 10px 18px;
+  border-radius: var(--oasis-radius-md);
+  border: 1px solid var(--oasis-border-strong);
+  background: transparent;
+  color: var(--oasis-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.reset:hover {
+  border-color: var(--oasis-accent);
+  background: var(--oasis-accent-soft);
+}
+
+.empty {
+  margin: 0;
+  border: 1px dashed var(--oasis-border-strong);
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-surface);
+  color: var(--oasis-text-muted);
+  font-size: 0.92rem;
+  padding: 14px 16px;
+}
+
+.result {
+  border: 1px solid var(--oasis-accent-border);
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-accent-soft);
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  animation: oasis-tool-in 160ms ease both;
+}
+
+.resultTitle {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--oasis-text);
+}
+
+.resultList {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  color: var(--oasis-text-secondary);
+  font-size: 0.95rem;
+}
+
+.next {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.95rem;
+}
+
+.intakeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--oasis-touch-min);
+  color: var(--oasis-accent);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.intakeLink:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 720px) {
+  .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .panel {
+    padding: 28px 26px;
+  }
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: 72px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .result {
+    animation: none;
+  }
+  .tab,
+  .check,
+  .reset {
+    transition: none;
+  }
+}

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { useState } from "react";
-import { Badge, Burger, NavLink } from "@mantine/core";
+import { useEffect, useRef, useState } from "react";
+import { Badge, Burger } from "@mantine/core";
 import { ColorSchemeToggle } from "../../../components/ColorSchemeToggle/ColorSchemeToggle";
 import type { AdminCounts, AdminViewId } from "../types";
 import classes from "./AdminShell.module.css";
@@ -22,6 +22,7 @@ type NavItem = {
 
 export function AdminShell({ active, onNavigate, counts, ownerEmail, children }: AdminShellProps) {
   const [open, setOpen] = useState(false);
+  const burgerRef = useRef<HTMLButtonElement | null>(null);
 
   const items: NavItem[] = [
     { id: "dashboard", label: "Dashboard", hint: "Status and next actions" },
@@ -34,19 +35,44 @@ export function AdminShell({ active, onNavigate, counts, ownerEmail, children }:
     { id: "settings", label: "Settings", hint: "Access and inbox rules" },
   ];
 
+  function focusMain() {
+    requestAnimationFrame(() => {
+      document.getElementById("admin-main")?.focus({ preventScroll: true });
+    });
+  }
+
   function go(view: AdminViewId) {
+    if (view === active) {
+      setOpen(false);
+      return;
+    }
     onNavigate(view);
     setOpen(false);
+    focusMain();
   }
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        burgerRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open ]);
 
   return (
     <div className={classes.shell}>
       <a href="#admin-main" className={classes.skip}>
         Skip to admin content
       </a>
+
       <header className={classes.header}>
         <div className={classes.headerInner}>
           <Burger
+            ref={burgerRef}
             opened={open}
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close admin menu" : "Open admin menu"}
@@ -68,47 +94,72 @@ export function AdminShell({ active, onNavigate, counts, ownerEmail, children }:
             <ColorSchemeToggle labelLight="Switch admin to light theme" labelDark="Switch admin to dark theme" />
           </div>
         </div>
-        {open ? (
-          <nav id="oasis-admin-nav" className={classes.mobileNav} aria-label="Admin">
+
+        <nav
+          id="oasis-admin-nav"
+          className={classes.mobileNav}
+          aria-label="Admin"
+          data-open={open ? "true" : "false"}
+          hidden={!open}
+        >
+          <ul className={classes.mobileList}>
             {items.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => go(item.id)}
-                aria-current={active === item.id ? "page" : undefined}
-                className={classes.mobileLink}
-                data-active={active === item.id ? "true" : "false"}
-              >
-                <span>{item.label}</span>
-                {typeof item.badge === "number" && item.badge > 0 ? (
-                  <span className={classes.mobileBadge}>{item.badge}</span>
-                ) : null}
-              </button>
+              <li key={item.id}>
+                <button
+                  type="button"
+                  onClick={() => go(item.id)}
+                  aria-current={active === item.id ? "page" : undefined}
+                  className={classes.mobileLink}
+                  data-active={active === item.id ? "true" : "false"}
+                >
+                  <span className={classes.mobileLabel}>
+                    <span className={classes.mobileName}>{item.label}</span>
+                    <span className={classes.mobileHint}>{item.hint}</span>
+                  </span>
+                  {typeof item.badge === "number" && item.badge > 0 ? (
+                    <span className={classes.mobileBadge} aria-label={`${item.badge} needing attention`}>
+                      {item.badge}
+                    </span>
+                  ) : null}
+                </button>
+              </li>
             ))}
-          </nav>
-        ) : null}
+          </ul>
+        </nav>
       </header>
 
       <div className={classes.body}>
         <nav className={classes.sideNav} aria-label="Admin">
+          <div className={classes.sideBrand}>
+            <p className={classes.sideTitle}>Oasis Admin</p>
+            <p className={classes.sideSub}>Private. Owner only.</p>
+          </div>
           <ul className={classes.navList}>
             {items.map((item) => (
               <li key={item.id}>
-                <NavLink
-                  label={item.label}
-                  description={item.hint}
-                  active={active === item.id}
+                <button
+                  type="button"
                   onClick={() => go(item.id)}
                   aria-current={active === item.id ? "page" : undefined}
-                  className={classes.navLink}
-                  rightSection={
-                    typeof item.badge === "number" && item.badge > 0 ? (
-                      <Badge size="sm" variant="light" color="gray" aria-label={`${item.badge} needing attention`}>
-                        {item.badge}
-                      </Badge>
-                    ) : undefined
-                  }
-                />
+                  className={classes.navButton}
+                  data-active={active === item.id ? "true" : "false"}
+                >
+                  <span className={classes.navText}>
+                    <span className={classes.navName}>{item.label}</span>
+                    <span className={classes.navHint}>{item.hint}</span>
+                  </span>
+                  {typeof item.badge === "number" && item.badge > 0 ? (
+                    <Badge
+                      size="sm"
+                      variant="light"
+                      color="gray"
+                      aria-label={`${item.badge} needing attention`}
+                      className={classes.navBadge}
+                    >
+                      {item.badge}
+                    </Badge>
+                  ) : null}
+                </button>
               </li>
             ))}
           </ul>

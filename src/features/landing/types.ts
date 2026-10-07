@@ -84,3 +84,17 @@ export type LandingPageProps = {
   intakeEndpoint?: string;
   turnstileSiteKey?: string;
 };
+
+/* Public proof. Only approved rows from GET /api/public/work-items. */
+
+export type WorkItemKind = "proof" | "sample-concept";
+
+export type WorkItem = {
+  id: string;
+  title: string;
+  body: string | null;
+  kind: WorkItemKind;
+  relatedToolId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};

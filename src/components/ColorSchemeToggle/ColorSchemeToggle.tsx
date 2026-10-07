@@ -1,4 +1,4 @@
-import { ActionIcon, useMantineColorScheme } from "@mantine/core";
+import { useMantineColorScheme } from "@mantine/core";
 import classes from "./ColorSchemeToggle.module.css";
 
 export type ColorSchemeToggleProps = {
@@ -6,7 +6,11 @@ export type ColorSchemeToggleProps = {
   labelDark?: string;
 };
 
-/** Small light and dark switch. Labels keep it clear for keyboard and screen readers. */
+/**
+ * Custom light and dark switch. A native button keeps keyboard,
+ * focus, and screen reader behavior. Motion is a short thumb slide
+ * with an opacity crossfade, disabled under reduced motion.
+ */
 export function ColorSchemeToggle({
   labelLight = "Switch to light theme",
   labelDark = "Switch to dark theme",
@@ -15,17 +19,20 @@ export function ColorSchemeToggle({
   const isDark = colorScheme === "dark";
 
   return (
-    <ActionIcon
-      variant="outline"
-      size="lg"
+    <button
+      type="button"
       aria-label={isDark ? labelLight : labelDark}
       title={isDark ? labelLight : labelDark}
+      aria-pressed={isDark}
+      data-state={isDark ? "dark" : "light"}
       onClick={() => setColorScheme(isDark ? "light" : "dark")}
       className={classes.toggle}
     >
-      <span aria-hidden="true" className={classes.glyph}>
-        {isDark ? "☾" : "☀"}
+      <span aria-hidden="true" className={classes.track}>
+        <span className={classes.sun}>{"\u2600"}</span>
+        <span className={classes.moon}>{"\u263E"}</span>
+        <span className={classes.thumb} />
       </span>
-    </ActionIcon>
+    </button>
   );
 }

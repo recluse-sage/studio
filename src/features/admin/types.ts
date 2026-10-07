@@ -123,7 +123,9 @@ export type ToolCreateInput = {
 
 export type ToolUpdateInput = Partial<ToolCreateInput>;
 
-export type AvailabilityStatus = "open" | "limited" | "booked";
+/* Server value space is open, limited, waitlist, paused, and closed.
+   Booked stays as a legacy client value so existing tone mapping keeps working. */
+export type AvailabilityStatus = "open" | "limited" | "booked" | "waitlist" | "paused" | "closed";
 
 export type AvailabilityState = {
   status: AvailabilityStatus;
@@ -164,15 +166,27 @@ export type AdminCounts = {
   newIntakes: number;
   outreachNeedingReply: number;
   activeBuilds: number;
+  lastBackupDrillAt: string | null;
+  overdueFollowUps: number;
 };
 
 export type AdminOverview = {
   newIntakes: number;
   outreachNeedingReply: number;
   activeBuilds: number;
+  lastBackupDrillAt: string | null;
+  overdueFollowUps: number;
+  pendingProofNotes?: number;
   intakesByStatus?: Record<string, number>;
   outreachByStatus?: Record<string, number>;
   toolsByStatus?: Record<string, number>;
+};
+
+/** Presence booleans from GET /api/admin/system. Never carries secret values. */
+export type AdminSystemPresence = {
+  d1Ok: boolean;
+  turnstileConfigured: boolean;
+  accessConfigured: boolean;
 };
 
 export type PagedResponse<T> = {

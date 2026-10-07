@@ -1,14 +1,23 @@
-import { json, nowIso, safeError, type OasisEnv } from "../env.ts";
+import {
+  adminError,
+  adminJson,
+  nowIso,
+  publicError,
+  publicJson,
+  type OasisEnv,
+} from "../env.ts";
 import { auditActor, verifyAccessJwt } from "../access.ts";
 import { insertAudit, newId, parsePaging } from "../db.ts";
 import {
   INTAKE_STATUSES,
   OUTREACH_STATUSES,
+  PROOF_KINDS,
   SHOWCASE_STATUSES,
   validateAvailabilityInput,
   validateManualIntakeInput,
   validateOutreachInput,
   validateProofNoteInput,
+  validateProofNotePatch,
   validateToolInput,
   findUnknownFields,
 } from "../validation.ts";
@@ -24,7 +33,7 @@ async function requireAdmin(
   if (!check.ok) {
     const status = check.status || 401;
     return {
-      denied: safeError(
+      denied: adminError(
         check.error || "Not authorized.",
         status,
         status === 503 ? "not-configured" : "unauthorized",
@@ -118,12 +127,35 @@ function rowToUsage(r: Record<string, unknown>): unknown {
   };
 }
 
+function proofKindOf(v: unknown): string {
+  if (
+    typeof v === "string" &&
+    (PROOF_KINDS as readonly string[]).includes(v)
+  ) {
+    return v;
+  }
+  return "ops-note";
+}
+
 function rowToProof(r: Record<string, unknown>): unknown {
   return {
     id: r.id,
     title: r.title,
     body: r.body ?? null,
     permissionStatus: r.permission_status,
+    relatedToolId: r.related_tool_id ?? null,
+    kind: proofKindOf(r.kind),
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+function rowToWorkItem(r: Record<string, unknown>): unknown {
+  return {
+    id: r.id,
+    title: r.title,
+    body: r.body ?? null,
+    kind: proofKindOf(r.kind),
     relatedToolId: r.related_tool_id ?? null,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
@@ -145,7 +177,7 @@ export async function handleAdminOverview(
 ): Promise<Response> {
   const gate = await requireAdmin(request, env);
   if ("denied" in gate) return gate.denied;
-  if (request.method !== "GET") return safeError("Method not allowed.", 405);
+  if (request.method !== "GET") return adminError("Method not allowed.", 405);
   try {
     const intakeRows = await env.DB.prepare(
       "SELECT status, COUNT(*) AS n FROM intakes GROUP BY status",
@@ -177,12 +209,35 @@ export async function handleAdminOverview(
     )
       .bind()
       .first<{ n: number }>();
+    let lastBackupDrillAt: string | null = null;
+    try {
+      const drill = await env.DB.prepare(
+        "SELECT MAX(created_at) AS m FROM proof_notes WHERE kind = 'backup-drill'",
+      )
+        .bind()
+        .first<{ m: string | null }>();
+      lastBackupDrillAt =
+        drill && typeof drill.m === "string" ? drill.m : null;
+    } catch {
+      lastBackupDrillAt = null;
+    }
+    let overdueFollowUps = 0;
+    try {
+      const overdue = await env.DB.prepare(
+        "SELECT COUNT(*) AS n FROM outreach WHERE next_follow_up IS NOT NULL AND next_follow_up < date('now') AND status IN ('messaged','no_reply')",
+      )
+        .bind()
+        .first<{ n: number }>();
+      overdueFollowUps = Number(overdue?.n) || 0;
+    } catch {
+      overdueFollowUps = 0;
+    }
     const toMap = (rows: { status: string; n: number }[]): Record<string, number> => {
       const m: Record<string, number> = {};
       for (const r of rows) m[r.status] = Number(r.n) || 0;
       return m;
     };
-    return json({
+    return adminJson({
       intakesByStatus: toMap(
         (intakeRows.results || []) as { status: string; n: number }[],
       ),
@@ -199,9 +254,11 @@ export async function handleAdminOverview(
       },
       pendingProofNotes: Number(pendingProof?.n) || 0,
       outreachNeedingReply: Number(needingReply?.n) || 0,
+      lastBackupDrillAt,
+      overdueFollowUps,
     });
   } catch {
-    return safeError("Could not load overview.", 500, "db-error");
+    return adminError("Could not load overview.", 500, "db-error");
   }
 }
 
@@ -245,14 +302,14 @@ export async function handleAdminIntakes(
           .first<{ n: number }>();
         total = Number(t?.n) || 0;
       }
-      return json({
+      return adminJson({
         items: (rows.results || []).map((r) => rowToIntake(r as Record<string, unknown>)),
         total,
         limit,
         offset,
       });
     } catch {
-      return safeError("Could not list intakes.", 500, "db-error");
+      return adminError("Could not list intakes.", 500, "db-error");
     }
   }
 
@@ -261,11 +318,11 @@ export async function handleAdminIntakes(
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid intake data.", 400, "bad-json");
+      return adminError("Invalid intake data.", 400, "bad-json");
     }
     const checked = validateManualIntakeInput(raw);
     if (!checked.ok || !checked.data) {
-      return safeError(checked.error || "Invalid intake data.", 400, "validation");
+      return adminError(checked.error || "Invalid intake data.", 400, "validation");
     }
     const d = checked.data;
     const id = newId();
@@ -295,7 +352,7 @@ export async function handleAdminIntakes(
         entityId: id,
         summary: "manual source admin-manual",
       });
-      return json(
+      return adminJson(
         {
           id,
           saved: true,
@@ -306,33 +363,33 @@ export async function handleAdminIntakes(
         201,
       );
     } catch {
-      return safeError("Could not save intake.", 500, "db-error");
+      return adminError("Could not save intake.", 500, "db-error");
     }
   }
 
   if (request.method === "PATCH") {
     const id = idFromUrl(url);
-    if (!id) return safeError("Missing intake id.", 400, "bad-id");
+    if (!id) return adminError("Missing intake id.", 400, "bad-id");
     let raw: unknown;
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid update.", 400, "bad-json");
+      return adminError("Invalid update.", 400, "bad-json");
     }
     if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-      return safeError("Invalid update.", 400, "validation");
+      return adminError("Invalid update.", 400, "validation");
     }
     const rec = raw as Record<string, unknown>;
     // Explicit allowlist: only status may change from admin.
     if (findUnknownFields(rec, ["status"]).length > 0) {
-      return safeError("Invalid update.", 400, "validation");
+      return adminError("Invalid update.", 400, "validation");
     }
     const next =
       typeof rec.status === "string" &&
       (INTAKE_STATUSES as readonly string[]).includes(rec.status)
         ? rec.status
         : null;
-    if (!next) return safeError("Status is invalid.", 400, "validation");
+    if (!next) return adminError("Status is invalid.", 400, "validation");
     try {
       await env.DB.prepare(
         "UPDATE intakes SET status = ?, updated_at = ? WHERE id = ?",
@@ -346,13 +403,13 @@ export async function handleAdminIntakes(
         entityId: id,
         summary: "status -> " + next,
       });
-      return json({ id, status: next });
+      return adminJson({ id, status: next });
     } catch {
-      return safeError("Could not update intake.", 500, "db-error");
+      return adminError("Could not update intake.", 500, "db-error");
     }
   }
 
-  return safeError("Method not allowed.", 405);
+  return adminError("Method not allowed.", 405);
 }
 
 // GET, POST /api/admin/outreach and PATCH /api/admin/outreach/:id
@@ -373,7 +430,7 @@ export async function handleAdminOutreach(
       let total = 0;
       if (status) {
         if (!(OUTREACH_STATUSES as readonly string[]).includes(status)) {
-          return safeError("Outreach status is invalid.", 400, "validation");
+          return adminError("Outreach status is invalid.", 400, "validation");
         }
         rows = await env.DB.prepare(
           "SELECT id, business_name, contact, channel, status, notes, next_follow_up, last_contact_at, created_at, updated_at FROM outreach WHERE status = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?",
@@ -397,14 +454,14 @@ export async function handleAdminOutreach(
           .first<{ n: number }>();
         total = Number(t?.n) || 0;
       }
-      return json({
+      return adminJson({
         items: (rows.results || []).map((r) => rowToOutreach(r as Record<string, unknown>)),
         total,
         limit,
         offset,
       });
     } catch {
-      return safeError("Could not list outreach.", 500, "db-error");
+      return adminError("Could not list outreach.", 500, "db-error");
     }
   }
 
@@ -413,11 +470,11 @@ export async function handleAdminOutreach(
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid outreach data.", 400, "bad-json");
+      return adminError("Invalid outreach data.", 400, "bad-json");
     }
     const checked = validateOutreachInput(raw);
     if (!checked.ok || !checked.data) {
-      return safeError(checked.error || "Invalid outreach data.", 400, "validation");
+      return adminError(checked.error || "Invalid outreach data.", 400, "validation");
     }
     const d = checked.data;
     const id = newId();
@@ -435,55 +492,55 @@ export async function handleAdminOutreach(
         entityId: id,
         summary: "created status " + d.status,
       });
-      return json(
+      return adminJson(
         { id, status: d.status, needsReply: outreachNeedsReply(d.status) },
         201,
       );
     } catch {
-      return safeError("Could not create outreach.", 500, "db-error");
+      return adminError("Could not create outreach.", 500, "db-error");
     }
   }
 
   if (request.method === "PATCH") {
     const id = idFromUrl(url);
-    if (!id) return safeError("Missing outreach id.", 400, "bad-id");
+    if (!id) return adminError("Missing outreach id.", 400, "bad-id");
     let raw: unknown;
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid outreach data.", 400, "bad-json");
+      return adminError("Invalid outreach data.", 400, "bad-json");
     }
     if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-      return safeError("Invalid outreach data.", 400, "validation");
+      return adminError("Invalid outreach data.", 400, "validation");
     }
     const rec = raw as Record<string, unknown>;
     const allowed = ["businessName", "contact", "channel", "status", "notes", "nextFollowUp", "lastContactAt"];
     if (findUnknownFields(rec, allowed).length > 0) {
-      return safeError("Invalid outreach data.", 400, "validation");
+      return adminError("Invalid outreach data.", 400, "validation");
     }
     const sets: string[] = [];
     const vals: unknown[] = [];
     if (rec.businessName !== undefined) {
       if (typeof rec.businessName !== "string" || rec.businessName.trim().length < 2 || rec.businessName.trim().length > 120) {
-        return safeError("Business name is invalid.", 400, "validation");
+        return adminError("Business name is invalid.", 400, "validation");
       }
       sets.push("business_name = ?");
       vals.push(rec.businessName.trim());
     }
     if (rec.status !== undefined) {
       if (typeof rec.status !== "string" || !(OUTREACH_STATUSES as readonly string[]).includes(rec.status)) {
-        return safeError("Outreach status is invalid.", 400, "validation");
+        return adminError("Outreach status is invalid.", 400, "validation");
       }
       sets.push("status = ?");
       vals.push(rec.status);
     }
     if (rec.contact !== undefined) {
       if (rec.contact !== null && rec.contact !== "" && typeof rec.contact !== "string") {
-        return safeError("Contact value is invalid.", 400, "validation");
+        return adminError("Contact value is invalid.", 400, "validation");
       }
       const t = rec.contact === null || rec.contact === "" ? null : (rec.contact as string).trim();
       if (t !== null && (t.length < 1 || t.length > 160)) {
-        return safeError("Contact value is invalid.", 400, "validation");
+        return adminError("Contact value is invalid.", 400, "validation");
       }
       const v = t === "" ? null : t;
       sets.push("contact = ?");
@@ -491,11 +548,11 @@ export async function handleAdminOutreach(
     }
     if (rec.channel !== undefined) {
       if (rec.channel !== null && rec.channel !== "" && typeof rec.channel !== "string") {
-        return safeError("Channel value is invalid.", 400, "validation");
+        return adminError("Channel value is invalid.", 400, "validation");
       }
       const t = rec.channel === null || rec.channel === "" ? null : (rec.channel as string).trim();
       if (t !== null && (t.length < 1 || t.length > 60)) {
-        return safeError("Channel value is invalid.", 400, "validation");
+        return adminError("Channel value is invalid.", 400, "validation");
       }
       const v = t === "" ? null : t;
       sets.push("channel = ?");
@@ -503,41 +560,41 @@ export async function handleAdminOutreach(
     }
     if (rec.notes !== undefined) {
       if (rec.notes !== null && rec.notes !== "" && typeof rec.notes !== "string") {
-        return safeError("Notes are invalid.", 400, "validation");
+        return adminError("Notes are invalid.", 400, "validation");
       }
       const t = rec.notes === null || rec.notes === "" ? null : (rec.notes as string).trim();
       if (t !== null && (t.length < 1 || t.length > 2000)) {
-        return safeError("Notes are too long.", 400, "validation");
+        return adminError("Notes are too long.", 400, "validation");
       }
       sets.push("notes = ?");
       vals.push(t);
     }
     if (rec.nextFollowUp !== undefined) {
       if (rec.nextFollowUp !== null && rec.nextFollowUp !== "" && typeof rec.nextFollowUp !== "string") {
-        return safeError("Follow up date must be YYYY-MM-DD.", 400, "validation");
+        return adminError("Follow up date must be YYYY-MM-DD.", 400, "validation");
       }
       const t = rec.nextFollowUp === null || rec.nextFollowUp === "" ? null : (rec.nextFollowUp as string).trim();
       if (t !== null && !/^\d{4}-\d{2}-\d{2}$/.test(t)) {
-        return safeError("Follow up date must be YYYY-MM-DD.", 400, "validation");
+        return adminError("Follow up date must be YYYY-MM-DD.", 400, "validation");
       }
       sets.push("next_follow_up = ?");
       vals.push(t);
     }
     if (rec.lastContactAt !== undefined) {
       if (rec.lastContactAt !== null && rec.lastContactAt !== "" && typeof rec.lastContactAt !== "string") {
-        return safeError("Last contact date is invalid.", 400, "validation");
+        return adminError("Last contact date is invalid.", 400, "validation");
       }
       const t = rec.lastContactAt === null || rec.lastContactAt === "" ? null : (rec.lastContactAt as string).trim();
       if (t !== null && t.length > 32) {
-        return safeError("Last contact date is invalid.", 400, "validation");
+        return adminError("Last contact date is invalid.", 400, "validation");
       }
       if (t !== null && !/^\d{4}-\d{2}-\d{2}$/.test(t) && Number.isNaN(Date.parse(t))) {
-        return safeError("Last contact date is invalid.", 400, "validation");
+        return adminError("Last contact date is invalid.", 400, "validation");
       }
       sets.push("last_contact_at = ?");
       vals.push(t);
     }
-    if (sets.length === 0) return safeError("Nothing to update.", 400, "validation");
+    if (sets.length === 0) return adminError("Nothing to update.", 400, "validation");
     sets.push("updated_at = ?");
     vals.push(nowIso());
     vals.push(id);
@@ -557,15 +614,15 @@ export async function handleAdminOutreach(
         summary: "fields " + sets.length,
       });
       if (nextStatus !== undefined) {
-        return json({ id, status: nextStatus, needsReply: outreachNeedsReply(nextStatus) });
+        return adminJson({ id, status: nextStatus, needsReply: outreachNeedsReply(nextStatus) });
       }
-      return json({ id });
+      return adminJson({ id });
     } catch {
-      return safeError("Could not update outreach.", 500, "db-error");
+      return adminError("Could not update outreach.", 500, "db-error");
     }
   }
 
-  return safeError("Method not allowed.", 405);
+  return adminError("Method not allowed.", 405);
 }
 
 // GET, POST /api/admin/tools and PATCH /api/admin/tools/:id
@@ -589,14 +646,14 @@ export async function handleAdminTools(
       const t = await env.DB.prepare("SELECT COUNT(*) AS n FROM tools")
         .bind()
         .first<{ n: number }>();
-      return json({
+      return adminJson({
         items: (rows.results || []).map((r) => rowToTool(r as Record<string, unknown>)),
         total: Number(t?.n) || 0,
         limit,
         offset,
       });
     } catch {
-      return safeError("Could not list tools.", 500, "db-error");
+      return adminError("Could not list tools.", 500, "db-error");
     }
   }
 
@@ -605,11 +662,11 @@ export async function handleAdminTools(
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid tool data.", 400, "bad-json");
+      return adminError("Invalid tool data.", 400, "bad-json");
     }
     const checked = validateToolInput(raw);
     if (!checked.ok || !checked.data) {
-      return safeError(checked.error || "Invalid tool data.", 400, "validation");
+      return adminError(checked.error || "Invalid tool data.", 400, "validation");
     }
     const d = checked.data;
     const id = newId();
@@ -627,7 +684,7 @@ export async function handleAdminTools(
         entityId: id,
         summary: "slug " + d.slug + " status " + d.status,
       });
-      return json(
+      return adminJson(
         {
           id,
           slug: d.slug,
@@ -639,26 +696,26 @@ export async function handleAdminTools(
         201,
       );
     } catch {
-      return safeError("Could not create tool. Slug may exist.", 500, "db-error");
+      return adminError("Could not create tool. Slug may exist.", 500, "db-error");
     }
   }
 
   if (request.method === "PATCH") {
     const id = idFromUrl(url);
-    if (!id) return safeError("Missing tool id.", 400, "bad-id");
+    if (!id) return adminError("Missing tool id.", 400, "bad-id");
     let raw: unknown;
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid tool data.", 400, "bad-json");
+      return adminError("Invalid tool data.", 400, "bad-json");
     }
     if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-      return safeError("Invalid tool data.", 400, "validation");
+      return adminError("Invalid tool data.", 400, "validation");
     }
     const rec = raw as Record<string, unknown>;
     const allowed = ["name", "slug", "description", "status", "isAvailable", "availabilityNote", "url", "businessName", "showcaseStatus"];
     if (findUnknownFields(rec, allowed).length > 0) {
-      return safeError("Invalid tool data.", 400, "validation");
+      return adminError("Invalid tool data.", 400, "validation");
     }
     const sets: string[] = [];
     const vals: unknown[] = [];
@@ -666,31 +723,31 @@ export async function handleAdminTools(
     let nextShowcase: string | undefined;
     if (rec.name !== undefined) {
       if (typeof rec.name !== "string" || rec.name.trim().length < 2 || rec.name.trim().length > 80) {
-        return safeError("Tool name is invalid.", 400, "validation");
+        return adminError("Tool name is invalid.", 400, "validation");
       }
       sets.push("name = ?");
       vals.push(rec.name.trim());
     }
     if (rec.slug !== undefined) {
       if (typeof rec.slug !== "string" || !/^[a-z0-9-]{2,60}$/.test(rec.slug.trim())) {
-        return safeError("Tool slug is invalid.", 400, "validation");
+        return adminError("Tool slug is invalid.", 400, "validation");
       }
       sets.push("slug = ?");
       vals.push(rec.slug.trim());
     }
     if (rec.description !== undefined) {
       if (rec.description !== null && rec.description !== "" && typeof rec.description !== "string") {
-        return safeError("Description is invalid.", 400, "validation");
+        return adminError("Description is invalid.", 400, "validation");
       }
       const t = rec.description === null || rec.description === "" ? null : (rec.description as string).trim();
-      if (t !== null && t.length > 2000) return safeError("Description is too long.", 400, "validation");
+      if (t !== null && t.length > 2000) return adminError("Description is too long.", 400, "validation");
       sets.push("description = ?");
       vals.push(t);
     }
     if (rec.status !== undefined) {
       const list = ["draft", "active", "paused", "retired"];
       if (typeof rec.status !== "string" || !list.includes(rec.status)) {
-        return safeError("Tool status is invalid.", 400, "validation");
+        return adminError("Tool status is invalid.", 400, "validation");
       }
       sets.push("status = ?");
       vals.push(rec.status);
@@ -702,38 +759,38 @@ export async function handleAdminTools(
           : rec.isAvailable === false || rec.isAvailable === 0
             ? 0
             : -1;
-      if (v === -1) return safeError("Availability is invalid.", 400, "validation");
+      if (v === -1) return adminError("Availability is invalid.", 400, "validation");
       sets.push("is_available = ?");
       vals.push(v);
     }
     if (rec.availabilityNote !== undefined) {
       if (rec.availabilityNote !== null && rec.availabilityNote !== "" && typeof rec.availabilityNote !== "string") {
-        return safeError("Availability note is invalid.", 400, "validation");
+        return adminError("Availability note is invalid.", 400, "validation");
       }
       const t = rec.availabilityNote === null || rec.availabilityNote === "" ? null : (rec.availabilityNote as string).trim();
-      if (t !== null && t.length > 240) return safeError("Availability note is too long.", 400, "validation");
+      if (t !== null && t.length > 240) return adminError("Availability note is too long.", 400, "validation");
       sets.push("availability_note = ?");
       vals.push(t);
     }
     if (rec.url !== undefined) {
       if (rec.url !== null && rec.url !== "" && typeof rec.url !== "string") {
-        return safeError("Tool URL is invalid.", 400, "validation");
+        return adminError("Tool URL is invalid.", 400, "validation");
       }
       const t = rec.url === null || rec.url === "" ? null : (rec.url as string).trim();
-      if (t !== null && t.length > 500) return safeError("Tool URL is too long.", 400, "validation");
+      if (t !== null && t.length > 500) return adminError("Tool URL is too long.", 400, "validation");
       if (t !== null && !/^https?:\/\/.+/.test(t)) {
-        return safeError("Tool URL must start with http.", 400, "validation");
+        return adminError("Tool URL must start with http.", 400, "validation");
       }
       sets.push("url = ?");
       vals.push(t);
     }
     if (rec.businessName !== undefined) {
       if (rec.businessName !== null && rec.businessName !== "" && typeof rec.businessName !== "string") {
-        return safeError("Business name is invalid.", 400, "validation");
+        return adminError("Business name is invalid.", 400, "validation");
       }
       const t = rec.businessName === null || rec.businessName === "" ? null : (rec.businessName as string).trim();
       if (t !== null && (t.length < 2 || t.length > 80)) {
-        return safeError("Business name is invalid.", 400, "validation");
+        return adminError("Business name is invalid.", 400, "validation");
       }
       sets.push("business_name = ?");
       vals.push(t);
@@ -741,13 +798,13 @@ export async function handleAdminTools(
     }
     if (rec.showcaseStatus !== undefined) {
       if (typeof rec.showcaseStatus !== "string" || !(SHOWCASE_STATUSES as readonly string[]).includes(rec.showcaseStatus)) {
-        return safeError("Showcase status is invalid.", 400, "validation");
+        return adminError("Showcase status is invalid.", 400, "validation");
       }
       sets.push("showcase_status = ?");
       vals.push(rec.showcaseStatus);
       nextShowcase = rec.showcaseStatus as string;
     }
-    if (sets.length === 0) return safeError("Nothing to update.", 400, "validation");
+    if (sets.length === 0) return adminError("Nothing to update.", 400, "validation");
     sets.push("updated_at = ?");
     vals.push(nowIso());
     vals.push(id);
@@ -795,13 +852,13 @@ export async function handleAdminTools(
           }
         }
       }
-      return json(out);
+      return adminJson(out);
     } catch {
-      return safeError("Could not update tool.", 500, "db-error");
+      return adminError("Could not update tool.", 500, "db-error");
     }
   }
 
-  return safeError("Method not allowed.", 405);
+  return adminError("Method not allowed.", 405);
 }
 
 // GET /api/admin/usage (read only aggregates, no PII columns selected)
@@ -811,7 +868,7 @@ export async function handleAdminUsage(
 ): Promise<Response> {
   const gate = await requireAdmin(request, env);
   if ("denied" in gate) return gate.denied;
-  if (request.method !== "GET") return safeError("Method not allowed.", 405);
+  if (request.method !== "GET") return adminError("Method not allowed.", 405);
   const url = new URL(request.url);
   const { limit, offset } = parsePaging(url);
   const rawKey = url.searchParams.get("toolKey");
@@ -843,18 +900,18 @@ export async function handleAdminUsage(
         .first<{ n: number }>();
       total = Number(t?.n) || 0;
     }
-    return json({
+    return adminJson({
       items: (rows.results || []).map((r) => rowToUsage(r as Record<string, unknown>)),
       total,
       limit,
       offset,
     });
   } catch {
-    return safeError("Could not load usage.", 500, "db-error");
+    return adminError("Could not load usage.", 500, "db-error");
   }
 }
 
-// GET, POST /api/admin/proof-notes
+// GET, POST /api/admin/proof-notes and PATCH /api/admin/proof-notes/:id
 export async function handleAdminProofNotes(
   request: Request,
   env: OasisEnv,
@@ -869,40 +926,89 @@ export async function handleAdminProofNotes(
     const rawPerm = url.searchParams.get("permission");
     const permission =
       rawPerm === null || rawPerm === "" ? null : rawPerm.trim().slice(0, 20);
+    const rawKind = url.searchParams.get("kind");
+    const kindFilter =
+      rawKind === null || rawKind === "" ? null : rawKind.trim().slice(0, 20);
+    if (
+      kindFilter &&
+      !(PROOF_KINDS as readonly string[]).includes(kindFilter)
+    ) {
+      return adminError("Kind value is invalid.", 400, "validation");
+    }
     try {
       let rows;
       let total = 0;
-      if (permission) {
+      if (permission && kindFilter) {
         rows = await env.DB.prepare(
-          "SELECT id, title, body, permission_status, related_tool_id, created_at, updated_at FROM proof_notes WHERE permission_status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          "SELECT id, title, body, permission_status, related_tool_id, kind, created_at, updated_at FROM proof_notes WHERE permission_status = ? AND kind = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
         )
-          .bind(permission, limit, offset)
+          .bind(permission, kindFilter, limit, offset)
           .all();
+        const t = await env.DB.prepare(
+          "SELECT COUNT(*) AS n FROM proof_notes WHERE permission_status = ? AND kind = ?",
+        )
+          .bind(permission, kindFilter)
+          .first<{ n: number }>();
+        total = Number(t?.n) || 0;
+      } else if (permission) {
+        try {
+          rows = await env.DB.prepare(
+            "SELECT id, title, body, permission_status, related_tool_id, kind, created_at, updated_at FROM proof_notes WHERE permission_status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          )
+            .bind(permission, limit, offset)
+            .all();
+        } catch {
+          rows = await env.DB.prepare(
+            "SELECT id, title, body, permission_status, related_tool_id, created_at, updated_at FROM proof_notes WHERE permission_status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          )
+            .bind(permission, limit, offset)
+            .all();
+        }
         const t = await env.DB.prepare(
           "SELECT COUNT(*) AS n FROM proof_notes WHERE permission_status = ?",
         )
           .bind(permission)
           .first<{ n: number }>();
         total = Number(t?.n) || 0;
-      } else {
+      } else if (kindFilter) {
         rows = await env.DB.prepare(
-          "SELECT id, title, body, permission_status, related_tool_id, created_at, updated_at FROM proof_notes ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          "SELECT id, title, body, permission_status, related_tool_id, kind, created_at, updated_at FROM proof_notes WHERE kind = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
         )
-          .bind(limit, offset)
+          .bind(kindFilter, limit, offset)
           .all();
+        const t = await env.DB.prepare(
+          "SELECT COUNT(*) AS n FROM proof_notes WHERE kind = ?",
+        )
+          .bind(kindFilter)
+          .first<{ n: number }>();
+        total = Number(t?.n) || 0;
+      } else {
+        try {
+          rows = await env.DB.prepare(
+            "SELECT id, title, body, permission_status, related_tool_id, kind, created_at, updated_at FROM proof_notes ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          )
+            .bind(limit, offset)
+            .all();
+        } catch {
+          rows = await env.DB.prepare(
+            "SELECT id, title, body, permission_status, related_tool_id, created_at, updated_at FROM proof_notes ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          )
+            .bind(limit, offset)
+            .all();
+        }
         const t = await env.DB.prepare("SELECT COUNT(*) AS n FROM proof_notes")
           .bind()
           .first<{ n: number }>();
         total = Number(t?.n) || 0;
       }
-      return json({
+      return adminJson({
         items: (rows.results || []).map((r) => rowToProof(r as Record<string, unknown>)),
         total,
         limit,
         offset,
       });
     } catch {
-      return safeError("Could not list notes.", 500, "db-error");
+      return adminError("Could not list notes.", 500, "db-error");
     }
   }
 
@@ -911,35 +1017,117 @@ export async function handleAdminProofNotes(
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid note data.", 400, "bad-json");
+      return adminError("Invalid note data.", 400, "bad-json");
     }
     const checked = validateProofNoteInput(raw);
     if (!checked.ok || !checked.data) {
-      return safeError(checked.error || "Invalid note data.", 400, "validation");
+      return adminError(checked.error || "Invalid note data.", 400, "validation");
     }
     const d = checked.data;
     const id = newId();
     const now = nowIso();
     try {
-      await env.DB.prepare(
-        "INSERT INTO proof_notes (id, title, body, permission_status, related_tool_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      )
-        .bind(id, d.title, d.body, d.permissionStatus, d.relatedToolId, now, now)
-        .run();
+      try {
+        await env.DB.prepare(
+          "INSERT INTO proof_notes (id, title, body, permission_status, related_tool_id, kind, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+          .bind(id, d.title, d.body, d.permissionStatus, d.relatedToolId, d.kind, now, now)
+          .run();
+      } catch {
+        await env.DB.prepare(
+          "INSERT INTO proof_notes (id, title, body, permission_status, related_tool_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        )
+          .bind(id, d.title, d.body, d.permissionStatus, d.relatedToolId, now, now)
+          .run();
+      }
       await insertAudit(env, {
         actor,
         action: "proof.create",
         entity: "proof_note",
         entityId: id,
-        summary: "permission " + d.permissionStatus,
+        summary: "permission " + d.permissionStatus + " kind " + d.kind,
       });
-      return json({ id }, 201);
+      return adminJson({ id, kind: d.kind }, 201);
     } catch {
-      return safeError("Could not create note.", 500, "db-error");
+      return adminError("Could not create note.", 500, "db-error");
     }
   }
 
-  return safeError("Method not allowed.", 405);
+  if (request.method === "PATCH") {
+    const id = idFromUrl(url);
+    if (!id) return adminError("Missing note id.", 400, "bad-id");
+    let raw: unknown;
+    try {
+      raw = await request.json();
+    } catch {
+      return adminError("Invalid update.", 400, "bad-json");
+    }
+    const checked = validateProofNotePatch(raw);
+    if (!checked.ok || !checked.data) {
+      return adminError(checked.error || "Invalid update.", 400, "validation");
+    }
+    const patch = checked.data;
+    try {
+      let current: Record<string, unknown> | null = null;
+      try {
+        current = await env.DB.prepare(
+          "SELECT id, permission_status, kind FROM proof_notes WHERE id = ?",
+        )
+          .bind(id)
+          .first<Record<string, unknown>>();
+      } catch {
+        current = await env.DB.prepare(
+          "SELECT id, permission_status FROM proof_notes WHERE id = ?",
+        )
+          .bind(id)
+          .first<Record<string, unknown>>();
+      }
+      if (!current) return adminError("Note not found.", 404, "not-found");
+      const beforePerm =
+        typeof current.permission_status === "string"
+          ? current.permission_status
+          : "pending";
+      const beforeKind = proofKindOf(current.kind);
+      const nextPerm = patch.permissionStatus ?? beforePerm;
+      const nextKind = patch.kind ?? beforeKind;
+      try {
+        await env.DB.prepare(
+          "UPDATE proof_notes SET permission_status = ?, kind = ?, updated_at = ? WHERE id = ?",
+        )
+          .bind(nextPerm, nextKind, nowIso(), id)
+          .run();
+      } catch {
+        if (patch.kind !== undefined && patch.permissionStatus === undefined) {
+          return adminError("Could not update note.", 500, "db-error");
+        }
+        await env.DB.prepare(
+          "UPDATE proof_notes SET permission_status = ?, updated_at = ? WHERE id = ?",
+        )
+          .bind(nextPerm, nowIso(), id)
+          .run();
+      }
+      await insertAudit(env, {
+        actor,
+        action: "proof.update",
+        entity: "proof_note",
+        entityId: id,
+        summary:
+          "permission " +
+          beforePerm +
+          " -> " +
+          nextPerm +
+          " kind " +
+          beforeKind +
+          " -> " +
+          nextKind,
+      });
+      return adminJson({ id, permissionStatus: nextPerm, kind: nextKind });
+    } catch {
+      return adminError("Could not update note.", 500, "db-error");
+    }
+  }
+
+  return adminError("Method not allowed.", 405);
 }
 
 // GET, PUT /api/admin/availability. Access gate required.
@@ -960,11 +1148,11 @@ export async function handleAdminAvailability(
         .bind()
         .first<Record<string, unknown>>();
       if (!row) {
-        return json({ configured: false, availability: null });
+        return adminJson({ configured: false, availability: null });
       }
-      return json({ configured: true, availability: rowToAvailability(row) });
+      return adminJson({ configured: true, availability: rowToAvailability(row) });
     } catch {
-      return safeError("Could not load availability.", 500, "db-error");
+      return adminError("Could not load availability.", 500, "db-error");
     }
   }
 
@@ -973,11 +1161,11 @@ export async function handleAdminAvailability(
     try {
       raw = await request.json();
     } catch {
-      return safeError("Invalid availability data.", 400, "bad-json");
+      return adminError("Invalid availability data.", 400, "bad-json");
     }
     const checked = validateAvailabilityInput(raw);
     if (!checked.ok || !checked.data) {
-      return safeError(
+      return adminError(
         checked.error || "Invalid availability data.",
         400,
         "validation",
@@ -1031,13 +1219,13 @@ export async function handleAdminAvailability(
             createdAt,
             updatedAt: now,
           };
-      return json({ configured: true, availability });
+      return adminJson({ configured: true, availability });
     } catch {
-      return safeError("Could not save availability.", 500, "db-error");
+      return adminError("Could not save availability.", 500, "db-error");
     }
   }
 
-  return safeError("Method not allowed.", 405);
+  return adminError("Method not allowed.", 405);
 }
 
 // GET /api/public/availability. No auth. Only public fields.
@@ -1045,7 +1233,7 @@ export async function handlePublicAvailability(
   request: Request,
   env: OasisEnv,
 ): Promise<Response> {
-  if (request.method !== "GET") return safeError("Method not allowed.", 405);
+  if (request.method !== "GET") return publicError("Method not allowed.", 405);
   try {
     const row = await env.DB.prepare(
       "SELECT status, label, next_window, public_note FROM site_availability WHERE id = 'primary'",
@@ -1053,7 +1241,7 @@ export async function handlePublicAvailability(
       .bind()
       .first<Record<string, unknown>>();
     if (!row) {
-      return json({
+      return publicJson({
         configured: false,
         status: "not-configured",
         label: null,
@@ -1061,7 +1249,7 @@ export async function handlePublicAvailability(
         note: null,
       });
     }
-    return json({
+    return publicJson({
       configured: true,
       status: row.status,
       label: row.label ?? null,
@@ -1069,6 +1257,67 @@ export async function handlePublicAvailability(
       note: row.public_note ?? null,
     });
   } catch {
-    return safeError("Could not load availability.", 500, "db-error");
+    return publicError("Could not load availability.", 500, "db-error");
+  }
+}
+
+// GET /api/admin/system. Presence booleans only, never secret values.
+export async function handleAdminSystem(
+  request: Request,
+  env: OasisEnv,
+): Promise<Response> {
+  const gate = await requireAdmin(request, env);
+  if ("denied" in gate) return gate.denied;
+  if (request.method !== "GET") return adminError("Method not allowed.", 405);
+  const accessVarsSet = Boolean(env.ACCESS_TEAM_DOMAIN && env.ACCESS_AUD);
+  const turnstileSecretSet = Boolean(env.TURNSTILE_SECRET_KEY);
+  let dbOk = false;
+  try {
+    await env.DB.prepare("SELECT 1 AS ok").bind().first<{ ok: number }>();
+    dbOk = true;
+  } catch {
+    dbOk = false;
+  }
+  return adminJson({ accessVarsSet, turnstileSecretSet, dbOk });
+}
+
+// GET /api/public/work-items. Approved real proof plus labeled samples only.
+// Filters to permission approved and kind proof or sample-concept. Every item
+// carries kind so the UI can label samples and never present them as real proof.
+export async function handlePublicWorkItems(
+  request: Request,
+  env: OasisEnv,
+): Promise<Response> {
+  if (request.method !== "GET") return publicError("Method not allowed.", 405);
+  try {
+    let rows: Record<string, unknown>[] = [];
+    try {
+      const res = await env.DB.prepare(
+        "SELECT id, title, body, kind, related_tool_id, created_at, updated_at FROM proof_notes WHERE permission_status = 'approved' AND kind IN ('proof','sample-concept') ORDER BY created_at DESC LIMIT 100",
+      )
+        .bind()
+        .all<Record<string, unknown>>();
+      rows = (res.results || []) as Record<string, unknown>[];
+    } catch {
+      // Kind column missing on an old database. Return empty rather than
+      // mislabeling rows. Migration 0002 adds the column.
+      try {
+        const fallback = await env.DB.prepare(
+          "SELECT id, title, body, related_tool_id, created_at, updated_at FROM proof_notes WHERE permission_status = 'approved' ORDER BY created_at DESC LIMIT 100",
+        )
+          .bind()
+          .all<Record<string, unknown>>();
+        const fb = (fallback.results || []) as Record<string, unknown>[];
+        // Without kind we cannot prove sample labeling, so stay empty.
+        void fb;
+        rows = [];
+      } catch {
+        rows = [];
+      }
+    }
+    const items = rows.map((r) => rowToWorkItem(r));
+    return publicJson({ items, total: items.length });
+  } catch {
+    return publicError("Could not load work items.", 500, "db-error");
   }
 }

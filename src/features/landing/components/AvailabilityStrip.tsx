@@ -13,22 +13,18 @@ export function AvailabilityStrip({ availability }: AvailabilityStripProps) {
   return (
     <section id="availability" className={classes.section} aria-labelledby="availability-title">
       <div className={classes.inner}>
-        <div className={classes.card}>
-          <div className={classes.head}>
-            <p className={classes.eyebrow}>Current availability</p>
-            <h2 id="availability-title" className={classes.title}>
-              One build at a time
-            </h2>
-          </div>
-          <div className={classes.body}>
-            <StatusBadge tone={tone}>{availability.label}</StatusBadge>
-            <p className={classes.window}>{availability.nextWindow}</p>
-            <p className={classes.note}>{availability.note}</p>
-            <a href="#intake" className={classes.link}>
-              Save a spot with the intake
-            </a>
-          </div>
+        <StatusBadge tone={tone}>{availability.label}</StatusBadge>
+        <div className={classes.text}>
+          <h2 id="availability-title" className={classes.title}>
+            One build at a time
+          </h2>
+          <p className={classes.window}>{availability.nextWindow}</p>
+          <p className={classes.note}>{availability.note}</p>
         </div>
+        <a href="#intake" className={classes.link}>
+          Save a spot with the intake
+          <span aria-hidden="true">→</span>
+        </a>
       </div>
     </section>
   );

@@ -6,6 +6,7 @@ import {
   createOutreach,
   createProofNote,
   createTool,
+  fetchAdminSystem,
   fetchIntakesPaged,
   fetchOutreach,
   fetchOverview,
@@ -21,6 +22,7 @@ import {
 import type {
   AdminCounts,
   AdminIntakeCreateInput,
+  AdminSystemPresence,
   AvailabilityState,
   DeniedStatus,
   IntakeRecord,
@@ -48,7 +50,13 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-const EMPTY_COUNTS: AdminCounts = { newIntakes: 0, outreachNeedingReply: 0, activeBuilds: 0 };
+const EMPTY_COUNTS: AdminCounts = {
+  newIntakes: 0,
+  outreachNeedingReply: 0,
+  activeBuilds: 0,
+  lastBackupDrillAt: null,
+  overdueFollowUps: 0,
+};
 
 function toDenied(error: unknown): DeniedStatus | null {
   if (error instanceof AdminApiError && error.denied) {
@@ -63,6 +71,7 @@ export default function AdminRoute() {
   const [outreach, setOutreach] = useState<OutreachRecord[]>([]);
   const [tools, setTools] = useState<ToolRecord[]>([]);
   const [availability, setAvailability] = useState<AvailabilityState | null>(null);
+  const [system, setSystem] = useState<AdminSystemPresence | null>(null);
   const [usage, setUsage] = useState<UsageRow[]>([]);
   const [proofNotes, setProofNotes] = useState<ProofNote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +101,14 @@ export default function AdminRoute() {
         fetchUsage(),
         fetchProofNotes(),
       ]);
+      let systemValue: AdminSystemPresence | null = null;
+      try {
+        systemValue = await fetchAdminSystem();
+      } catch (systemError) {
+        const systemDenied = toDenied(systemError);
+        if (systemDenied) throw systemError;
+        systemValue = null;
+      }
       let availabilityValue: AvailabilityState | null = null;
       try {
         availabilityValue = await fetchAvailability();
@@ -109,6 +126,7 @@ export default function AdminRoute() {
       setOutreach(outreachRows);
       setTools(toolRows);
       setAvailability(availabilityValue);
+      setSystem(systemValue);
       setUsage(usageRows);
       setProofNotes(noteRows);
     } catch (loadError) {
@@ -248,6 +266,7 @@ export default function AdminRoute() {
       tools={tools}
       usage={usage}
       proofNotes={proofNotes}
+      system={system}
       loading={loading}
       error={error}
       denied={denied}

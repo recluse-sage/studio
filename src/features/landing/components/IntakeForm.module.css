@@ -1,5 +1,7 @@
 .section {
-  background: var(--oasis-surface);
+  background:
+    radial-gradient(48rem 24rem at 50% 0%, var(--oasis-hero-glow), transparent 65%),
+    var(--oasis-bg);
   border-top: 1px solid var(--oasis-border);
   width: 100%;
   max-width: 100%;
@@ -11,7 +13,7 @@
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
-  padding: 40px 20px 48px;
+  padding: 56px 20px 64px;
   display: grid;
   gap: 24px;
   grid-template-columns: minmax(0, 1fr);
@@ -26,18 +28,29 @@
 }
 
 .form {
+  position: relative;
   border: 1px solid var(--oasis-border);
-  border-radius: var(--oasis-radius-lg);
+  border-radius: var(--oasis-radius-xl);
   background: var(--oasis-surface-raised);
   box-shadow: var(--oasis-card-shadow);
-  padding: 20px;
+  padding: 22px 20px;
   display: grid;
-  gap: 18px;
+  gap: 20px;
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Thin accent edge ties the form to the site signal. */
+.form::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--oasis-accent), var(--oasis-signal));
 }
 
 .field {
@@ -51,14 +64,19 @@
 }
 
 .label {
-  font-weight: 650;
+  font-weight: 600;
   font-size: 0.93rem;
   color: var(--oasis-text);
+}
+
+.required {
+  color: var(--oasis-accent);
 }
 
 .input {
   background: var(--oasis-bg);
   border-color: var(--oasis-border-strong);
+  border-radius: var(--oasis-radius-md);
   color: var(--oasis-text);
   min-height: var(--oasis-touch-min);
   font-size: 1rem;
@@ -66,6 +84,18 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.input::placeholder {
+  color: var(--oasis-text-muted);
+}
+
+.input:focus,
+.input:focus-within {
+  border-color: var(--oasis-accent);
+  box-shadow: 0 0 0 3px var(--oasis-accent-soft);
+  outline: none;
 }
 
 .controlRoot {
@@ -74,18 +104,41 @@
   min-width: 0;
 }
 
-.input::placeholder {
-  color: var(--oasis-text-muted);
-}
-
 .row {
   display: grid;
-  gap: 18px;
+  gap: 20px;
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+}
+
+.verify {
+  border-top: 1px dashed var(--oasis-border-strong);
+  padding-top: 18px;
+}
+
+.turnstileBox {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.verifyNote {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.92rem;
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-surface);
+  padding: 12px 14px;
+}
+
+.fieldError {
+  color: var(--oasis-danger);
+  font-size: 0.88rem;
+  font-weight: 500;
 }
 
 .honeypot {
@@ -99,6 +152,7 @@
 
 .alert {
   border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-md);
 }
 
 .submitRow {
@@ -114,10 +168,21 @@
   background: var(--oasis-accent);
   color: var(--oasis-accent-contrast);
   border: 1px solid var(--oasis-accent);
+  font-weight: 600;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--oasis-accent-strong);
+  border-color: var(--oasis-accent-strong);
+}
+
+.submit:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .privacy {
@@ -129,7 +194,7 @@
 
 .success {
   border: 1px solid var(--oasis-accent-border);
-  border-radius: var(--oasis-radius-lg);
+  border-radius: var(--oasis-radius-xl);
   background: var(--oasis-success-soft);
   padding: 28px 22px;
   display: grid;
@@ -139,6 +204,7 @@
 .successTitle {
   margin: 0;
   font-family: var(--oasis-font-display);
+  font-weight: 600;
   font-size: 1.6rem;
   color: var(--oasis-text);
 }
@@ -156,10 +222,10 @@
 
 @media (min-width: 720px) {
   .inner {
-    padding: 64px 24px 72px;
+    padding: 72px 24px 80px;
   }
   .form {
-    padding: 28px;
+    padding: 30px 28px;
   }
   .row {
     grid-template-columns: repeat(2, minmax(0, 1fr));

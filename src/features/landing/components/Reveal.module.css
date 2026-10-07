@@ -1,0 +1,18 @@
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+/* Armed by JS only, so SSR and no-JS readers see the content. */
+.armed {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.armed.shown {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 260ms ease var(--reveal-delay, 0ms),
+    transform 260ms ease var(--reveal-delay, 0ms);
+}

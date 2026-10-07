@@ -1,0 +1,33 @@
+.wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.note {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.9rem;
+}
+
+.reset {
+  appearance: none;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--oasis-touch-min);
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--oasis-border-strong);
+  background: transparent;
+  color: var(--oasis-text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease;
+}
+
+.reset:hover {
+  border-color: var(--oasis-accent);
+  color: var(--oasis-text);
+  background: var(--oasis-accent-soft);
+}

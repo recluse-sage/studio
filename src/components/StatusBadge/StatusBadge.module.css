@@ -8,8 +8,10 @@
   border: 1px solid var(--oasis-border);
   background: var(--oasis-surface);
   color: var(--oasis-text-secondary);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-family: var(--oasis-font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   line-height: 1.2;
   white-space: nowrap;
 }

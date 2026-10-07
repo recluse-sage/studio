@@ -1,68 +1,81 @@
 /* Oasis design tokens. Single source for Oasis surfaces only.
    Client projects must define their own palettes and must not reuse these names.
-   Light is default. Dark overrides use the same semantic names. */
+   Light is default. Dark overrides use the same semantic names.
+   Type: techy sans pairing. Space Grotesk for wordmark and headings,
+   IBM Plex Sans for body, IBM Plex Mono for labels and readouts. */
 
 :root,
 [data-mantine-color-scheme="light"] {
-  --oasis-bg: #ffffff;
-  --oasis-surface: #f4f6f4;
-  --oasis-surface-2: #e9ede9;
+  --oasis-bg: #fbfaf7;
+  --oasis-surface: #f2efe7;
+  --oasis-surface-2: #e7e2d4;
   --oasis-surface-raised: #ffffff;
-  --oasis-border: #dde4dd;
-  --oasis-border-strong: #c3cec3;
-  --oasis-text: #101613;
-  --oasis-text-secondary: #38433d;
-  --oasis-text-muted: #68756e;
-  --oasis-accent: #1d7a4b;
-  --oasis-accent-strong: #145c38;
-  --oasis-accent-soft: #e5f2ea;
-  --oasis-accent-border: #bcd9c7;
+  --oasis-border: #dfd9c9;
+  --oasis-border-strong: #c4bba4;
+  --oasis-text: #141814;
+  --oasis-text-secondary: #3b443c;
+  --oasis-text-muted: #5c6860;
+  --oasis-accent: #177245;
+  --oasis-accent-strong: #0e5a35;
+  --oasis-accent-soft: #e3f1e7;
+  --oasis-accent-border: #b7d6c1;
   --oasis-accent-contrast: #ffffff;
-  --oasis-success: #1d7a4b;
-  --oasis-success-soft: #e5f2ea;
+  --oasis-signal: #8a5a00;
+  --oasis-signal-soft: #f7ecd4;
+  --oasis-signal-dot: rgba(20, 60, 40, 0.16);
+  --oasis-glow-green: #dcefe2;
+  --oasis-glow-amber: #f3e3ba;
+  --oasis-success: #177245;
+  --oasis-success-soft: #e3f1e7;
   --oasis-warning: #8a5a00;
-  --oasis-warning-soft: #fdf1d7;
+  --oasis-warning-soft: #fbf0d3;
   --oasis-danger: #b3261e;
   --oasis-danger-soft: #fbe9e7;
-  --oasis-focus-ring: #1d7a4b;
-  --oasis-header-bg: rgba(255, 255, 255, 0.92);
-  --oasis-hero-glow: #e5f2ea;
-  --oasis-card-shadow: 0 1px 2px rgba(16, 22, 19, 0.06), 0 4px 16px rgba(16, 22, 19, 0.06);
-  --oasis-font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --oasis-font-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --oasis-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --oasis-focus-ring: #177245;
+  --oasis-header-bg: rgba(251, 250, 247, 0.9);
+  --oasis-hero-glow: #e9f3ea;
+  --oasis-card-shadow: 0 1px 2px rgba(20, 24, 20, 0.06), 0 12px 32px rgba(20, 24, 20, 0.08);
+  --oasis-font-display: "Space Grotesk", "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --oasis-font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --oasis-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --oasis-radius-sm: 8px;
   --oasis-radius-md: 12px;
   --oasis-radius-lg: 16px;
+  --oasis-radius-xl: 20px;
   --oasis-max-width: 1120px;
   --oasis-touch-min: 44px;
   color-scheme: light;
 }
 
 [data-mantine-color-scheme="dark"] {
-  --oasis-bg: #0a0f0d;
-  --oasis-surface: #111715;
-  --oasis-surface-2: #1a221f;
-  --oasis-surface-raised: #141c19;
-  --oasis-border: #24302b;
-  --oasis-border-strong: #34423b;
-  --oasis-text: #e8efeb;
-  --oasis-text-secondary: #bcc8c0;
-  --oasis-text-muted: #8b9991;
+  --oasis-bg: #0b0f0d;
+  --oasis-surface: #121815;
+  --oasis-surface-2: #1b231f;
+  --oasis-surface-raised: #151d19;
+  --oasis-border: #263029;
+  --oasis-border-strong: #39473e;
+  --oasis-text: #eaefea;
+  --oasis-text-secondary: #bec9c0;
+  --oasis-text-muted: #98a49c;
   --oasis-accent: #4cc38a;
-  --oasis-accent-strong: #7bdba6;
-  --oasis-accent-soft: #12271c;
-  --oasis-accent-border: #234434;
+  --oasis-accent-strong: #8adfae;
+  --oasis-accent-soft: #10241a;
+  --oasis-accent-border: #254434;
   --oasis-accent-contrast: #06110c;
+  --oasis-signal: #e5b45a;
+  --oasis-signal-soft: #241b08;
+  --oasis-signal-dot: rgba(140, 220, 175, 0.16);
+  --oasis-glow-green: #10241a;
+  --oasis-glow-amber: #241b08;
   --oasis-success: #4cc38a;
-  --oasis-success-soft: #12271c;
+  --oasis-success-soft: #10241a;
   --oasis-warning: #e8b93e;
   --oasis-warning-soft: #2b220d;
   --oasis-danger: #f0807a;
   --oasis-danger-soft: #2e1513;
-  --oasis-focus-ring: #7bdba6;
-  --oasis-header-bg: rgba(10, 15, 13, 0.92);
-  --oasis-hero-glow: #12271c;
-  --oasis-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 28px rgba(0, 0, 0, 0.35);
+  --oasis-focus-ring: #8adfae;
+  --oasis-header-bg: rgba(11, 15, 13, 0.88);
+  --oasis-hero-glow: #10241a;
+  --oasis-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }

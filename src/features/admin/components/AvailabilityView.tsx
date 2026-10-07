@@ -98,12 +98,14 @@ export function AvailabilityView({
             </label>
             <Select
               id="avail-status"
-              value={current.status}
+              value={current.status === "booked" ? "closed" : current.status}
               onChange={(v) => v && set("status", v as AvailabilityState["status"])}
               data={[
                 { value: "open", label: "Open for new work" },
                 { value: "limited", label: "Limited, one slot left" },
-                { value: "booked", label: "Booked, waitlist only" },
+                { value: "waitlist", label: "Waitlist only, no open slot" },
+                { value: "paused", label: "Paused, not taking work for now" },
+                { value: "closed", label: "Closed, not taking work" },
               ]}
             />
           </div>

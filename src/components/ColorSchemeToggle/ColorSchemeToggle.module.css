@@ -1,11 +1,73 @@
 .toggle {
-  border-color: var(--oasis-border);
-  color: var(--oasis-text-secondary);
+  appearance: none;
+  border: 1px solid var(--oasis-border-strong);
   background: var(--oasis-surface);
-  border-radius: 10px;
+  border-radius: 999px;
+  width: 56px;
+  height: 44px;
+  min-height: var(--oasis-touch-min);
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
-.glyph {
-  font-size: 18px;
+.toggle:hover {
+  border-color: var(--oasis-accent);
+  background: var(--oasis-accent-soft);
+}
+
+.track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 44px;
+  height: 28px;
+  border-radius: 999px;
+  padding: 0 7px;
+  background: var(--oasis-surface-2);
+  border: 1px solid var(--oasis-border);
+  font-size: 13px;
   line-height: 1;
+}
+
+.sun,
+.moon {
+  opacity: 0.45;
+  transition: opacity 150ms ease;
+}
+
+.toggle[data-state="light"] .sun {
+  opacity: 1;
+  color: var(--oasis-signal);
+}
+
+.toggle[data-state="dark"] .moon {
+  opacity: 1;
+  color: var(--oasis-accent-strong);
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--oasis-bg);
+  border: 1px solid var(--oasis-border-strong);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transform: translate(0, -50%);
+  transition: transform 160ms ease;
+}
+
+.toggle[data-state="dark"] .thumb {
+  transform: translate(16px, -50%);
+  background: var(--oasis-accent);
+  border-color: var(--oasis-accent);
 }

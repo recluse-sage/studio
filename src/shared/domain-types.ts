@@ -209,12 +209,15 @@ export interface UsageDailyRecord {
 
 export type ProofPermission = "pending" | "approved" | "denied";
 
+export type ProofKind = "proof" | "sample-concept" | "ops-note" | "backup-drill";
+
 export interface ProofNoteRecord {
   id: string;
   title: string;
   body: string | null;
   permissionStatus: ProofPermission;
   relatedToolId: string | null;
+  kind: ProofKind;
   createdAt: string;
   updatedAt: string;
 }
@@ -224,6 +227,12 @@ export interface ProofNoteCreateRequest {
   body?: string;
   permissionStatus?: ProofPermission;
   relatedToolId?: string;
+  kind?: ProofKind;
+}
+
+export interface ProofNoteUpdateRequest {
+  permissionStatus?: ProofPermission;
+  kind?: ProofKind;
 }
 
 export interface AdminOverviewResponse {
@@ -233,6 +242,29 @@ export interface AdminOverviewResponse {
   usageTotals7d: { views: number; offlineViews: number; contactClicks: number };
   pendingProofNotes: number;
   outreachNeedingReply: number;
+  lastBackupDrillAt: string | null;
+  overdueFollowUps: number;
+}
+
+export interface AdminSystemResponse {
+  accessVarsSet: boolean;
+  turnstileSecretSet: boolean;
+  dbOk: boolean;
+}
+
+export interface WorkItem {
+  id: string;
+  title: string;
+  body: string | null;
+  kind: ProofKind;
+  relatedToolId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkItemsResponse {
+  items: WorkItem[];
+  total: number;
 }
 
 export interface ApiErrorBody {

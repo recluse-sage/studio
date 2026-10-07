@@ -2,6 +2,15 @@
   max-width: 880px;
 }
 
+.eyebrow {
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--oasis-signal);
+  margin: 0 0 6px;
+}
+
 .pageTitle {
   font-family: var(--oasis-font-display);
   font-size: 1.7rem;
@@ -12,7 +21,139 @@
 
 .pageSub {
   color: var(--oasis-text-secondary);
-  margin: 4px 0 0;
+  margin: 6px 0 0;
+  max-width: 60ch;
+}
+
+.skelGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.scoreGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+.scoreCard {
+  background: var(--oasis-surface);
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-lg);
+  padding: 16px;
+  min-width: 0;
+}
+
+.scoreEyebrow {
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--oasis-text-muted);
+  margin: 0;
+}
+
+.scoreValue {
+  font-family: var(--oasis-font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--oasis-text);
+  margin: 6px 0 0;
+}
+
+.scoreValueSmall {
+  font-family: var(--oasis-font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--oasis-text);
+  margin: 6px 0 0;
+}
+
+.scoreLabel {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--oasis-text-secondary);
+}
+
+.scoreHelper {
+  margin: 8px 0 0;
+  color: var(--oasis-text-secondary);
+  line-height: 1.5;
+}
+
+.scoreLink {
+  margin-top: 10px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--oasis-accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  min-height: var(--oasis-touch-min);
+  display: inline-flex;
+  align-items: center;
+}
+
+[data-mantine-color-scheme="dark"] .scoreLink {
+  color: var(--oasis-accent-strong);
+}
+
+.scoreLink:focus-visible {
+  outline: 3px solid var(--oasis-focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.activeHint {
+  margin: 10px 2px 0;
+  color: var(--oasis-text-muted);
+}
+
+.plannerCard {
+  background: var(--oasis-signal-soft);
+  border: 1px solid var(--oasis-accent-border);
+  border-left: 4px solid var(--oasis-accent);
+}
+
+.plannerEyebrow {
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--oasis-signal);
+  margin: 0;
+}
+
+[data-mantine-color-scheme="dark"] .plannerEyebrow {
+  color: var(--oasis-signal);
+}
+
+.plannerTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.25rem;
+  margin: 8px 0 0;
+  color: var(--oasis-text);
+}
+
+.plannerDetail {
+  margin-top: 8px;
+  color: var(--oasis-text-secondary);
+  line-height: 1.55;
+  max-width: 62ch;
+}
+
+.plannerActions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .card {
@@ -20,13 +161,11 @@
   border-color: var(--oasis-border);
 }
 
-.eyebrow {
-  font-family: var(--oasis-font-mono);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--oasis-text-muted);
+.cardTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.1rem;
   margin: 0;
+  color: var(--oasis-text);
 }
 
 .nextWindow {
@@ -37,35 +176,10 @@
   color: var(--oasis-text-secondary);
 }
 
-.cardTitle {
-  font-size: 1.1rem;
-  margin: 0;
-  color: var(--oasis-text);
-}
-
 .countGrid {
   display: grid;
   gap: 12px;
   grid-template-columns: 1fr;
-}
-
-.countCard {
-  background: var(--oasis-surface);
-  border-color: var(--oasis-border);
-}
-
-.countNum {
-  font-size: 1.7rem;
-  font-weight: 750;
-  line-height: 1;
-  color: var(--oasis-text);
-  margin: 0;
-}
-
-.countLabel {
-  margin: 6px 0 0;
-  font-size: 0.9rem;
-  color: var(--oasis-text-secondary);
 }
 
 .emptyWrap {
@@ -143,8 +257,32 @@
   color: var(--oasis-text);
 }
 
+.reveal {
+  animation: admin-rise 200ms ease-out;
+}
+
+@keyframes admin-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (min-width: 640px) {
+  .scoreGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .countGrid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
   }
 }

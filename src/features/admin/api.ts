@@ -1,6 +1,7 @@
 import type {
   AdminCounts,
   AdminIntakeCreateInput,
+  AdminSystemPresence,
   AvailabilityState,
   IntakeRecord,
   OutreachCreateInput,
@@ -236,10 +237,20 @@ export async function fetchOverview(options: AdminApiOptions = {}): Promise<Admi
     newIntakes?: unknown;
     outreachNeedingReply?: unknown;
     activeBuilds?: unknown;
+    lastBackupDrillAt?: unknown;
+    overdueFollowUps?: unknown;
     intakesByStatus?: Record<string, number>;
     outreachByStatus?: Record<string, number>;
     toolsByStatus?: Record<string, number>;
   };
+  const lastBackupDrillAt =
+    typeof raw.lastBackupDrillAt === "string" && raw.lastBackupDrillAt.trim().length > 0
+      ? raw.lastBackupDrillAt
+      : null;
+  const overdueFollowUps =
+    typeof raw.overdueFollowUps === "number" && Number.isFinite(raw.overdueFollowUps) && raw.overdueFollowUps > 0
+      ? Math.floor(raw.overdueFollowUps)
+      : 0;
   if (
     typeof raw.newIntakes === "number" &&
     typeof raw.outreachNeedingReply === "number" &&
@@ -249,6 +260,8 @@ export async function fetchOverview(options: AdminApiOptions = {}): Promise<Admi
       newIntakes: raw.newIntakes,
       outreachNeedingReply: raw.outreachNeedingReply,
       activeBuilds: raw.activeBuilds,
+      lastBackupDrillAt,
+      overdueFollowUps,
     };
   }
   const intakesByStatus = raw.intakesByStatus ?? {};
@@ -265,7 +278,25 @@ export async function fetchOverview(options: AdminApiOptions = {}): Promise<Admi
     typeof toolsByStatus.active === "number"
       ? toolsByStatus.active
       : Object.values(toolsByStatus).reduce((a, b) => a + (typeof b === "number" ? b : 0), 0);
-  return { newIntakes, outreachNeedingReply, activeBuilds };
+  return { newIntakes, outreachNeedingReply, activeBuilds, lastBackupDrillAt, overdueFollowUps };
+}
+
+/** GET /api/admin/system. Presence booleans only, never secret values. Server enforces Access. */
+export async function fetchAdminSystem(options: AdminApiOptions = {}): Promise<AdminSystemPresence> {
+  const data = await requestJson<unknown>("/system", options);
+  const raw = (data ?? {}) as {
+    d1Ok?: unknown;
+    dbOk?: unknown;
+    turnstileConfigured?: unknown;
+    turnstileSecretSet?: unknown;
+    accessConfigured?: unknown;
+    accessVarsSet?: unknown;
+  };
+  return {
+    d1Ok: toBoolean(raw.d1Ok ?? raw.dbOk, false),
+    turnstileConfigured: toBoolean(raw.turnstileConfigured ?? raw.turnstileSecretSet, false),
+    accessConfigured: toBoolean(raw.accessConfigured ?? raw.accessVarsSet, false),
+  };
 }
 
 /** GET /api/admin/intakes?status=&limit=&offset=. Parses paged objects. */
@@ -410,11 +441,19 @@ function normalizeAvailability(data: unknown): AvailabilityState | null {
   }
   if (!data || typeof data !== "object" || Array.isArray(data)) return null;
   const value = data as Record<string, unknown>;
-  if (value.status !== "open" && value.status !== "limited" && value.status !== "booked") {
+  const status = value.status;
+  if (
+    status !== "open" &&
+    status !== "limited" &&
+    status !== "booked" &&
+    status !== "waitlist" &&
+    status !== "paused" &&
+    status !== "closed"
+  ) {
     return null;
   }
   return {
-    status: value.status,
+    status,
     label: typeof value.label === "string" ? value.label : "",
     nextWindow: typeof value.nextWindow === "string" ? value.nextWindow : "",
     note: typeof value.note === "string" ? value.note : "",

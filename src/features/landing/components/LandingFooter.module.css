@@ -1,51 +1,117 @@
 .footer {
-  background: var(--oasis-bg);
+  background: var(--oasis-surface);
   border-top: 1px solid var(--oasis-border);
 }
 
 .inner {
   max-width: var(--oasis-max-width);
   margin: 0 auto;
-  padding: 32px 20px 40px;
+  padding: 44px 20px 32px;
   display: grid;
-  gap: 18px;
+  gap: 32px;
 }
 
 .brand {
   margin: 0;
   font-family: var(--oasis-font-display);
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
   color: var(--oasis-text);
 }
 
+.dot {
+  color: var(--oasis-accent);
+}
+
 .tagline {
-  margin: 6px 0 0;
+  margin: 10px 0 0;
   color: var(--oasis-text-secondary);
-  font-size: 0.94rem;
+  font-size: 0.95rem;
+  max-width: 26rem;
+}
+
+.status {
+  margin: 16px 0 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--oasis-font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+  color: var(--oasis-text-secondary);
   max-width: 28rem;
 }
 
+.statusDot {
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--oasis-accent);
+  flex: none;
+}
+
 .nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 8px;
+  display: grid;
+  gap: 2px;
+  align-content: start;
+}
+
+.navTitle {
+  margin: 0 0 6px;
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--oasis-text-muted);
 }
 
 .link {
   display: inline-flex;
   align-items: center;
   min-height: var(--oasis-touch-min);
-  padding: 6px 10px;
+  padding: 6px 0;
   color: var(--oasis-text-secondary);
   text-decoration: none;
-  font-weight: 550;
-  font-size: 0.94rem;
-  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  justify-self: start;
+  transition: color 120ms ease;
 }
 
 .link:hover {
   color: var(--oasis-text);
-  background: var(--oasis-surface);
+  text-decoration: underline;
+}
+
+.contactBlock {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+}
+
+.contactText {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.95rem;
+  max-width: 24rem;
+}
+
+.contactLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--oasis-touch-min);
+  padding: 6px 0;
+  color: var(--oasis-accent);
+  font-weight: 600;
+  text-decoration: none;
+  justify-self: start;
+}
+
+.contactLink:hover {
+  text-decoration: underline;
 }
 
 .small {
@@ -53,13 +119,14 @@
   color: var(--oasis-text-muted);
   font-size: 0.86rem;
   border-top: 1px solid var(--oasis-border);
-  padding-top: 16px;
+  padding-top: 20px;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 768px) {
   .inner {
-    padding: 40px 24px 48px;
-    grid-template-columns: 1fr auto;
+    padding: 56px 24px 36px;
+    grid-template-columns: 1.3fr 0.7fr 1fr;
+    gap: 40px;
     align-items: start;
   }
   .small {

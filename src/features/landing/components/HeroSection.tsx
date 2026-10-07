@@ -1,5 +1,6 @@
 import { Button, List, ThemeIcon } from "@mantine/core";
 import { StatusBadge } from "../../../components/StatusBadge/StatusBadge";
+import { SignalVisual } from "./SignalVisual";
 import type { AvailabilitySummary } from "../types";
 import classes from "./HeroSection.module.css";
 
@@ -11,12 +12,18 @@ export function HeroSection({ availability }: HeroSectionProps) {
   return (
     <section className={classes.hero} aria-labelledby="hero-title">
       <div className={classes.inner}>
+        <div className={classes.visualWrap}>
+          <SignalVisual />
+        </div>
+
         <div className={classes.copy}>
           {availability ? (
             <StatusBadge tone={availability.status === "booked" ? "closed" : "open"}>
               {availability.label}
             </StatusBadge>
-          ) : null}
+          ) : (
+            <p className={classes.kicker}>Solo studio. One build at a time.</p>
+          )}
           <h1 id="hero-title" className={classes.title}>
             Small websites, tools, and automations for local businesses.
           </h1>
@@ -63,38 +70,6 @@ export function HeroSection({ availability }: HeroSectionProps) {
             </List.Item>
           </List>
         </div>
-
-        <aside className={classes.card} aria-label="How intake works">
-          <p className={classes.cardEyebrow}>Intake in three parts</p>
-          <ol className={classes.cardList}>
-            <li>
-              <span className={classes.step}>1</span>
-              <div>
-                <p className={classes.cardTitle}>The job</p>
-                <p className={classes.cardText}>What task repeats and how often it happens.</p>
-              </div>
-            </li>
-            <li>
-              <span className={classes.step}>2</span>
-              <div>
-                <p className={classes.cardTitle}>The business</p>
-                <p className={classes.cardText}>Name, contact, and best way to reply.</p>
-              </div>
-            </li>
-            <li>
-              <span className={classes.step}>3</span>
-              <div>
-                <p className={classes.cardTitle}>Send</p>
-                <p className={classes.cardText}>Send the details. We reply with next steps.</p>
-              </div>
-            </li>
-          </ol>
-          <p className={classes.cardFoot}>
-            {availability
-              ? availability.nextWindow
-              : "Send an intake and we will confirm timing."}
-          </p>
-        </aside>
       </div>
     </section>
   );

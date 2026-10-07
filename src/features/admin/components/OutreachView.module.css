@@ -20,6 +20,11 @@
   accent-color: var(--oasis-accent);
 }
 
+.checkbox:focus-visible {
+  outline: 3px solid var(--oasis-focus-ring);
+  outline-offset: 2px;
+}
+
 .checkLabel {
   font-size: 0.94rem;
   font-weight: 550;
@@ -36,12 +41,69 @@
   border-color: var(--oasis-border);
 }
 
+.queueCard {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
+  border-left: 4px solid var(--oasis-signal);
+}
+
+.queueTitle {
+  font-family: var(--oasis-font-display);
+  font-size: 1.05rem;
+  margin: 0;
+  color: var(--oasis-text);
+}
+
+.queueCount {
+  font-family: var(--oasis-font-mono);
+  font-size: 0.82rem;
+  color: var(--oasis-text-secondary);
+  white-space: nowrap;
+}
+
+.queueEmpty {
+  margin-top: 12px;
+}
+
+.queueList {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.queueRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--oasis-border);
+  border-radius: 10px;
+  background: var(--oasis-surface-raised);
+  min-height: var(--oasis-touch-min);
+}
+
+.queueMain {
+  min-width: 0;
+}
+
+.queueBadges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: none;
+}
+
 .business {
   color: var(--oasis-text);
 }
 
 .muted {
   color: var(--oasis-text-secondary);
+  line-height: 1.5;
 }
 
 .note {

@@ -1,0 +1,80 @@
+.visual {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-xl);
+  background:
+    radial-gradient(22rem 16rem at 50% 30%, var(--oasis-hero-glow), transparent 70%),
+    radial-gradient(16rem 12rem at 85% 95%, var(--oasis-signal-soft), transparent 70%),
+    var(--oasis-surface);
+  box-shadow: var(--oasis-card-shadow);
+  padding: 18px 18px 16px;
+}
+
+/* Dotted signal field, faded toward the edges. Dots, not a grid. */
+.visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, var(--oasis-signal-dot) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  background-position: center;
+  -webkit-mask-image: radial-gradient(120% 100% at 50% 40%, black 30%, transparent 85%);
+  mask-image: radial-gradient(120% 100% at 50% 40%, black 30%, transparent 85%);
+  pointer-events: none;
+}
+
+.readout {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--oasis-text-muted);
+}
+
+.readoutState {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* Static dot. No pulse loop, no motion. */
+.stateDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--oasis-accent);
+}
+
+.canvas {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 4px;
+}
+
+.chips {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.chip {
+  font-family: var(--oasis-font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--oasis-text-secondary);
+  border: 1px solid var(--oasis-border);
+  background: var(--oasis-surface-raised);
+  border-radius: 999px;
+  padding: 5px 11px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+}

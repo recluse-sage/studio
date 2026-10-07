@@ -13,6 +13,11 @@ body {
   overflow-x: clip;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 76px;
+}
+
 body {
   background: var(--oasis-bg);
   color: var(--oasis-text);
@@ -33,6 +38,11 @@ a {
   text-underline-offset: 3px;
 }
 
+::selection {
+  background: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+}
+
 /* Visible keyboard focus everywhere. No decorative motion. */
 :focus-visible {
   outline: 3px solid var(--oasis-focus-ring);
@@ -46,13 +56,15 @@ a[role="button"],
 input[type="submit"],
 .mantine-Button-root,
 .mantine-NavLink-root,
-.mantine-Anchor-root {
+.mantine-Anchor-root,
+.mantine-ActionIcon-root {
   min-height: var(--oasis-touch-min);
 }
 
 input,
 select,
-textarea {
+textarea,
+button {
   font: inherit;
   max-width: 100%;
 }
@@ -74,4 +86,21 @@ textarea {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Restrained motion everywhere. Transform and opacity only.
+   Press feedback runs 100 to 160ms. Popovers 125 to 200ms.
+   No parallax, no decorative loops, no mouse tracking. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
 }
