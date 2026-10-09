@@ -11,7 +11,7 @@ States: todo, doing, done. Each item names its owner.
 - [ ] todo (owner): Monthly restore drill into a throwaway database after the first export lands, date logged in admin notes.
 - [ ] todo (agent): Screenshot pass at 360, 768, 1280 in both color schemes after the redesign deploys.
 
-## Redesign brief (revised plan approved 2026-10-09, build running in designer plus fixer lanes)
+## Redesign brief (revised plan approved 2026-10-09, shipped live 2026-10-09 as 67065f1)
 
 Copy, warm SME voice:
 
