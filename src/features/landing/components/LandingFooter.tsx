@@ -12,6 +12,7 @@ export function LandingFooter({
   showAvailability = true,
   availability = null,
 }: LandingFooterProps) {
+  void showAvailability;
   const year = new Date().getFullYear();
   const statusLine = availability
     ? `${availability.label}. ${availability.nextWindow}`
@@ -27,8 +28,8 @@ export function LandingFooter({
             </span>
           </p>
           <p className={classes.tagline}>
-            Solo studio for small websites, tools, and automations. Clear scope,
-            practical handoff, and you own the finished work.
+            We are oasis.dev, a studio solving problems for small, medium, and
+            enterprise business by building tools, websites, and automations.
           </p>
           <p className={classes.status}>
             <span className={classes.statusDot} aria-hidden="true" />
@@ -41,14 +42,18 @@ export function LandingFooter({
           <a href="#services" className={classes.link}>
             Services
           </a>
+          <a href="#tools" className={classes.link}>
+            Tools
+          </a>
+          <a href="#intake" className={classes.link}>
+            Intake
+          </a>
           <a href="#process" className={classes.link}>
             Process
           </a>
-          {showAvailability ? (
-            <a href="#availability" className={classes.link}>
-              Availability
-            </a>
-          ) : null}
+          <a href="#faq" className={classes.link}>
+            FAQ
+          </a>
           <a href="#top" className={classes.link}>
             Back to top
           </a>
@@ -66,8 +71,7 @@ export function LandingFooter({
         </div>
 
         <p className={classes.small}>
-          © {year} Oasis.dev. Solo studio, one build at a time. Work is shown
-          publicly only with client permission.
+          © {year} Oasis.dev. Work is shown publicly only with client permission.
         </p>
       </div>
     </footer>

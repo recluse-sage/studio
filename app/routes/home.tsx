@@ -11,11 +11,11 @@ import { useLoaderData } from "react-router";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Oasis.dev: small websites, tools, and automations" },
+    { title: "Oasis.dev: tools, websites, and automations that solve problems" },
     {
       name: "description",
       content:
-        "Oasis is a solo studio building small websites, tools, and automations for local businesses. One build at a time. Start with a short intake.",
+        "We are oasis.dev, a studio solving problems for small, medium, and enterprise business by building tools, websites, and automations. Start with a short intake.",
     },
   ];
 };

@@ -63,12 +63,16 @@ export type IntakeFormValues = {
   businessName: string;
   businessType: BusinessType | "";
   taskDescription: string;
-  frequency: string;
+  frequency?: string;
   timeline?: string;
   budget?: string;
   contactMethod: ContactMethod;
   contactValue: string;
   honeypot?: string;
+};
+
+export type DisplaySettings = {
+  proofVisible: boolean;
 };
 
 export type IntakeSubmitState =

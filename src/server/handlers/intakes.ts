@@ -52,14 +52,13 @@ export async function handlePublicIntake(
 
   try {
     await env.DB.prepare(
-      "INSERT INTO intakes (id, business_name, business_type, task_description, frequency, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', 'pending', ?, ?)",
+      "INSERT INTO intakes (id, business_name, business_type, task_description, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', 'pending', ?, ?)",
     )
       .bind(
         id,
         data.businessName,
         data.businessType,
         data.taskDescription,
-        data.frequency,
         data.timeline,
         data.budget,
         data.contactMethod,

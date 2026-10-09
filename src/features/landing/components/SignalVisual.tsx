@@ -1,87 +1,188 @@
+import { useEffect, useState } from "react";
 import classes from "./SignalVisual.module.css";
 
 /**
- * Abstract tech signal visual. Pure CSS and SVG, no photo,
- * no business imagery, no logo. Decorative only.
+ * Clay journey through the true six stages.
+ * Pure CSS and SVG, no photos, no logos. Decorative plus honest labels.
+ * Auto walks once on load, then rests. Hover or focus steps stage to stage.
+ * Frozen under reduced motion.
  */
-export function SignalVisual() {
-  return (
-    <div className={classes.visual} aria-hidden="true">
-      <div className={classes.readout}>
-        <span className={classes.readoutName}>oasis.signal</span>
-        <span className={classes.readoutState}>
-          <span className={classes.stateDot} />
-          steady
-        </span>
-      </div>
 
-      <svg
-        className={classes.canvas}
-        viewBox="0 0 440 340"
-        role="presentation"
-        focusable="false"
-      >
-        <defs>
-          <radialGradient id="oasis-node-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" style={{ stopColor: "var(--oasis-accent)" }} stopOpacity="0.35" />
-            <stop offset="100%" style={{ stopColor: "var(--oasis-accent)" }} stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="oasis-pipe" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" style={{ stopColor: "var(--oasis-accent)" }} stopOpacity="0.25" />
-            <stop offset="50%" style={{ stopColor: "var(--oasis-accent)" }} stopOpacity="0.9" />
-            <stop offset="100%" style={{ stopColor: "var(--oasis-signal)" }} stopOpacity="0.7" />
-          </linearGradient>
-        </defs>
-
-        {/* Concentric signal arcs */}
-        <g fill="none" style={{ stroke: "var(--oasis-accent)" }} strokeWidth="1.5">
-          <circle cx="215" cy="128" r="52" opacity="0.85" />
-          <circle cx="215" cy="128" r="88" opacity="0.45" strokeDasharray="3 6" />
-          <circle cx="215" cy="128" r="124" opacity="0.25" strokeDasharray="2 8" />
-        </g>
-
-        {/* Core node */}
-        <circle cx="215" cy="128" r="26" fill="url(#oasis-node-glow)" />
-        <circle cx="215" cy="128" r="9" style={{ fill: "var(--oasis-accent)" }} />
-        <circle cx="215" cy="128" r="9" fill="none" style={{ stroke: "var(--oasis-bg)" }} strokeWidth="2" opacity="0.6" />
-
-        {/* Side ticks */}
-        <g style={{ stroke: "var(--oasis-accent)" }} strokeWidth="2" opacity="0.5">
-          <line x1="60" y1="60" x2="72" y2="60" />
-          <line x1="66" y1="54" x2="66" y2="66" />
-          <line x1="368" y1="88" x2="380" y2="88" />
-          <line x1="374" y1="82" x2="374" y2="94" />
-        </g>
-
-        {/* Pipeline from intake to launch */}
-        <line x1="50" y1="252" x2="380" y2="252" stroke="url(#oasis-pipe)" strokeWidth="2" />
-        <g>
-          <circle cx="50" cy="252" r="7" style={{ fill: "var(--oasis-bg)", stroke: "var(--oasis-accent)" }} strokeWidth="2" />
-          <circle cx="160" cy="252" r="7" style={{ fill: "var(--oasis-accent)" }} />
-          <circle cx="270" cy="252" r="7" style={{ fill: "var(--oasis-bg)", stroke: "var(--oasis-accent)" }} strokeWidth="2" />
-          <circle cx="380" cy="252" r="7" style={{ fill: "var(--oasis-bg)", stroke: "var(--oasis-signal)" }} strokeWidth="2" />
-        </g>
-        <g
-          style={{ fill: "var(--oasis-text-muted)" }}
-          fontSize="12"
-          fontFamily="var(--oasis-font-mono)"
-          textAnchor="middle"
-        >
-          <text x="50" y="282">intake</text>
-          <text x="160" y="282">scope</text>
-          <text x="270" y="282">build</text>
-          <text x="380" y="282">launch</text>
-        </g>
-
-        {/* Connector from core to pipeline */}
-        <line x1="215" y1="150" x2="215" y2="238" style={{ stroke: "var(--oasis-accent)" }} strokeWidth="1.5" strokeDasharray="4 5" opacity="0.6" />
+const STAGES = [
+  {
+    id: "problem",
+    index: "01",
+    label: "Problem",
+    text: "You bring a problem.",
+    icon: (
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="10" cy="10" r="2.2" fill="currentColor" />
       </svg>
+    ),
+  },
+  {
+    id: "talk",
+    index: "02",
+    label: "Talk",
+    text: "We talk it through.",
+    icon: (
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <path
+          d="M3 5.5h14v8H9.5L6 16.5v-3H3v-8Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+        <circle cx="7.5" cy="9.5" r="1" fill="currentColor" />
+        <circle cx="10.5" cy="9.5" r="1" fill="currentColor" />
+        <circle cx="13.5" cy="9.5" r="1" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    id: "solution",
+    index: "03",
+    label: "Solution",
+    text: "We find the fit.",
+    icon: (
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path
+          d="m7.5 10.2 1.8 1.8 3.4-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: "build",
+    index: "04",
+    label: "Build",
+    text: "We build it.",
+    icon: (
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <rect x="3.5" y="10" width="6" height="6" rx="1.8" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="10.5" y="4" width="6" height="6" rx="1.8" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    ),
+  },
+  {
+    id: "ship",
+    index: "05",
+    label: "Ship",
+    text: "We ship it to you.",
+    icon: (
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <path
+          d="M3 10.5 17 4l-4.5 13-2.8-5.2L3 10.5Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: "use-share",
+    index: "06",
+    label: "Use and share",
+    text: "You use it and share it.",
+    icon: (
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <circle cx="5.5" cy="10" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="14.5" cy="5.5" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="14.5" cy="14.5" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="m7.8 9 4.2-2.2M7.8 11l4.2 2.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+] as const;
 
-      <div className={classes.chips}>
-        <span className={classes.chip}>clear scope</span>
-        <span className={classes.chip}>one build</span>
-        <span className={classes.chip}>plain handoff</span>
-      </div>
+export function SignalVisual() {
+  const [active, setActive] = useState(0);
+  const [walked, setWalked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setWalked(true);
+      return;
+    }
+    let step = 0;
+    let alive = true;
+    const timers: Array<ReturnType<typeof setTimeout>> = [];
+    for (let i = 1; i < STAGES.length; i += 1) {
+      timers.push(
+        setTimeout(() => {
+          if (!alive) return;
+          step = i;
+          setActive(step);
+          if (i === STAGES.length - 1) setWalked(true);
+        }, i * 550),
+      );
+    }
+    if (STAGES.length <= 1) setWalked(true);
+    else {
+      timers.push(
+        setTimeout(() => {
+          if (alive) setWalked(true);
+        }, STAGES.length * 550),
+      );
+    }
+    return () => {
+      alive = false;
+      timers.forEach((t) => clearTimeout(t));
+    };
+  }, []);
+
+  return (
+    <div className={classes.visual} data-walked={walked}>
+      <p className={classes.readout}>
+        <span className={classes.readoutName}>oasis.dev journey</span>
+        <span className={classes.readoutState}>
+          <span className={classes.stateDot} aria-hidden="true" />
+          {walked ? "resting" : "walking"}
+        </span>
+      </p>
+
+      <ol className={classes.stages} aria-label="How we work, six stages">
+        {STAGES.map((stage, i) => (
+          <li key={stage.id} className={classes.stageItem}>
+            <button
+              type="button"
+              className={classes.stage}
+              data-active={i === active}
+              aria-current={i === active ? "step" : undefined}
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => setActive(i)}
+              aria-label={`Stage ${stage.index}: ${stage.label}. ${stage.text}`}
+            >
+              <span className={classes.blob} aria-hidden="true">
+                <span className={classes.blobIcon}>{stage.icon}</span>
+              </span>
+              <span className={classes.stageText}>
+                <span className={classes.stageIndex} aria-hidden="true">
+                  {stage.index}
+                </span>
+                <span className={classes.stageLabel}>{stage.label}</span>
+                <span className={classes.stageLine}>{stage.text}</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+
+      <p className={classes.hint} aria-hidden="true">
+        Hover or tap a stage to step through.
+      </p>
     </div>
   );
 }

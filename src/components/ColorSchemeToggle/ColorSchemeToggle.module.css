@@ -1,10 +1,10 @@
 .toggle {
   appearance: none;
-  border: 1px solid var(--oasis-border-strong);
-  background: var(--oasis-surface);
-  border-radius: 999px;
-  width: 56px;
-  height: 44px;
+  border: 0;
+  background: transparent;
+  border-radius: 12px;
+  width: var(--oasis-touch-min);
+  height: var(--oasis-touch-min);
   min-height: var(--oasis-touch-min);
   padding: 0;
   margin: 0;
@@ -13,61 +13,54 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  transition: background-color 150ms ease, border-color 150ms ease;
+  color: var(--oasis-text-secondary);
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
 .toggle:hover {
-  border-color: var(--oasis-accent);
   background: var(--oasis-accent-soft);
+  color: var(--oasis-text);
 }
 
-.track {
+.icons {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 44px;
-  height: 28px;
-  border-radius: 999px;
-  padding: 0 7px;
-  background: var(--oasis-surface-2);
-  border: 1px solid var(--oasis-border);
-  font-size: 13px;
-  line-height: 1;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
 }
 
-.sun,
+.icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.sun {
+  opacity: 0;
+  transform: rotate(-45deg) scale(0.85);
+}
+
 .moon {
-  opacity: 0.45;
-  transition: opacity 150ms ease;
+  opacity: 0;
+  transform: rotate(45deg) scale(0.85);
 }
 
 .toggle[data-state="light"] .sun {
   opacity: 1;
-  color: var(--oasis-signal);
+  transform: rotate(0deg) scale(1);
 }
 
 .toggle[data-state="dark"] .moon {
   opacity: 1;
-  color: var(--oasis-accent-strong);
+  transform: rotate(0deg) scale(1);
 }
 
-.thumb {
-  position: absolute;
-  top: 50%;
-  left: 3px;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: var(--oasis-bg);
-  border: 1px solid var(--oasis-border-strong);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-  transform: translate(0, -50%);
-  transition: transform 160ms ease;
-}
-
-.toggle[data-state="dark"] .thumb {
-  transform: translate(16px, -50%);
-  background: var(--oasis-accent);
-  border-color: var(--oasis-accent);
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .icon {
+    transition: none;
+  }
 }

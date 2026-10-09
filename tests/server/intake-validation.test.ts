@@ -46,8 +46,14 @@ describe("intake validation", () => {
   });
 
   it("rejects overlong optional fields", () => {
-    const r = validateIntakeInput({ ...base, frequency: "x".repeat(61) });
+    const r = validateIntakeInput({ ...base, timeline: "x".repeat(61) });
     expect(r.ok).toBe(false);
+  });
+
+  it("rejects the removed frequency field", () => {
+    expect(
+      validateIntakeInput({ ...base, frequency: "weekly" }).ok,
+    ).toBe(false);
   });
 
   it("rejects filled honeypot", () => {

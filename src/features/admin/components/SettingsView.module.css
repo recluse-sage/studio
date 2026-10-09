@@ -87,3 +87,13 @@
   color: var(--oasis-text-secondary);
   margin-top: 12px;
 }
+
+.displayForm {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.saveButton {
+  justify-self: start;
+}

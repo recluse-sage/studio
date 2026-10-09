@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Burger, Button } from "@mantine/core";
 import { ColorSchemeToggle } from "../../../components/ColorSchemeToggle/ColorSchemeToggle";
 import classes from "./LandingHeader.module.css";
@@ -10,14 +10,25 @@ export type LandingHeaderProps = {
 
 const NAV = [
   { href: "#services", label: "Services" },
+  { href: "#tools", label: "Tools" },
+  { href: "#intake", label: "Intake" },
   { href: "#process", label: "Process" },
-  { href: "#availability", label: "Availability" },
-  { href: "#intake", label: "Contact" },
+  { href: "#faq", label: "FAQ" },
 ];
 
 export function LandingHeader({ intakeHref = "#intake", showAvailability = true }: LandingHeaderProps) {
   const [open, setOpen] = useState(false);
-  const items = showAvailability ? NAV : NAV.filter((item) => item.href !== "#availability");
+  void showAvailability;
+  const items = NAV;
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open ]);
 
   return (
     <header className={classes.header}>

@@ -9,28 +9,40 @@ export type ProcessSectionProps = {
 
 const FALLBACK: ProcessStep[] = [
   {
-    id: "note",
+    id: "problem",
     index: "01",
-    title: "Short note",
-    description: "Send the intake. We read every word and reply with plain next steps.",
+    title: "You bring a problem",
+    description: "Tell us the work that repeats or the outcome you need.",
   },
   {
-    id: "scope",
+    id: "talk",
     index: "02",
-    title: "Fixed scope",
-    description: "You get a clear scope that lists what is included, timing, and cost.",
+    title: "We talk it through",
+    description: "A short conversation so we understand the problem and the context.",
   },
   {
-    id: "build",
+    id: "solution",
     index: "03",
-    title: "Build and launch",
-    description: "We build, you review on your phone, then we launch and hand it over.",
+    title: "We find the solution",
+    description: "We agree the smallest useful fix and put scope, timing, and cost in writing.",
   },
   {
-    id: "proof",
+    id: "build-ship",
     index: "04",
-    title: "Permission first",
-    description: "If you approve, selected details can become public proof of the work.",
+    title: "We build and ship",
+    description: "We build it, you review it on your phone, then we ship it to you.",
+  },
+  {
+    id: "use",
+    index: "05",
+    title: "You use it",
+    description: "You run it in daily work with a practical handoff. You own the result.",
+  },
+  {
+    id: "share",
+    index: "06",
+    title: "You share it",
+    description: "When it helps, you share it with people. With permission, it can become proof.",
   },
 ];
 
@@ -42,8 +54,8 @@ export function ProcessSection({ steps }: ProcessSectionProps) {
         <SectionHeading
           id="process"
           eyebrow="Process"
-          title="Simple from first note to launch"
-          description="No long calls to start. No jargon. You stay in control at each step."
+          title="From problem to shared result"
+          description="Six clear stages. You stay in control at each one."
         />
         <ol className={classes.list}>
           {list.map((step, position) => (

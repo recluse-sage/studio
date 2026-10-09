@@ -1,6 +1,11 @@
 // Phase-one API contract for UI integration.
 // Public: POST /api/intakes -> 201 IntakePublicResponse, 400, 429, 503.
+// Intake fields: businessName, businessType, taskDescription, timeline, budget,
+// contactMethod, contactValue, website honeypot, turnstileToken. Frequency was
+// removed. Quiz goal folds into taskDescription via quizToIntakePrefill and
+// buildTaskDescriptionFromQuiz in src/shared/quiz.ts. Turnstile stays fail closed.
 // Public: GET /api/public/availability -> 200 AvailabilityPublicResponse, public max-age 60.
+// Public: GET /api/public/display -> 200 { proofVisible: boolean }, public max-age 60. Proof hidden by default.
 // Public: GET /api/public/work-items -> 200 WorkItemsResponse with approved proof plus labeled samples only, kind on every item, public max-age 60.
 // Private (Access JWT required): all /api/admin/* need Cf-Access-Jwt-Assertion and return private no-store.
 // GET /api/admin/overview -> 200 AdminOverviewResponse with outreachNeedingReply, lastBackupDrillAt, overdueFollowUps.
@@ -14,6 +19,7 @@
 // GET, POST /api/admin/tools and PATCH /api/admin/tools/:id.
 // Tools include businessName, showcaseStatus, and isAvailable flag.
 // GET, PUT /api/admin/availability -> 200 AvailabilityAdminResponse.
+// GET, PUT /api/admin/display -> 200 { proofVisible: boolean }, private no-store, audit display.update.
 // GET /api/admin/usage?toolKey=&limit=&offset= -> 200 PagedResponse aggregates only.
 // GET, POST /api/admin/proof-notes -> 200 PagedResponse with kind on every item. POST accepts optional kind, default ops-note.
 // PATCH /api/admin/proof-notes/:id permission transitions only, writes proof.update audit with before and after.
@@ -38,6 +44,9 @@ export const API_ROUTES = {
   toolUpdate: "PATCH /api/admin/tools/:id",
   availabilityRead: "GET /api/admin/availability",
   availabilityUpdate: "PUT /api/admin/availability",
+  displayRead: "GET /api/admin/display",
+  displayUpdate: "PUT /api/admin/display",
+  publicDisplay: "GET /api/public/display",
   usageRead: "GET /api/admin/usage",
   proofList: "GET /api/admin/proof-notes",
   proofCreate: "POST /api/admin/proof-notes",

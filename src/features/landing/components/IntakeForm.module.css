@@ -29,7 +29,7 @@
 
 .form {
   position: relative;
-  border: 1px solid var(--oasis-border);
+  border: 0;
   border-radius: var(--oasis-radius-xl);
   background: var(--oasis-surface-raised);
   box-shadow: var(--oasis-card-shadow);
@@ -115,14 +115,27 @@
 }
 
 .verify {
-  border-top: 1px dashed var(--oasis-border-strong);
+  border-top: 1px solid var(--oasis-border);
   padding-top: 18px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+}
+
+.prefillNote {
+  margin: 0;
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-accent-soft);
+  color: var(--oasis-text-secondary);
+  font-size: 0.9rem;
+  padding: 10px 14px;
 }
 
 .turnstileBox {
-  display: grid;
-  gap: 8px;
-  justify-items: start;
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .verifyNote {

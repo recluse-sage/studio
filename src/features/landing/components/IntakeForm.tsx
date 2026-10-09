@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Alert, Button, Select, Textarea, TextInput } from "@mantine/core";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
@@ -11,6 +11,7 @@ import type {
   IntakeSubmitState,
 } from "../types";
 import { TurnstileWidget, resetTurnstileWidget } from "./TurnstileWidget";
+import { QUIZ_PREFILL_EVENT } from "./ToolsSection";
 import classes from "./IntakeForm.module.css";
 
 export type IntakeFormProps = {
@@ -23,7 +24,6 @@ const initialValues: IntakeFormValues = {
   businessName: "",
   businessType: "",
   taskDescription: "",
-  frequency: "",
   contactMethod: "sms",
   contactValue: "",
   honeypot: "",
@@ -39,10 +39,6 @@ function validate(values: IntakeFormValues): Partial<Record<string, string>> {
   }
   if (values.taskDescription.trim().length < 10) {
     errors.taskDescription = "Describe the task in at least 10 characters so we can scope it.";
-  }
-  const frequency = (values.frequency ?? "").trim();
-  if (frequency.length > 0 && frequency.length > 60) {
-    errors.frequency = "Keep frequency under 60 characters.";
   }
   if (values.contactValue.trim().length < 3) {
     errors.contactValue = "Add a phone, email, or handle where we can reach you.";
@@ -69,13 +65,29 @@ export function IntakeForm({
   const [token, setToken] = useState("");
   const [tokenError, setTokenError] = useState<string | null>(null);
   const [widgetKey, setWidgetKey] = useState(0);
+  const [prefillNote, setPrefillNote] = useState(false);
 
   const siteKey = (turnstileSiteKey ?? "").trim();
   const hasSiteKey = siteKey.length > 0;
 
+  /* Quiz prefill from the guided Tools flow. Fills the task field only. */
+  useEffect(() => {
+    function onPrefill(event: Event) {
+      const detail = (event as CustomEvent<{ text?: unknown }>).detail;
+      const text = typeof detail?.text === "string" ? detail.text.trim() : "";
+      if (!text) return;
+      setValues((prev) => ({ ...prev, taskDescription: text }));
+      setFieldErrors((prev) => ({ ...prev, taskDescription: undefined }));
+      setPrefillNote(true);
+    }
+    window.addEventListener(QUIZ_PREFILL_EVENT, onPrefill as EventListener);
+    return () => window.removeEventListener(QUIZ_PREFILL_EVENT, onPrefill as EventListener);
+  }, []);
+
   function set<K extends keyof IntakeFormValues>(key: K, value: IntakeFormValues[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
     setFieldErrors((prev) => ({ ...prev, [key as string]: undefined }));
+    if (key === "taskDescription") setPrefillNote(false);
   }
 
   function resetWidget() {
@@ -122,6 +134,7 @@ export function IntakeForm({
       setState({ status: "success", message: result.message });
       setValues(initialValues);
       setFieldErrors({});
+      setPrefillNote(false);
       resetWidget();
       onSuccess?.();
     } else {
@@ -174,13 +187,18 @@ export function IntakeForm({
             >
               What repeating task hurts most <span aria-hidden="true">*</span>
             </label>
+            {prefillNote ? (
+              <p className={classes.prefillNote} role="status">
+                Filled from your guided check. Edit it freely before sending.
+              </p>
+            ) : null}
             <Textarea
               id="intake-taskDescription"
               name="taskDescription"
               required
               minRows={3}
               autosize={false}
-              placeholder="Example: confirming bookings by text takes an hour each day"
+              placeholder="Confirming bookings by text takes an hour each day"
               value={values.taskDescription}
               onChange={(e) => set("taskDescription", e.currentTarget.value)}
               error={fieldErrors.taskDescription}
@@ -191,26 +209,6 @@ export function IntakeForm({
           </div>
 
           <div className={classes.row}>
-            <div className={classes.field}>
-              <label
-                htmlFor="intake-frequency"
-                id="intake-frequency-label"
-                className={classes.label}
-              >
-                How often, optional
-              </label>
-              <TextInput
-                id="intake-frequency"
-                name="frequency"
-                placeholder="Daily, weekly, each booking"
-                value={values.frequency}
-                onChange={(e) => set("frequency", e.currentTarget.value)}
-                error={fieldErrors.frequency}
-                aria-invalid={Boolean(fieldErrors.frequency)}
-                aria-labelledby="intake-frequency-label"
-                classNames={{ root: classes.controlRoot, input: classes.input }}
-              />
-            </div>
             <div className={classes.field}>
               <label
                 htmlFor="intake-businessType"
@@ -233,9 +231,6 @@ export function IntakeForm({
                 classNames={{ root: classes.controlRoot, input: classes.input }}
               />
             </div>
-          </div>
-
-          <div className={classes.row}>
             <div className={classes.field}>
               <label
                 htmlFor="intake-businessName"
@@ -258,6 +253,9 @@ export function IntakeForm({
                 classNames={{ root: classes.controlRoot, input: classes.input }}
               />
             </div>
+          </div>
+
+          <div className={classes.row}>
             <div className={classes.field}>
               <label
                 htmlFor="intake-contactMethod"
@@ -281,34 +279,33 @@ export function IntakeForm({
                 classNames={{ root: classes.controlRoot, input: classes.input }}
               />
             </div>
-          </div>
-
-          <div className={classes.field}>
-            <label
-              htmlFor="intake-contactValue"
-              id="intake-contactValue-label"
-              className={classes.label}
-            >
-              Best contact <span aria-hidden="true">*</span>
-            </label>
-            <TextInput
-              id="intake-contactValue"
-              name="contactValue"
-              required
-              autoComplete="tel"
-              placeholder="Phone, email, or handle"
-              value={values.contactValue}
-              onChange={(e) => set("contactValue", e.currentTarget.value)}
-              error={fieldErrors.contactValue}
-              aria-invalid={Boolean(fieldErrors.contactValue)}
-              aria-labelledby="intake-contactValue-label"
-              classNames={{ root: classes.controlRoot, input: classes.input }}
-            />
+            <div className={classes.field}>
+              <label
+                htmlFor="intake-contactValue"
+                id="intake-contactValue-label"
+                className={classes.label}
+              >
+                Best contact <span aria-hidden="true">*</span>
+              </label>
+              <TextInput
+                id="intake-contactValue"
+                name="contactValue"
+                required
+                autoComplete="tel"
+                placeholder="Phone, email, or handle"
+                value={values.contactValue}
+                onChange={(e) => set("contactValue", e.currentTarget.value)}
+                error={fieldErrors.contactValue}
+                aria-invalid={Boolean(fieldErrors.contactValue)}
+                aria-labelledby="intake-contactValue-label"
+                classNames={{ root: classes.controlRoot, input: classes.input }}
+              />
+            </div>
           </div>
 
           <div className={`${classes.field} ${classes.verify}`} id="intake-verification" tabIndex={-1}>
-            <span className={classes.label} id="intake-verification-label">
-              Verification <span aria-hidden="true" className={classes.required}>*</span>
+            <span className="oasis-sr-only" id="intake-verification-label">
+              Spam verification
             </span>
             {hasSiteKey ? (
               <div className={classes.turnstileBox}>

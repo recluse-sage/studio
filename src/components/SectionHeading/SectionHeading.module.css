@@ -10,9 +10,6 @@
 
 .eyebrow {
   margin: 0 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-family: var(--oasis-font-mono);
   font-size: 12px;
   letter-spacing: 0.14em;
@@ -21,26 +18,8 @@
   font-weight: 500;
 }
 
-.eyebrow::before {
-  content: "";
-  width: 18px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--oasis-accent);
-  flex: none;
-}
-
 .wrap[data-align="center"] .eyebrow {
-  justify-content: center;
-}
-
-.wrap[data-align="center"] .eyebrow::after {
-  content: "";
-  width: 18px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--oasis-accent);
-  flex: none;
+  text-align: center;
 }
 
 .title {

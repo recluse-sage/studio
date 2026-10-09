@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Alert, Anchor, Badge, Card, Group, List, Stack, Text, Title } from "@mantine/core";
+import type { FormEvent } from "react";
+import { Alert, Anchor, Badge, Button, Card, Checkbox, Group, List, Stack, Text, Title } from "@mantine/core";
 import classes from "./SettingsView.module.css";
 
 export type SettingsViewProps = {
@@ -51,10 +52,88 @@ export function SettingsView({
   const configured = publicSiteUrl?.trim() ? publicSiteUrl.trim() : null;
   const validSiteUrl = configured ? toValidSiteUrl(configured) : null;
   const [currentOrigin, setCurrentOrigin] = useState<string | null>(null);
+  const displayEndpoint = `${adminBase}/display`;
+  const [proofVisible, setProofVisible] = useState(false);
+  const [displayLoading, setDisplayLoading] = useState(true);
+  const [displaySaving, setDisplaySaving] = useState(false);
+  const [displayError, setDisplayError] = useState<string | null>(null);
+  const [displaySaved, setDisplaySaved] = useState(false);
 
   useEffect(() => {
     setCurrentOrigin(window.location.origin);
   }, []);
+
+  /* Content display flags. Proof stays hidden until enabled. Shape is { proofVisible: boolean }. */
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+    setDisplayLoading(true);
+    setDisplayError(null);
+    fetch(displayEndpoint, { signal: controller.signal })
+      .then(async (res) => {
+        if (!active) return;
+        if (!res.ok) {
+          setDisplayError("Display settings could not load just now.");
+          setDisplayLoading(false);
+          return;
+        }
+        try {
+          const raw = (await res.json()) as { proofVisible?: unknown; display?: { proofVisible?: unknown } };
+          const value = raw.proofVisible ?? raw.display?.proofVisible;
+          setProofVisible(value === true);
+        } catch {
+          setProofVisible(false);
+        }
+        setDisplayLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setDisplayError("Display settings could not load just now.");
+        setDisplayLoading(false);
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [displayEndpoint]);
+
+  async function saveDisplay(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setDisplaySaving(true);
+    setDisplayError(null);
+    setDisplaySaved(false);
+    try {
+      const res = await fetch(displayEndpoint, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ proofVisible }),
+      });
+      if (!res.ok) {
+        let message = "Could not save display settings. Try again.";
+        try {
+          const data = (await res.json()) as { error?: string; message?: string };
+          if (typeof data.error === "string" && data.error.trim()) message = data.error;
+          else if (typeof data.message === "string" && data.message.trim()) message = data.message;
+        } catch {
+          /* keep fallback */
+        }
+        setDisplayError(message);
+      } else {
+        try {
+          const raw = (await res.json()) as { proofVisible?: unknown; display?: { proofVisible?: unknown } };
+          const value = raw.proofVisible ?? raw.display?.proofVisible;
+          if (typeof value === "boolean") setProofVisible(value);
+        } catch {
+          /* keep local value */
+        }
+        setDisplaySaved(true);
+      }
+    } catch {
+      setDisplayError("Could not save display settings. Check your connection.");
+    } finally {
+      setDisplaySaving(false);
+    }
+  }
 
   const configuredOrigin = validSiteUrl ? toOrigin(validSiteUrl) : null;
   const mismatch =
@@ -229,6 +308,46 @@ export function SettingsView({
         <Text size="sm" className={classes.muted}>
           Spam is handled with Turnstile, a hidden field, few fields, and rate limits on the server.
         </Text>
+      </Card>
+
+      <Card withBorder radius="lg" padding="lg" className={classes.card}>
+        <Title order={2} className={classes.cardTitle}>
+          Content display
+        </Title>
+        <Text size="sm" className={classes.muted}>
+          Control what proof content shows on the public site. Proof stays hidden
+          until you turn it on. Manage items in Proof Notes.
+        </Text>
+        {displayLoading ? (
+          <Text size="sm" role="status" className={classes.muted}>
+            Loading display settings.
+          </Text>
+        ) : (
+          <form onSubmit={saveDisplay} className={classes.displayForm}>
+            <Checkbox
+              label="Show proof section on the public site"
+              description="Off means the work section stays hidden, even when approved proof exists."
+              checked={proofVisible}
+              onChange={(event) => {
+                setProofVisible(event.currentTarget.checked);
+                setDisplaySaved(false);
+              }}
+            />
+            {displayError ? (
+              <Alert color="red" variant="light" role="alert" className={classes.alert}>
+                {displayError}
+              </Alert>
+            ) : null}
+            {displaySaved ? (
+              <Alert color="green" variant="light" role="status" className={classes.alert}>
+                Display settings saved.
+              </Alert>
+            ) : null}
+            <Button type="submit" loading={displaySaving} className={classes.saveButton}>
+              Save display
+            </Button>
+          </form>
+        )}
       </Card>
 
       <Card withBorder radius="lg" padding="lg" className={classes.card}>

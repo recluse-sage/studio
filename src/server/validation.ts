@@ -61,11 +61,14 @@ export const PROOF_KINDS = [
 ] as const;
 
 // Public intake allowlist. Any other key is treated as mass assignment.
+// True stages: taskDescription holds the problem, contact fields hold the
+// talk step, timeline and budget scope the solution, build and ship plus
+// use and share happen after intake. Frequency was removed: repeat detail
+// belongs in taskDescription, including the quiz goal prefix.
 export const INTAKE_ALLOWED_FIELDS = [
   "businessName",
   "businessType",
   "taskDescription",
-  "frequency",
   "timeline",
   "budget",
   "contactMethod",
@@ -78,7 +81,6 @@ export interface ValidIntake {
   businessName: string;
   businessType: BusinessType;
   taskDescription: string;
-  frequency: string | null;
   timeline: string | null;
   budget: string | null;
   contactMethod: ContactMethod;
@@ -164,13 +166,11 @@ export function validateIntakeInput(raw: unknown): {
     return { ok: false, error: "Contact email looks invalid." };
   }
 
-  const frequency = cleanStr(raw.frequency, 60);
   const timeline = cleanStr(raw.timeline, 60);
   const budget = cleanStr(raw.budget, 60);
   // cleanStr returns null for missing or blank, but also for overlong.
   // Distinguish overlong optional fields explicitly.
   for (const [key, val] of [
-    ["frequency", raw.frequency],
     ["timeline", raw.timeline],
     ["budget", raw.budget],
   ] as const) {
@@ -186,7 +186,6 @@ export function validateIntakeInput(raw: unknown): {
       businessName,
       businessType,
       taskDescription,
-      frequency,
       timeline,
       budget,
       contactMethod,
@@ -200,7 +199,6 @@ export const MANUAL_INTAKE_ALLOWED_FIELDS = [
   "businessName",
   "businessType",
   "taskDescription",
-  "frequency",
   "timeline",
   "budget",
   "contactMethod",
@@ -211,7 +209,6 @@ export interface ValidManualIntake {
   businessName: string;
   businessType: BusinessType;
   taskDescription: string;
-  frequency: string | null;
   timeline: string | null;
   budget: string | null;
   contactMethod: ContactMethod;
@@ -265,7 +262,7 @@ export function validateManualIntakeInput(raw: unknown): {
   ) {
     return { ok: false, error: "Contact email looks invalid." };
   }
-  for (const key of ["frequency", "timeline", "budget"] as const) {
+  for (const key of ["timeline", "budget"] as const) {
     const v = (raw as Record<string, unknown>)[key];
     if (v !== undefined && v !== null && v !== "" && typeof v !== "string") {
       return { ok: false, error: "Optional field is invalid." };
@@ -274,7 +271,6 @@ export function validateManualIntakeInput(raw: unknown): {
       return { ok: false, error: "Optional field is too long." };
     }
   }
-  const frequency = cleanStr(raw.frequency, 60);
   const timeline = cleanStr(raw.timeline, 60);
   const budget = cleanStr(raw.budget, 60);
   return {
@@ -283,7 +279,6 @@ export function validateManualIntakeInput(raw: unknown): {
       businessName,
       businessType,
       taskDescription,
-      frequency,
       timeline,
       budget,
       contactMethod,
@@ -663,4 +658,21 @@ export function validateProofNotePatch(raw: unknown): {
     return { ok: false, error: "Nothing to update." };
   }
   return { ok: true, data: out };
+}
+
+export const DISPLAY_ALLOWED_FIELDS = ["proofVisible"] as const;
+
+export function validateDisplayInput(raw: unknown): {
+  ok: boolean;
+  error?: string;
+  data?: { proofVisible: boolean };
+} {
+  if (!isRecord(raw)) return { ok: false, error: "Invalid display data." };
+  if (findUnknownFields(raw, DISPLAY_ALLOWED_FIELDS).length > 0) {
+    return { ok: false, error: "Invalid display data." };
+  }
+  if (typeof raw.proofVisible !== "boolean") {
+    return { ok: false, error: "Proof visibility must be true or false." };
+  }
+  return { ok: true, data: { proofVisible: raw.proofVisible } };
 }

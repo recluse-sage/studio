@@ -41,8 +41,8 @@ export function ServicesSection({ services }: ServicesSectionProps) {
         <SectionHeading
           id="services"
           eyebrow="Services"
-          title="Three ways to get help"
-          description="Pick the shape that fits. Every build starts with the same short intake."
+          title="Tools, websites, and automations"
+          description="We solve problems for small, medium, and enterprise business. Every build starts with the same short intake."
         />
         <div className={classes.grid}>
           {list.map((service, position) => (

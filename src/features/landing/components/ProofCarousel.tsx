@@ -1,7 +1,12 @@
 import { useEffect, useId, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
-import { fetchPublicWorkItems, DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT } from "../api";
+import {
+  fetchPublicWorkItems,
+  fetchPublicDisplay,
+  DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT,
+  DEFAULT_PUBLIC_DISPLAY_ENDPOINT,
+} from "../api";
 import type { WorkItem } from "../types";
 import classes from "./ProofCarousel.module.css";
 
@@ -15,6 +20,7 @@ import classes from "./ProofCarousel.module.css";
 
 export type ProofCarouselProps = {
   endpoint?: string;
+  displayEndpoint?: string;
 };
 
 type SampleSlide = {
@@ -186,11 +192,32 @@ function SampleSlideCard({ slide }: { slide: SampleSlide }) {
   );
 }
 
-export function ProofCarousel({ endpoint = DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT }: ProofCarouselProps) {
+export function ProofCarousel({
+  endpoint = DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT,
+  displayEndpoint = DEFAULT_PUBLIC_DISPLAY_ENDPOINT,
+}: ProofCarouselProps) {
   const headingId = useId();
   const [items, setItems] = useState<WorkItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [proofVisible, setProofVisible] = useState(false);
+
+  /* Proof stays hidden until the owner enables it in Settings. */
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+    fetchPublicDisplay(displayEndpoint, controller.signal).then((display) => {
+      if (!active) return;
+      setProofVisible(display.proofVisible);
+    }).catch(() => {
+      if (!active) return;
+      setProofVisible(false);
+    });
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [displayEndpoint]);
 
   useEffect(() => {
     let active = true;
@@ -225,6 +252,8 @@ export function ProofCarousel({ endpoint = DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT }:
 
   const proofCarousel = useCarousel(approved.length);
   const sampleCarousel = useCarousel(samples.length);
+
+  if (!proofVisible) return null;
 
   return (
     <section id="work" className={classes.section} aria-labelledby={headingId}>

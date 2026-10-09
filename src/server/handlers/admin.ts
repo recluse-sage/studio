@@ -14,6 +14,7 @@ import {
   PROOF_KINDS,
   SHOWCASE_STATUSES,
   validateAvailabilityInput,
+  validateDisplayInput,
   validateManualIntakeInput,
   validateOutreachInput,
   validateProofNoteInput,
@@ -49,7 +50,6 @@ function rowToIntake(r: Record<string, unknown>): unknown {
     businessName: r.business_name,
     businessType: r.business_type,
     taskDescription: r.task_description,
-    frequency: r.frequency ?? null,
     timeline: r.timeline ?? null,
     budget: r.budget ?? null,
     contactMethod: r.contact_method,
@@ -281,7 +281,7 @@ export async function handleAdminIntakes(
       let total = 0;
       if (status && (INTAKE_STATUSES as readonly string[]).includes(status)) {
         rows = await env.DB.prepare(
-          "SELECT id, business_name, business_type, task_description, frequency, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at FROM intakes WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          "SELECT id, business_name, business_type, task_description, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at FROM intakes WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
         )
           .bind(status, limit, offset)
           .all();
@@ -293,7 +293,7 @@ export async function handleAdminIntakes(
         total = Number(t?.n) || 0;
       } else {
         rows = await env.DB.prepare(
-          "SELECT id, business_name, business_type, task_description, frequency, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at FROM intakes ORDER BY created_at DESC LIMIT ? OFFSET ?",
+          "SELECT id, business_name, business_type, task_description, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at FROM intakes ORDER BY created_at DESC LIMIT ? OFFSET ?",
         )
           .bind(limit, offset)
           .all();
@@ -329,14 +329,13 @@ export async function handleAdminIntakes(
     const now = nowIso();
     try {
       await env.DB.prepare(
-        "INSERT INTO intakes (id, business_name, business_type, task_description, frequency, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'admin-manual', 'new', 'pending', ?, ?)",
+        "INSERT INTO intakes (id, business_name, business_type, task_description, timeline, budget, contact_method, contact_value, source, status, email_notification, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'admin-manual', 'new', 'pending', ?, ?)",
       )
         .bind(
           id,
           d.businessName,
           d.businessType,
           d.taskDescription,
-          d.frequency,
           d.timeline,
           d.budget,
           d.contactMethod,
@@ -1319,5 +1318,101 @@ export async function handlePublicWorkItems(
     return publicJson({ items, total: items.length });
   } catch {
     return publicError("Could not load work items.", 500, "db-error");
+  }
+}
+
+function displayVisibleOf(row: Record<string, unknown> | null): boolean {
+  if (!row) return false;
+  const v = row.proof_visible;
+  return v === 1 || v === true || v === "1";
+}
+
+// GET, PUT /api/admin/display. Access gate required.
+// Shape is always { proofVisible: boolean }. Proof stays hidden until the
+// owner turns it on. PUT writes an audit row.
+export async function handleAdminDisplay(
+  request: Request,
+  env: OasisEnv,
+): Promise<Response> {
+  const gate = await requireAdmin(request, env);
+  if ("denied" in gate) return gate.denied;
+  const actor = auditActor(gate.sub);
+
+  if (request.method === "GET") {
+    try {
+      const row = await env.DB.prepare(
+        "SELECT proof_visible FROM display_settings WHERE id = 'primary'",
+      )
+        .bind()
+        .first<Record<string, unknown>>();
+      return adminJson({ proofVisible: displayVisibleOf(row) });
+    } catch {
+      // Table missing before migration 0003. Default stays hidden.
+      return adminJson({ proofVisible: false });
+    }
+  }
+
+  if (request.method === "PUT") {
+    let raw: unknown;
+    try {
+      raw = await request.json();
+    } catch {
+      return adminError("Invalid display data.", 400, "bad-json");
+    }
+    const checked = validateDisplayInput(raw);
+    if (!checked.ok || !checked.data) {
+      return adminError(
+        checked.error || "Invalid display data.",
+        400,
+        "validation",
+      );
+    }
+    const now = nowIso();
+    const visible = checked.data.proofVisible ? 1 : 0;
+    try {
+      const existing = await env.DB.prepare(
+        "SELECT created_at FROM display_settings WHERE id = 'primary'",
+      )
+        .bind()
+        .first<{ created_at: string }>();
+      const createdAt = existing?.created_at || now;
+      await env.DB.prepare(
+        "INSERT INTO display_settings (id, proof_visible, created_at, updated_at) VALUES ('primary', ?, ?, ?) ON CONFLICT(id) DO UPDATE SET proof_visible = excluded.proof_visible, updated_at = excluded.updated_at",
+      )
+        .bind(visible, createdAt, now)
+        .run();
+      await insertAudit(env, {
+        actor,
+        action: "display.update",
+        entity: "display_settings",
+        entityId: "primary",
+        summary: "proofVisible " + String(checked.data.proofVisible),
+      });
+      return adminJson({ proofVisible: checked.data.proofVisible });
+    } catch {
+      return adminError("Could not save display.", 500, "db-error");
+    }
+  }
+
+  return adminError("Method not allowed.", 405);
+}
+
+// GET /api/public/display. No auth. Shape { proofVisible: boolean }.
+// Public cache for 60 seconds via publicJson.
+export async function handlePublicDisplay(
+  request: Request,
+  env: OasisEnv,
+): Promise<Response> {
+  if (request.method !== "GET") return publicError("Method not allowed.", 405);
+  try {
+    const row = await env.DB.prepare(
+      "SELECT proof_visible FROM display_settings WHERE id = 'primary'",
+    )
+      .bind()
+      .first<Record<string, unknown>>();
+    return publicJson({ proofVisible: displayVisibleOf(row) });
+  } catch {
+    // Table missing before migration 0003. Default stays hidden.
+    return publicJson({ proofVisible: false });
   }
 }

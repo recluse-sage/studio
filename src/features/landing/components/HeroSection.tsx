@@ -22,15 +22,15 @@ export function HeroSection({ availability }: HeroSectionProps) {
               {availability.label}
             </StatusBadge>
           ) : (
-            <p className={classes.kicker}>Solo studio. One build at a time.</p>
+            <p className={classes.kicker}>Studio for small, medium, and enterprise business</p>
           )}
           <h1 id="hero-title" className={classes.title}>
-            Small websites, tools, and automations for local businesses.
+            We solve problems by building tools, websites, and automations.
           </h1>
           <p className={classes.lede}>
-            Oasis is a solo studio. One build at a time, with clear scope and a
-            practical handoff. Tell us the task that repeats too often and we
-            will suggest a useful next step.
+            We are oasis.dev. We help small, medium, and enterprise teams with the
+            work that repeats. Tell us the problem and we will suggest a useful
+            next step.
           </p>
           <div className={classes.ctaRow}>
             <Button component="a" href="#intake" size="lg" className={classes.primary}>
@@ -48,7 +48,7 @@ export function HeroSection({ availability }: HeroSectionProps) {
                 </ThemeIcon>
               }
             >
-              One point of contact from first note to launch
+              You talk with us from first note to launch
             </List.Item>
             <List.Item
               icon={
@@ -57,7 +57,7 @@ export function HeroSection({ availability }: HeroSectionProps) {
                 </ThemeIcon>
               }
             >
-              Fixed scope in writing before any build starts
+              Scope, timing, and cost in writing before we build
             </List.Item>
             <List.Item
               icon={
@@ -66,7 +66,7 @@ export function HeroSection({ availability }: HeroSectionProps) {
                 </ThemeIcon>
               }
             >
-              Short form. Easy to fill on your phone.
+              Short form that is easy to fill on your phone
             </List.Item>
           </List>
         </div>

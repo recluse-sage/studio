@@ -15,25 +15,24 @@
   gap: 16px;
 }
 
-/* Whole card is one link. Hover lifts it. Press settles it. */
+/* Whole card is one link. Hover lifts it. Press settles it. No border, only shadow. */
 .card {
   position: relative;
   display: grid;
   gap: 10px;
   align-content: start;
-  border: 1px solid var(--oasis-border);
+  border: 0;
   border-radius: var(--oasis-radius-lg);
   background: var(--oasis-surface);
   padding: 22px 20px;
   text-decoration: none;
   color: inherit;
   min-height: var(--oasis-touch-min);
-  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, background-color 140ms ease;
+  transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
 .card:hover {
   transform: translateY(-3px);
-  border-color: var(--oasis-accent-border);
   background: var(--oasis-surface-raised);
   box-shadow: var(--oasis-card-shadow);
 }

@@ -135,7 +135,7 @@
 .checkIcon {
   background: var(--oasis-accent-soft);
   color: var(--oasis-accent);
-  border: 1px solid var(--oasis-accent-border);
+  border: 0;
   font-size: 13px;
 }
 

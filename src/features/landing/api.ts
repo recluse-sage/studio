@@ -10,6 +10,96 @@ import type {
 export const DEFAULT_INTAKE_ENDPOINT = "/api/intakes";
 export const DEFAULT_PUBLIC_AVAILABILITY_ENDPOINT = "/api/public/availability";
 export const DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT = "/api/public/work-items";
+export const DEFAULT_PUBLIC_DISPLAY_ENDPOINT = "/api/public/display";
+export const DEFAULT_ADMIN_DISPLAY_ENDPOINT = "/api/admin/display";
+
+export type DisplaySettings = {
+  proofVisible: boolean;
+};
+
+function normalizeDisplay(raw: unknown): DisplaySettings {
+  if (raw && typeof raw === "object") {
+    const r = raw as Record<string, unknown>;
+    const nested = r.display && typeof r.display === "object" ? (r.display as Record<string, unknown>) : null;
+    const value = r.proofVisible ?? nested?.proofVisible;
+    if (value === true) return { proofVisible: true };
+  }
+  return { proofVisible: false };
+}
+
+/**
+ * GET public display flags. Proof stays hidden until enabled.
+ * Returns hidden on any failure. Never throws.
+ */
+export async function fetchPublicDisplay(
+  endpoint: string = DEFAULT_PUBLIC_DISPLAY_ENDPOINT,
+  signal?: AbortSignal,
+): Promise<DisplaySettings> {
+  try {
+    const res = await fetch(endpoint, { signal });
+    if (!res.ok) return { proofVisible: false };
+    const raw = (await res.json()) as unknown;
+    return normalizeDisplay(raw);
+  } catch {
+    return { proofVisible: false };
+  }
+}
+
+/**
+ * GET admin display flags. Returns null when the request fails.
+ */
+export async function fetchAdminDisplay(
+  endpoint: string = DEFAULT_ADMIN_DISPLAY_ENDPOINT,
+  signal?: AbortSignal,
+): Promise<DisplaySettings | null> {
+  try {
+    const res = await fetch(endpoint, { signal });
+    if (!res.ok) return null;
+    const raw = (await res.json()) as unknown;
+    return normalizeDisplay(raw);
+  } catch {
+    return null;
+  }
+}
+
+export type UpdateDisplayResult = { ok: true; display: DisplaySettings } | { ok: false; message: string };
+
+/**
+ * PUT admin display flags. Shape is exactly { proofVisible: boolean }.
+ */
+export async function updateAdminDisplay(
+  display: DisplaySettings,
+  endpoint: string = DEFAULT_ADMIN_DISPLAY_ENDPOINT,
+  signal?: AbortSignal,
+): Promise<UpdateDisplayResult> {
+  try {
+    const res = await fetch(endpoint, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ proofVisible: display.proofVisible }),
+      signal,
+    });
+    if (res.ok) {
+      try {
+        const raw = (await res.json()) as unknown;
+        return { ok: true, display: normalizeDisplay(raw) };
+      } catch {
+        return { ok: true, display };
+      }
+    }
+    let message = "Could not save display settings. Try again.";
+    try {
+      const data = (await res.json()) as { error?: string; message?: string };
+      if (typeof data.error === "string" && data.error.trim()) message = data.error;
+      else if (typeof data.message === "string" && data.message.trim()) message = data.message;
+    } catch {
+      /* keep fallback */
+    }
+    return { ok: false, message };
+  } catch {
+    return { ok: false, message: "Could not save display settings. Check your connection." };
+  }
+}
 
 export type EmailNotificationState = "pending" | "sent" | "failed";
 

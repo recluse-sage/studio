@@ -84,9 +84,9 @@
 }
 
 .burger {
-  border: 1px solid var(--oasis-border);
-  border-radius: 10px;
-  background: var(--oasis-surface);
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
   width: var(--oasis-touch-min);
   height: var(--oasis-touch-min);
 }

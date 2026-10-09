@@ -1,716 +1,395 @@
-import { useId, useRef, useState } from "react";
-import type { KeyboardEvent } from "react";
+import { useMemo, useState } from "react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
+import {
+  QUESTIONS,
+  recommend,
+  getNextQuestionId,
+  quizToIntakePrefill,
+  buildTaskDescriptionFromQuiz,
+} from "../../../shared/quiz";
 import classes from "./ToolsSection.module.css";
 
 /**
- * Five small honest homepage tools. All client side, no fake data.
- * Each tool takes simple inputs and returns a plain next step plus
- * an intake link. Empty state first, result state after checking.
+ * One guided wizard built on the shared quiz model.
+ * QUESTIONS, branching, and the recommend function come from src/shared/quiz.
+ * This file renders flow only. It never duplicates the rules.
  */
 
-const TABS = [
-  { id: "price", label: "Price shape" },
-  { id: "booking", label: "Booking check" },
-  { id: "followup", label: "Follow up math" },
-  { id: "hours", label: "Hours and contact" },
-  { id: "automation", label: "Automation fit" },
-] as const;
+type QuizOption = { value: string; label: string };
+type QuizQuestion = {
+  id: string;
+  label: string;
+  hint?: string;
+  options: QuizOption[];
+};
 
-type TabId = (typeof TABS)[number]["id"];
-
-function IntakeLink({ text }: { text: string }) {
-  return (
-    <a href="#intake" className={classes.intakeLink}>
-      {text}
-      <span aria-hidden="true">→</span>
-    </a>
-  );
+function toOptions(raw: unknown): QuizOption[] {
+  if (!Array.isArray(raw)) return [];
+  const out: QuizOption[] = [];
+  for (const item of raw) {
+    if (typeof item === "string" && item.trim().length > 0) {
+      out.push({ value: item, label: item });
+      continue;
+    }
+    if (item && typeof item === "object") {
+      const o = item as Record<string, unknown>;
+      const valueRaw = o.value ?? o.id ?? o.key;
+      const labelRaw = o.label ?? o.title ?? o.text ?? o.name;
+      const value = typeof valueRaw === "string" && valueRaw.trim().length > 0 ? valueRaw : null;
+      const label = typeof labelRaw === "string" && labelRaw.trim().length > 0 ? labelRaw : value;
+      if (value && label) out.push({ value, label });
+    }
+  }
+  return out;
 }
 
-function ToolActions({
-  onCheck,
-  onReset,
-  hasResult,
-  checkLabel,
-}: {
-  onCheck: () => void;
-  onReset: () => void;
-  hasResult: boolean;
-  checkLabel: string;
-}) {
-  return (
-    <div className={classes.actions}>
-      <button type="button" className={classes.check} onClick={onCheck}>
-        {checkLabel}
-      </button>
-      {hasResult ? (
-        <button type="button" className={classes.reset} onClick={onReset}>
-          Start over
-        </button>
-      ) : null}
-    </div>
-  );
+function normalizeQuestions(raw: unknown): QuizQuestion[] {
+  if (!Array.isArray(raw)) return [];
+  const list: QuizQuestion[] = [];
+  raw.forEach((entry, position) => {
+    if (!entry || typeof entry !== "object") return;
+    const q = entry as Record<string, unknown>;
+    const idRaw = q.id ?? q.key ?? `q${position + 1}`;
+    const labelRaw = q.label ?? q.question ?? q.title ?? q.text;
+    const id = typeof idRaw === "string" && idRaw.trim().length > 0 ? idRaw : `q${position + 1}`;
+    const label =
+      typeof labelRaw === "string" && labelRaw.trim().length > 0 ? labelRaw : `Question ${position + 1}`;
+    const hintRaw = q.hint ?? q.help ?? q.description;
+    const hint = typeof hintRaw === "string" && hintRaw.trim().length > 0 ? hintRaw : undefined;
+    const parsed = toOptions(q.options ?? q.choices ?? q.answers);
+    const options = parsed.length > 0 ? parsed : [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }];
+    list.push({ id, label, hint, options });
+  });
+  return list;
 }
 
-function EmptyNote({ text }: { text: string }) {
-  return (
-    <p className={classes.empty}>
-      {text} Nothing is sent. Results stay on this page.
-    </p>
-  );
+function fitLabel(fit: unknown): string {
+  if (fit === "website") return "A small website";
+  if (fit === "tool") return "A small tool";
+  if (fit === "automation") return "A simple automation";
+  return "A useful next step";
 }
 
-function FieldError({ message }: { message: string | null }) {
-  if (!message) return null;
-  return (
-    <p role="alert" className={classes.fieldError}>
-      {message}
-    </p>
-  );
-}
+export const QUIZ_PREFILL_EVENT = "oasis:quiz-prefill";
 
-/* 1. Price shape estimator. Shape words only, never a price. */
+type RecommendResult = {
+  fit?: unknown;
+  runnerUp?: unknown;
+  why?: unknown;
+};
 
-function PriceShapeTool() {
-  const [need, setNeed] = useState("");
-  const [size, setSize] = useState("");
-  const [wantsBooking, setWantsBooking] = useState(false);
-  const [wantsReminders, setWantsReminders] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ shape: string; lines: string[] } | null>(null);
+export function ToolsSection() {
+  const questions = useMemo(() => normalizeQuestions(QUESTIONS as unknown), []);
+  const byId = useMemo(() => new Map(questions.map((q) => [q.id, q])), [questions]);
 
-  function check() {
-    if (!need || !size) {
-      setError("Choose what you need and the size, then check the shape.");
-      setResult(null);
-      return;
-    }
-    setError(null);
-    const base =
-      need === "website" && size === "one"
-        ? "a one page website"
-        : need === "website" && size === "few"
-          ? "a small website of a few pages"
-          : need === "website"
-            ? "a website built in stages, starting with one clear page"
-            : need === "tool" && size === "one"
-              ? "a small tool that does one job"
-              : need === "tool" && size === "few"
-                ? "a small tool with one main job plus one helper"
-                : need === "tool"
-                  ? "a tool built in stages, starting with the most repeated job"
-                  : size === "one"
-                    ? "one simple link between two steps you already do"
-                    : size === "few"
-                      ? "a short chain that links intake, reply, and booking"
-                      : "an automation built in stages, starting with reminders";
-    const lines: string[] = [];
-    if (wantsBooking) lines.push("Include a booking or quote step people can finish on a phone.");
-    if (wantsReminders) lines.push("Include simple reminders so fewer bookings slip.");
-    lines.push("Mention timing and budget in one line so the scope can stay fixed.");
-    setResult({ shape: base, lines });
-  }
-
-  function reset() {
-    setNeed("");
-    setSize("");
-    setWantsBooking(false);
-    setWantsReminders(false);
-    setError(null);
-    setResult(null);
-  }
-
-  return (
-    <div className={classes.tool}>
-      <p className={classes.toolIntro}>
-        Answer three questions. You get a likely build shape and what to include in
-        your intake. This is a starting shape, not a quote or a promise.
-      </p>
-      <div className={classes.field}>
-        <label className={classes.label} htmlFor="price-need">
-          What do you need
-        </label>
-        <select
-          id="price-need"
-          className={classes.input}
-          value={need}
-          onChange={(e) => setNeed(e.currentTarget.value)}
-        >
-          <option value="">Choose one</option>
-          <option value="website">A simple website</option>
-          <option value="tool">A small tool</option>
-          <option value="automation">Link steps with automation</option>
-        </select>
-      </div>
-      <div className={classes.field}>
-        <label className={classes.label} htmlFor="price-size">
-          How big does it feel
-        </label>
-        <select
-          id="price-size"
-          className={classes.input}
-          value={size}
-          onChange={(e) => setSize(e.currentTarget.value)}
-        >
-          <option value="">Choose one</option>
-          <option value="one">One page or one task</option>
-          <option value="few">A few pages or two tasks</option>
-          <option value="several">Several pages or connected steps</option>
-        </select>
-      </div>
-      <fieldset className={classes.checkGroup}>
-        <legend className={classes.label}>Extras, optional</legend>
-        <label className={classes.checkRow}>
-          <input
-            type="checkbox"
-            checked={wantsBooking}
-            onChange={(e) => setWantsBooking(e.currentTarget.checked)}
-          />
-          Take bookings or quotes
-        </label>
-        <label className={classes.checkRow}>
-          <input
-            type="checkbox"
-            checked={wantsReminders}
-            onChange={(e) => setWantsReminders(e.currentTarget.checked)}
-          />
-          Send reminders or follow ups
-        </label>
-      </fieldset>
-      <FieldError message={error} />
-      <ToolActions onCheck={check} onReset={reset} hasResult={result !== null} checkLabel="Check shape" />
-      {result ? (
-        <div role="status" aria-live="polite" className={classes.result}>
-          <h4 className={classes.resultTitle}>Likely shape: {result.shape}.</h4>
-          <ul className={classes.resultList}>
-            {result.lines.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-          <p className={classes.next}>
-            Next step: send the intake and paste these answers in one line.
-          </p>
-          <IntakeLink text="Send this in the intake" />
-        </div>
-      ) : (
-        <EmptyNote text="Choose the options above, then select Check shape." />
-      )}
-    </div>
-  );
-}
-
-/* 2. Booking readiness checker. */
-
-function BookingReadinessTool() {
-  const [channel, setChannel] = useState("");
-  const [misses, setMisses] = useState("");
-  const [chasing, setChasing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ title: string; lines: string[] } | null>(null);
-
-  function check() {
-    const missed = misses.trim() === "" ? null : Number(misses);
-    if (!channel) {
-      setError("Choose how people book now, then check readiness.");
-      setResult(null);
-      return;
-    }
-    if (missed !== null && (!Number.isFinite(missed) || missed < 0 || missed > 500)) {
-      setError("Missed bookings must be a number from 0 to 500, or leave it blank.");
-      setResult(null);
-      return;
-    }
-    setError(null);
-    const lines: string[] = [];
-    if (channel === "no-clear-way") {
-      lines.push("Name one booking path first, such as text or a simple form.");
-    } else {
-      lines.push("Keep the current path. New tools should link to it, not replace it yet.");
-    }
-    if (missed !== null && missed >= 3) {
-      lines.push("At this miss rate, confirmations are the first fix worth scoping.");
-    } else if (missed !== null && missed > 0) {
-      lines.push("A short confirmation step should cover the gaps you typed.");
-    } else {
-      lines.push("Low misses means a light helper is enough. Keep the change small.");
-    }
-    if (chasing) lines.push("Manual chasing is the clearest sign a reminder helper would help.");
-    const title =
-      channel === "no-clear-way"
-        ? "Start with one clear booking path."
-        : missed !== null && missed >= 3
-          ? "Worth fixing soon. Start with confirmations."
-          : "Mostly ready. Keep the fix small.";
-    setResult({ title, lines });
-  }
-
-  function reset() {
-    setChannel("");
-    setMisses("");
-    setChasing(false);
-    setError(null);
-    setResult(null);
-  }
-
-  return (
-    <div className={classes.tool}>
-      <p className={classes.toolIntro}>
-        Three quick answers about how bookings work today. You get a plain readout
-        and the smallest useful next step.
-      </p>
-      <div className={classes.field}>
-        <label className={classes.label} htmlFor="booking-channel">
-          How do people book now
-        </label>
-        <select
-          id="booking-channel"
-          className={classes.input}
-          value={channel}
-          onChange={(e) => setChannel(e.currentTarget.value)}
-        >
-          <option value="">Choose one</option>
-          <option value="phone-text">By phone call or text</option>
-          <option value="dm-social">By DM or social message</option>
-          <option value="walk-in">In person or walk in</option>
-          <option value="no-clear-way">No clear way yet</option>
-        </select>
-      </div>
-      <div className={classes.field}>
-        <label className={classes.label} htmlFor="booking-misses">
-          Messy or missed bookings per week, optional
-        </label>
-        <input
-          id="booking-misses"
-          className={classes.input}
-          type="number"
-          min={0}
-          max={500}
-          inputMode="numeric"
-          placeholder="Example: 2"
-          value={misses}
-          onChange={(e) => setMisses(e.currentTarget.value)}
-        />
-      </div>
-      <label className={classes.checkRow}>
-        <input
-          type="checkbox"
-          checked={chasing}
-          onChange={(e) => setChasing(e.currentTarget.checked)}
-        />
-        Confirmations take manual chasing
-      </label>
-      <FieldError message={error} />
-      <ToolActions onCheck={check} onReset={reset} hasResult={result !== null} checkLabel="Check readiness" />
-      {result ? (
-        <div role="status" aria-live="polite" className={classes.result}>
-          <h4 className={classes.resultTitle}>{result.title}</h4>
-          <ul className={classes.resultList}>
-            {result.lines.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-          <p className={classes.next}>
-            Next step: send the intake and describe the booking path in two lines.
-          </p>
-          <IntakeLink text="Send this in the intake" />
-        </div>
-      ) : (
-        <EmptyNote text="Choose how bookings work today, then select Check readiness." />
-      )}
-    </div>
-  );
-}
-
-/* 3. Quote follow up calculator. Math from typed numbers only. */
-
-const numberFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-
-function FollowUpTool() {
-  const [quotes, setQuotes] = useState("");
-  const [value, setValue] = useState("");
-  const [habit, setHabit] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ pipeline: string; extra: string; note: string } | null>(null);
-
-  function check() {
-    const q = Number(quotes);
-    const v = Number(value);
-    if (quotes.trim() === "" || !Number.isFinite(q) || q < 0 || q > 100000) {
-      setError("Add quotes per month as a number from 0 to 100000.");
-      setResult(null);
-      return;
-    }
-    if (value.trim() === "" || !Number.isFinite(v) || v < 0 || v > 100000000) {
-      setError("Add an average job value as a number. Use your own currency.");
-      setResult(null);
-      return;
-    }
-    if (!habit) {
-      setError("Choose how often you follow up, then do the math.");
-      setResult(null);
-      return;
-    }
-    setError(null);
-    const pipeline = q * v;
-    const extra = pipeline / 10;
-    const note =
-      habit === "every"
-        ? "You already follow up, so the win is speed. A simple log plus one reminder keeps it steady."
-        : habit === "sometimes"
-          ? "Some follow up slips through. One shared list plus one reminder usually covers it."
-          : "Most quotes get no follow up, so even one reminder pass each week can matter.";
-    setResult({
-      pipeline: numberFormat.format(pipeline),
-      extra: numberFormat.format(extra),
-      note,
-    });
-  }
-
-  function reset() {
-    setQuotes("");
-    setValue("");
-    setHabit("");
-    setError(null);
-    setResult(null);
-  }
-
-  return (
-    <div className={classes.tool}>
-      <p className={classes.toolIntro}>
-        Type your own numbers. The math below uses only what you typed, in your own
-        currency. No averages from other businesses.
-      </p>
-      <div className={classes.row}>
-        <div className={classes.field}>
-          <label className={classes.label} htmlFor="follow-quotes">
-            Quotes per month
-          </label>
-          <input
-            id="follow-quotes"
-            className={classes.input}
-            type="number"
-            min={0}
-            max={100000}
-            inputMode="numeric"
-            placeholder="Example: 20"
-            value={quotes}
-            onChange={(e) => setQuotes(e.currentTarget.value)}
-          />
-        </div>
-        <div className={classes.field}>
-          <label className={classes.label} htmlFor="follow-value">
-            Average job value
-          </label>
-          <input
-            id="follow-value"
-            className={classes.input}
-            type="number"
-            min={0}
-            max={100000000}
-            inputMode="decimal"
-            placeholder="Example: 150"
-            value={value}
-            onChange={(e) => setValue(e.currentTarget.value)}
-          />
-        </div>
-      </div>
-      <div className={classes.field}>
-        <label className={classes.label} htmlFor="follow-habit">
-          Do you follow up every quote
-        </label>
-        <select
-          id="follow-habit"
-          className={classes.input}
-          value={habit}
-          onChange={(e) => setHabit(e.currentTarget.value)}
-        >
-          <option value="">Choose one</option>
-          <option value="every">Yes, every quote</option>
-          <option value="sometimes">Sometimes</option>
-          <option value="rarely">Rarely or never</option>
-        </select>
-      </div>
-      <FieldError message={error} />
-      <ToolActions onCheck={check} onReset={reset} hasResult={result !== null} checkLabel="Do the math" />
-      {result ? (
-        <div role="status" aria-live="polite" className={classes.result}>
-          <h4 className={classes.resultTitle}>
-            Your typed pipeline is about {result.pipeline}. One extra win in ten would be about {result.extra}.
-          </h4>
-          <p className={classes.next}>{result.note}</p>
-          <p className={classes.next}>
-            Next step: send the intake with your two numbers and we will suggest one
-            follow up step.
-          </p>
-          <IntakeLink text="Send this in the intake" />
-        </div>
-      ) : (
-        <EmptyNote text="Add your two numbers and habit, then select Do the math." />
-      )}
-    </div>
-  );
-}
-
-/* 4. Hours and contact completeness checker. */
-
-const HOURS_ITEMS = [
-  { id: "google-hours", label: "Hours are current on your map listing" },
-  { id: "social-hours", label: "Hours appear on your site or social profile" },
-  { id: "phone-tap", label: "Phone number is easy to tap on a phone" },
-  { id: "map-link", label: "Map or directions link is easy to find" },
-  { id: "reply-channel", label: "You name the fastest way to reach you" },
-] as const;
-
-function HoursContactTool() {
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const [result, setResult] = useState<{ score: number; missing: string[] } | null>(null);
-
-  function toggle(id: string, value: boolean) {
-    setChecked((prev) => ({ ...prev, [id]: value }));
-  }
-
-  function check() {
-    const missing = HOURS_ITEMS.filter((item) => !checked[item.id]).map((item) => item.label);
-    setResult({ score: HOURS_ITEMS.length - missing.length, missing });
-  }
-
-  function reset() {
-    setChecked({});
-    setResult(null);
-  }
-
-  return (
-    <div className={classes.tool}>
-      <p className={classes.toolIntro}>
-        Tick what a new customer can already find in under a minute. You get a
-        score out of five plus the exact gaps to close.
-      </p>
-      <fieldset className={classes.checkGroup}>
-        <legend className={classes.label}>What can a customer find fast</legend>
-        {HOURS_ITEMS.map((item) => (
-          <label key={item.id} className={classes.checkRow}>
-            <input
-              type="checkbox"
-              checked={Boolean(checked[item.id])}
-              onChange={(e) => toggle(item.id, e.currentTarget.checked)}
-            />
-            {item.label}
-          </label>
-        ))}
-      </fieldset>
-      <ToolActions onCheck={check} onReset={reset} hasResult={result !== null} checkLabel="Check completeness" />
-      {result ? (
-        <div role="status" aria-live="polite" className={classes.result}>
-          <h4 className={classes.resultTitle}>
-            Score: {result.score} of {HOURS_ITEMS.length}.
-            {result.missing.length === 0
-              ? " Everything on this list is covered."
-              : " Start with the first gap below."}
-          </h4>
-          {result.missing.length > 0 ? (
-            <ul className={classes.resultList}>
-              {result.missing.map((label) => (
-                <li key={label}>Missing: {label.toLowerCase()}.</li>
-              ))}
-            </ul>
-          ) : null}
-          <p className={classes.next}>
-            Next step: send the intake and list the gaps. A hours and contact pass is
-            a small first build.
-          </p>
-          <IntakeLink text="Send this in the intake" />
-        </div>
-      ) : (
-        <EmptyNote text="Tick the boxes that are true today, then select Check completeness." />
-      )}
-    </div>
-  );
-}
-
-/* 5. Automation fit quiz. */
-
-const QUIZ = [
-  { id: "q1", question: "Does one task repeat every week" },
-  { id: "q2", question: "Are the steps mostly the same each time" },
-  { id: "q3", question: "Do reminders or follow ups need manual chasing" },
-  { id: "q4", question: "Is the same info typed in more than one place" },
-] as const;
-
-function AutomationFitTool() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [history, setHistory] = useState<string[]>([]);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ score: number; title: string; detail: string } | null>(null);
 
-  function check() {
-    const unanswered = QUIZ.filter((q) => answers[q.id] !== "yes" && answers[q.id] !== "no");
-    if (unanswered.length > 0) {
-      setError("Answer all four questions, then check the fit.");
-      setResult(null);
+  const current: QuizQuestion | null = currentId ? (byId.get(currentId) ?? null) : null;
+
+  const orderedIds = useMemo(() => questions.map((q) => q.id), [questions]);
+  const stepIndex = currentId ? history.length : 0;
+  const totalSteps = orderedIds.length + 2;
+
+  function nextIdFor(nextAnswers: Record<string, string>): string | null {
+    try {
+      const next = (getNextQuestionId as (a: Record<string, string>) => unknown)(nextAnswers);
+      if (typeof next === "string" && next.trim().length > 0) return next;
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  function begin() {
+    setError(null);
+    setStarted(true);
+    setFinished(false);
+    const first = nextIdFor(answers) ?? orderedIds[0] ?? null;
+    if (first) {
+      setHistory([]);
+      setCurrentId(first);
+    } else {
+      setFinished(true);
+    }
+  }
+
+  function goNext() {
+    if (!started) {
+      begin();
+      return;
+    }
+    if (finished) return;
+    if (!current) return;
+    const value = answers[current.id];
+    if (!value) {
+      setError("Choose one option, then select Next.");
       return;
     }
     setError(null);
-    const score = QUIZ.filter((q) => answers[q.id] === "yes").length;
-    const title =
-      score <= 1
-        ? "Low fit. Keep it manual for now."
-        : score === 2
-          ? "Fair fit. One small helper could help."
-          : score === 3
-            ? "Good fit. Worth scoping one helper."
-            : "Strong fit. A helper is worth scoping.";
-    const detail =
-      score <= 1
-        ? "Few repeated steps means a build would add cost without clear return. Revisit when the task repeats more."
-        : score <= 3
-          ? "Name the single most repeated step in your intake. That becomes the first helper."
-          : "Name the repeated steps in order in your intake. That list becomes the scope.";
-    setResult({ score, title, detail });
+    const next = nextIdFor(answers);
+    if (next && byId.has(next) && !history.includes(next)) {
+      setHistory((prev) => [...prev, current.id]);
+      setCurrentId(next);
+    } else {
+      // No further question. Show the result.
+      setHistory((prev) => [...prev, current.id]);
+      setFinished(true);
+      setCurrentId(null);
+    }
+  }
+
+  function goBack() {
+    setError(null);
+    if (finished) {
+      const prev = history[history.length - 1] ?? null;
+      setHistory((h) => h.slice(0, -1));
+      setFinished(false);
+      setStarted(true);
+      setCurrentId(prev);
+      return;
+    }
+    if (history.length === 0) {
+      setStarted(false);
+      setCurrentId(null);
+      return;
+    }
+    const prev = history[history.length - 1];
+    setHistory((h) => h.slice(0, -1));
+    setCurrentId(prev);
   }
 
   function reset() {
     setAnswers({});
+    setHistory([]);
+    setCurrentId(null);
+    setStarted(false);
+    setFinished(false);
     setError(null);
-    setResult(null);
   }
 
-  return (
-    <div className={classes.tool}>
-      <p className={classes.toolIntro}>
-        Four yes or no questions about the task that repeats. You get an honest fit
-        readout, including when not to build.
-      </p>
-      {QUIZ.map((q, index) => (
-        <fieldset key={q.id} className={classes.quizGroup}>
-          <legend className={classes.label}>
-            {index + 1}. {q.question}
-          </legend>
-          <div className={classes.quizRow}>
-            <label className={classes.quizOption}>
-              <input
-                type="radio"
-                name={`automation-${q.id}`}
-                value="yes"
-                checked={answers[q.id] === "yes"}
-                onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: "yes" }))}
-              />
-              Yes
-            </label>
-            <label className={classes.quizOption}>
-              <input
-                type="radio"
-                name={`automation-${q.id}`}
-                value="no"
-                checked={answers[q.id] === "no"}
-                onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: "no" }))}
-              />
-              No
-            </label>
-          </div>
-        </fieldset>
-      ))}
-      <FieldError message={error} />
-      <ToolActions onCheck={check} onReset={reset} hasResult={result !== null} checkLabel="Check fit" />
-      {result ? (
-        <div role="status" aria-live="polite" className={classes.result}>
-          <h4 className={classes.resultTitle}>
-            {result.score} of 4 yes. {result.title}
-          </h4>
-          <p className={classes.next}>{result.detail}</p>
-          <p className={classes.next}>
-            Next step: send the intake and describe the repeating task in two lines.
-          </p>
-          <IntakeLink text="Send this in the intake" />
-        </div>
-      ) : (
-        <EmptyNote text="Answer all four questions, then select Check fit." />
-      )}
-    </div>
-  );
-}
-
-/* Section shell with keyboard safe tabs. */
-
-export function ToolsSection() {
-  const headingId = useId();
-  const [active, setActive] = useState<number>(0);
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-
-  function select(index: number) {
-    setActive((index + TABS.length) % TABS.length);
-  }
-
-  function onTabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      const next = (index + 1) % TABS.length;
-      select(next);
-      tabRefs.current[next]?.focus();
-    } else if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      const prev = (index - 1 + TABS.length) % TABS.length;
-      select(prev);
-      tabRefs.current[prev]?.focus();
-    } else if (event.key === "Home") {
-      event.preventDefault();
-      select(0);
-      tabRefs.current[0]?.focus();
-    } else if (event.key === "End") {
-      event.preventDefault();
-      select(TABS.length - 1);
-      tabRefs.current[TABS.length - 1]?.focus();
+  let recommendation: RecommendResult | null = null;
+  if (finished) {
+    try {
+      recommendation = (recommend as (a: Record<string, string>) => RecommendResult)(answers);
+    } catch {
+      recommendation = null;
     }
   }
 
-  const activeId: TabId = TABS[active].id;
+  const why: string[] = Array.isArray((recommendation as { why?: unknown } | null)?.why)
+    ? ((recommendation as { why: unknown[] }).why.filter((w): w is string => typeof w === "string" && w.trim().length > 0))
+    : [];
+
+  function prefillText(): string {
+    try {
+      const shaped = (quizToIntakePrefill as (a: Record<string, string>) => { taskDescriptionPrefix?: unknown })(answers);
+      if (shaped && typeof shaped.taskDescriptionPrefix === "string" && shaped.taskDescriptionPrefix.trim()) {
+        return shaped.taskDescriptionPrefix;
+      }
+    } catch {
+      /* fall through */
+    }
+    try {
+      const built = (buildTaskDescriptionFromQuiz as (a: Record<string, string>, b: string) => unknown)(answers, "");
+      if (typeof built === "string" && built.trim()) return built;
+    } catch {
+      /* fall through */
+    }
+    return "Guided check from oasis.dev tools.";
+  }
+
+  function useInIntake() {
+    const text = prefillText().trim();
+    try {
+      window.dispatchEvent(new CustomEvent(QUIZ_PREFILL_EVENT, { detail: { text } }));
+    } catch {
+      /* ignore dispatch errors */
+    }
+    window.location.hash = "#intake";
+    window.setTimeout(() => {
+      document.getElementById("intake-taskDescription")?.focus({ preventScroll: true });
+    }, 60);
+  }
+
+  const stepLabels = useMemo(() => {
+    const items: Array<{ key: string; label: string }> = [{ key: "intro", label: "Intro" }];
+    questions.forEach((q, i) => {
+      const short = q.id.length <= 12 ? q.id : `Step ${i + 1}`;
+      items.push({ key: q.id, label: short });
+    });
+    items.push({ key: "result", label: "Result" });
+    return items;
+  }, [questions]);
+
+  function stepState(key: string, position: number): { current: boolean; done: boolean } {
+    if (position === 0) return { current: !started && !finished, done: started || finished };
+    if (key === "result") return { current: finished, done: false };
+    if (finished) return { current: false, done: Boolean(answers[key]) };
+    if (key === currentId) return { current: true, done: false };
+    return { current: false, done: history.includes(key) };
+  }
 
   return (
-    <section id="tools" className={classes.section} aria-labelledby={headingId}>
+    <section id="tools" className={classes.section} aria-labelledby="tools-title">
       <div className={classes.inner}>
         <SectionHeading
           id="tools"
-          eyebrow="Quick checks"
-          title="Five checks that help you decide"
-          description="Small honest helpers. Answer a few questions, get a plain next step. All on this page, no account needed."
+          eyebrow="Tools"
+          title="Find the right next step"
+          description="Answer a few quick questions and we will suggest a useful next step."
         />
-        <div
-          role="tablist"
-          aria-label="Homepage helper tools"
-          className={classes.tabs}
-        >
-          {TABS.map((tab, index) => (
-            <button
-              key={tab.id}
-              ref={(el) => {
-                tabRefs.current[index] = el;
-              }}
-              role="tab"
-              id={`tool-tab-${tab.id}`}
-              aria-selected={index === active}
-              aria-controls={`tool-panel-${tab.id}`}
-              tabIndex={index === active ? 0 : -1}
-              className={classes.tab}
-              data-active={index === active}
-              onClick={() => select(index)}
-              onKeyDown={(event) => onTabKey(event, index)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <div
-          role="tabpanel"
-          id={`tool-panel-${activeId}`}
-          aria-labelledby={`tool-tab-${activeId}`}
-          className={classes.panel}
-          key={activeId}
-        >
-          {activeId === "price" ? <PriceShapeTool /> : null}
-          {activeId === "booking" ? <BookingReadinessTool /> : null}
-          {activeId === "followup" ? <FollowUpTool /> : null}
-          {activeId === "hours" ? <HoursContactTool /> : null}
-          {activeId === "automation" ? <AutomationFitTool /> : null}
-        </div>
+
+        {questions.length === 0 ? (
+          <p className={classes.empty} role="status">
+            The guided check is being prepared. Send the intake with a line about the task that repeats.
+          </p>
+        ) : (
+          <div className={classes.shell}>
+            <ol className={classes.steps} aria-label="Wizard steps">
+              {stepLabels.map((item, i) => {
+                const s = stepState(item.key, i);
+                return (
+                  <li key={item.key} className={classes.stepItem} data-current={s.current} data-done={s.done}>
+                    <span className={classes.stepDot} aria-hidden="true">
+                      {s.done ? (
+                        <svg viewBox="0 0 12 12" focusable="false">
+                          <path
+                            d="m2.5 6.2 2.2 2.2 4.8-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      ) : (
+                        <span className={classes.stepNumber} aria-hidden="true">
+                          {i === 0 ? "•" : i === stepLabels.length - 1 ? "✓" : String(i)}
+                        </span>
+                      )}
+                    </span>
+                    <span className={classes.stepLabel} aria-current={s.current ? "step" : undefined}>
+                      {item.label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+
+            <p className={classes.progress} role="status" aria-live="polite">
+              {!started && !finished
+                ? `Intro of ${totalSteps} steps`
+                : finished
+                  ? `Result, step ${totalSteps} of ${totalSteps}`
+                  : `Step ${stepIndex + 2} of ${totalSteps}${current ? `: ${current.label}` : ""}`}
+            </p>
+
+            <div className={classes.panel} key={currentId ?? (finished ? "result" : "intro")}>
+              {!started && !finished ? (
+                <div className={classes.intro}>
+                  <span className={classes.stageIcon} aria-hidden="true">
+                    <svg viewBox="0 0 20 20" focusable="false">
+                      <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M10 6.5v3.5l2.5 1.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <p className={classes.introText}>
+                    Three short questions about the work that repeats. Your answers stay on this page.
+                  </p>
+                </div>
+              ) : null}
+
+              {current && !finished ? (
+                <fieldset className={classes.group}>
+                  <legend className={classes.question}>{current.label}</legend>
+                  {current.hint ? <p className={classes.hint}>{current.hint}</p> : null}
+                  <div className={classes.options}>
+                    {current.options.map((option) => (
+                      <label key={option.value} className={classes.option}>
+                        <input
+                          type="radio"
+                          name={`quiz-${current.id}`}
+                          value={option.value}
+                          checked={answers[current.id] === option.value}
+                          onChange={() => setAnswers((prev) => ({ ...prev, [current.id]: option.value }))}
+                        />
+                        {option.label}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              ) : null}
+
+              {finished && recommendation ? (
+                <div className={classes.result} role="status" aria-live="polite">
+                  <span className={classes.stageIcon} aria-hidden="true">
+                    <svg viewBox="0 0 20 20" focusable="false">
+                      <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                      <path
+                        d="m7.5 10.2 1.8 1.8 3.4-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <h3 className={classes.resultTitle}>{fitLabel(recommendation.fit)}.</h3>
+                  {why.length > 0 ? (
+                    <ul className={classes.why}>
+                      {why.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <p className={classes.prefill}>
+                    <span className={classes.prefillLabel}>Intake draft</span>
+                    {prefillText()}
+                  </p>
+                  <div className={classes.resultActions}>
+                    <button type="button" className={classes.primary} onClick={useInIntake}>
+                      Use this in the intake
+                    </button>
+                    <button type="button" className={classes.ghost} onClick={reset}>
+                      Start over
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              {error && !finished ? (
+                <p role="alert" className={classes.fieldError}>
+                  {error}
+                </p>
+              ) : null}
+
+              {!finished ? (
+                <div className={classes.nav}>
+                  {started ? (
+                    <button type="button" className={classes.ghost} onClick={goBack}>
+                      Back
+                    </button>
+                  ) : null}
+                  <button type="button" className={classes.primary} onClick={goNext}>
+                    Next
+                  </button>
+                </div>
+              ) : (
+                <div className={classes.nav}>
+                  <button type="button" className={classes.ghost} onClick={goBack}>
+                    Back
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

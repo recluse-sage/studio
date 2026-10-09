@@ -36,7 +36,6 @@ export interface IntakeCreateRequest {
   businessName: string;
   businessType: BusinessType;
   taskDescription: string;
-  frequency?: string;
   timeline?: string;
   budget?: string;
   contactMethod: ContactMethod;
@@ -59,7 +58,6 @@ export interface IntakeRecord {
   businessName: string;
   businessType: BusinessType;
   taskDescription: string;
-  frequency: string | null;
   timeline: string | null;
   budget: string | null;
   contactMethod: ContactMethod;
@@ -107,7 +105,6 @@ export interface AdminManualIntakeRequest {
   businessName: string;
   businessType: BusinessType;
   taskDescription: string;
-  frequency?: string;
   timeline?: string;
   budget?: string;
   contactMethod: ContactMethod;
@@ -270,6 +267,16 @@ export interface WorkItemsResponse {
 export interface ApiErrorBody {
   error: string;
   code?: string;
+}
+
+// Display settings. Single row table, proof hidden by default.
+// Admin GET and PUT plus public GET all use { proofVisible: boolean }.
+export interface DisplaySettingsResponse {
+  proofVisible: boolean;
+}
+
+export interface DisplayUpdateRequest {
+  proofVisible: boolean;
 }
 
 export interface PagedResponse<T> {

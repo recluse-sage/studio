@@ -3,6 +3,7 @@ import { safeError } from "./env.ts";
 import { handlePublicIntake } from "./handlers/intakes.ts";
 import {
   handleAdminAvailability,
+  handleAdminDisplay,
   handleAdminIntakes,
   handleAdminOutreach,
   handleAdminOverview,
@@ -11,6 +12,7 @@ import {
   handleAdminTools,
   handleAdminUsage,
   handlePublicAvailability,
+  handlePublicDisplay,
   handlePublicWorkItems,
 } from "./handlers/admin.ts";
 
@@ -32,6 +34,9 @@ export async function handleApiRequest(
   if (path === "/api/public/availability") {
     return handlePublicAvailability(request, env);
   }
+  if (path === "/api/public/display") {
+    return handlePublicDisplay(request, env);
+  }
   if (path === "/api/public/work-items") {
     return handlePublicWorkItems(request, env);
   }
@@ -43,6 +48,9 @@ export async function handleApiRequest(
   }
   if (path.startsWith("/api/admin/availability")) {
     return handleAdminAvailability(request, env);
+  }
+  if (path === "/api/admin/display" || path.startsWith("/api/admin/display/")) {
+    return handleAdminDisplay(request, env);
   }
   if (path.startsWith("/api/admin/intakes")) {
     return handleAdminIntakes(request, env);
