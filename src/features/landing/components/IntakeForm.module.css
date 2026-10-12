@@ -27,9 +27,10 @@
   font-size: 0.9rem;
 }
 
+/* Unified with quiz panel. Same radius, border, shadow, and rhythm. */
 .form {
   position: relative;
-  border: 0;
+  border: 1px solid var(--oasis-border);
   border-radius: var(--oasis-radius-xl);
   background: var(--oasis-surface-raised);
   box-shadow: var(--oasis-card-shadow);
@@ -42,15 +43,6 @@
   min-width: 0;
   box-sizing: border-box;
   overflow: hidden;
-}
-
-/* Thin accent edge ties the form to the site signal. */
-.form::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--oasis-accent), var(--oasis-signal));
 }
 
 .field {
@@ -78,13 +70,13 @@
   border-color: var(--oasis-border-strong);
   border-radius: var(--oasis-radius-md);
   color: var(--oasis-text);
-  min-height: var(--oasis-touch-min);
+  min-height: var(--oasis-btn-min);
   font-size: 1rem;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
 .input::placeholder {
@@ -169,16 +161,28 @@
 }
 
 .submitRow {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
 }
 
+/* Primary glass. Solid fallback first, glass layers after. */
 .submit {
+  min-height: var(--oasis-btn-min);
   background: var(--oasis-accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 55%),
+    var(--oasis-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--oasis-accent-contrast);
   border: 1px solid var(--oasis-accent);
   font-weight: 600;
@@ -186,23 +190,20 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  transition: transform 120ms ease, background-color 120ms ease;
+  border-radius: 12px;
+  transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
 
 .submit:hover:not(:disabled) {
-  background: var(--oasis-accent-strong);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%),
+    var(--oasis-accent-strong);
   border-color: var(--oasis-accent-strong);
+  color: var(--oasis-accent-contrast);
 }
 
 .submit:active:not(:disabled) {
   transform: translateY(1px);
-}
-
-.privacy {
-  margin: 0;
-  color: var(--oasis-text-muted);
-  font-size: 0.88rem;
-  line-height: 1.5;
 }
 
 .success {
@@ -229,6 +230,7 @@
 
 .ghostButton {
   justify-self: start;
+  min-height: var(--oasis-btn-min);
   border-color: var(--oasis-border-strong);
   color: var(--oasis-text);
 }
@@ -238,18 +240,20 @@
     padding: 72px 24px 80px;
   }
   .form {
-    padding: 30px 28px;
+    padding: 28px 26px;
   }
   .row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .submit {
     width: auto;
-    min-width: 220px;
+    min-width: 240px;
   }
-  .submitRow {
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    gap: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .submit {
+    transition: none;
   }
 }

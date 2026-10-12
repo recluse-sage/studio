@@ -1,0 +1,56 @@
+/* Grid motion manners. Same contract as the other variants: drift always, one
+   idle motion only at stage 6, will-change only while tweening. */
+
+.scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.drift {
+  will-change: auto;
+}
+
+.idleBob {
+  will-change: auto;
+}
+
+[data-tweening="1"] .drift .mv {
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="on"] .drift {
+    animation: grid-drift 18s ease-in-out infinite alternate;
+  }
+  [data-stage="5"][data-motion="on"] .idleBob {
+    animation: grid-bob 4s ease-in-out infinite;
+  }
+}
+
+@keyframes grid-drift {
+  from {
+    transform: translateX(-4px);
+  }
+  to {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes grid-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .idleBob {
+    animation: none;
+  }
+}

@@ -49,10 +49,22 @@
   color: var(--oasis-accent);
   font-weight: 600;
   text-decoration: none;
+  border-radius: 6px;
 }
 
 .link:hover {
   text-decoration: underline;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  transition: transform 140ms ease;
+}
+
+.link:hover .icon {
+  transform: translateX(3px);
 }
 
 @media (min-width: 768px) {

@@ -1,0 +1,58 @@
+/* Shared motion manners for scene SVG. Slow camera drift on the outer group,
+   idle bob on one nested group only at stage 6, will-change toggled only
+   while a tween runs. Transform and opacity only. Everything rests under
+   reduced motion. Colours stay in tokens; this file holds none. */
+
+.scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.drift {
+  will-change: auto;
+}
+
+.idleBob {
+  will-change: auto;
+}
+
+[data-tweening="1"] .drift .mv {
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="on"] .drift {
+    animation: cairn-drift 14s ease-in-out infinite alternate;
+  }
+  [data-stage="5"][data-motion="on"] .idleBob {
+    animation: cairn-bob 4s ease-in-out infinite;
+  }
+}
+
+@keyframes cairn-drift {
+  from {
+    transform: translateX(-5px);
+  }
+  to {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes cairn-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .idleBob {
+    animation: none;
+  }
+}

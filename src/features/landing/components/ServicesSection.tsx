@@ -1,3 +1,4 @@
+import { ArrowRight, Globe, Lightning, Wrench } from "@phosphor-icons/react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
 import type { ServiceItem } from "../types";
 import classes from "./ServicesSection.module.css";
@@ -33,6 +34,12 @@ const FALLBACK: ServiceItem[] = [
   },
 ];
 
+const SERVICE_ICONS: Record<string, typeof Globe> = {
+  websites: Globe,
+  tools: Wrench,
+  automations: Lightning,
+};
+
 export function ServicesSection({ services }: ServicesSectionProps) {
   const list = services.length > 0 ? services : FALLBACK;
   return (
@@ -45,28 +52,36 @@ export function ServicesSection({ services }: ServicesSectionProps) {
           description="We solve problems for small, medium, and enterprise business. Every build starts with the same short intake."
         />
         <div className={classes.grid}>
-          {list.map((service, position) => (
-            <a
-              key={service.id}
-              href={service.linkHref}
-              className={classes.card}
-            >
-              <span className={classes.cardIndex} aria-hidden="true">
-                {String(position + 1).padStart(2, "0")}
-              </span>
-              <h3 className={classes.cardTitle}>{service.title}</h3>
-              <p className={classes.cardText}>{service.description}</p>
-              <ul className={classes.points}>
-                {service.points.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-              <span className={classes.cardLink}>
-                {service.linkLabel}
-                <span className={classes.arrow} aria-hidden="true">→</span>
-              </span>
-            </a>
-          ))}
+          {list.map((service, position) => {
+            const Icon = SERVICE_ICONS[service.id] ?? Globe;
+            return (
+              <a
+                key={service.id}
+                href={service.linkHref}
+                className={classes.card}
+              >
+                <span className={classes.cardTop} aria-hidden="true">
+                  <span className={classes.cardIndex}>
+                    {String(position + 1).padStart(2, "0")}
+                  </span>
+                  <span className={classes.cardIcon}>
+                    <Icon weight="thin" focusable="false" />
+                  </span>
+                </span>
+                <h3 className={classes.cardTitle}>{service.title}</h3>
+                <p className={classes.cardText}>{service.description}</p>
+                <ul className={classes.points}>
+                  {service.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+                <span className={classes.cardLink}>
+                  <span>{service.linkLabel}</span>
+                  <ArrowRight weight="thin" focusable="false" className={classes.arrow} aria-hidden="true" />
+                </span>
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>

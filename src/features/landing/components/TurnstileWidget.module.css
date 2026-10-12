@@ -1,6 +1,16 @@
 .wrap {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.box {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 65px;
 }
 
 .note {
@@ -9,25 +19,41 @@
   font-size: 0.9rem;
 }
 
-.reset {
+.retry {
   appearance: none;
-  justify-self: start;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-height: var(--oasis-touch-min);
-  padding: 6px 14px;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
   border: 1px solid var(--oasis-border-strong);
   background: transparent;
-  color: var(--oasis-text-secondary);
-  font-size: 0.88rem;
+  color: var(--oasis-text);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease;
+  transition: border-color 140ms ease, color 140ms ease, background-color 140ms ease, transform 140ms ease;
 }
 
-.reset:hover {
+.retry:hover {
   border-color: var(--oasis-accent);
-  color: var(--oasis-text);
   background: var(--oasis-accent-soft);
+}
+
+.retry:active {
+  transform: translateY(1px);
+}
+
+.retryIcon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retry {
+    transition: none;
+  }
 }

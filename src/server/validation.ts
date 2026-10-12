@@ -65,6 +65,13 @@ export const PROOF_KINDS = [
 // talk step, timeline and budget scope the solution, build and ship plus
 // use and share happen after intake. Frequency was removed: repeat detail
 // belongs in taskDescription, including the quiz goal prefix.
+// Intake audit: the seven stored fields plus honeypot and token are minimal
+// and each is used to build. businessName and businessType label and shape
+// the work, taskDescription holds the problem, timeline and budget scope the
+// first step, contactMethod and contactValue enable the talk step. Budget
+// stays plain text so Free plus dollar or naira ranges need no new column.
+// Country for the currency rule is client side only and is never stored.
+// No new field is added, so no migration is needed.
 export const INTAKE_ALLOWED_FIELDS = [
   "businessName",
   "businessType",

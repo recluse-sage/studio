@@ -1,3 +1,4 @@
+import { Plus } from "@phosphor-icons/react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
 import classes from "./FaqSection.module.css";
 
@@ -35,6 +36,7 @@ export function FaqSection() {
       <div className={classes.inner}>
         <SectionHeading
           id="faq"
+          align="center"
           eyebrow="Questions"
           title="Plain answers"
           description="Short answers to the questions we hear most."
@@ -42,7 +44,12 @@ export function FaqSection() {
         <div className={classes.list}>
           {FAQS.map((item) => (
             <details key={item.question} className={classes.item}>
-              <summary className={classes.summary}>{item.question}</summary>
+              <summary className={classes.summary}>
+                <span className={classes.icon} aria-hidden="true">
+                  <Plus weight="thin" focusable="false" />
+                </span>
+                <span>{item.question}</span>
+              </summary>
               <p className={classes.answer}>{item.answer}</p>
             </details>
           ))}

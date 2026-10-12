@@ -32,19 +32,58 @@
 
 .rowInner {
   display: flex;
-  gap: 18px;
+  gap: 16px;
   align-items: flex-start;
+  border-radius: 12px;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.row:hover .rowInner {
+  transform: translateX(4px);
+}
+
+/* Stage icon steps forward on hover. Transform and opacity only. */
+.iconWrap {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--oasis-surface-raised);
+  border: 1px solid var(--oasis-border);
+  color: var(--oasis-accent);
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.iconWrap svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.row:hover .iconWrap {
+  transform: translateY(-2px);
+  background: var(--oasis-accent);
+  border-color: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+}
+
+.text {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  align-content: start;
 }
 
 .index {
+  margin: 0;
   font-family: var(--oasis-font-mono);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: var(--oasis-accent);
-  flex: none;
-  padding-top: 3px;
-  min-width: 2.5ch;
 }
 
 .itemTitle {
@@ -76,6 +115,7 @@
   color: var(--oasis-accent);
   font-weight: 600;
   text-decoration: none;
+  border-radius: 6px;
 }
 
 .closerLink:hover {
@@ -97,6 +137,17 @@
 
 @media (min-width: 1280px) {
   .rowInner {
-    gap: 22px;
+    gap: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rowInner,
+  .iconWrap {
+    transition: none;
+  }
+  .row:hover .rowInner,
+  .row:hover .iconWrap {
+    transform: none;
   }
 }

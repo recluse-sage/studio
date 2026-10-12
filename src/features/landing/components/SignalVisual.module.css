@@ -1,15 +1,33 @@
-/* Clay journey. Soft rounded stages, transform and opacity only. */
+/* Hero panel glass. Solid fallback first, glass layers after.
+   Blur plus 1px inner border plus refraction highlight. */
 
 .visual {
   position: relative;
   overflow: hidden;
   border-radius: var(--oasis-radius-xl);
+  background: var(--oasis-surface);
   background:
-    radial-gradient(22rem 16rem at 50% 28%, var(--oasis-hero-glow), transparent 70%),
-    radial-gradient(16rem 12rem at 85% 95%, var(--oasis-signal-soft), transparent 70%),
+    linear-gradient(180deg, var(--oasis-glass-highlight), transparent 28%),
     var(--oasis-surface);
-  box-shadow: var(--oasis-card-shadow);
+  border: 1px solid var(--oasis-border);
+  box-shadow:
+    inset 0 1px 0 var(--oasis-glass-highlight),
+    inset 0 0 0 1px var(--oasis-glass-border),
+    var(--oasis-glass-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 18px 18px 14px;
+}
+
+/* Refraction highlight washes the top edge. */
+.visual::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 72px;
+  background: linear-gradient(180deg, var(--oasis-glass-highlight), transparent);
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* Dotted field, faded toward edges. Decorative only. */
@@ -49,6 +67,7 @@
   height: 8px;
   border-radius: 999px;
   background: var(--oasis-accent);
+  flex: none;
 }
 
 .stages {
@@ -73,7 +92,7 @@
   gap: 14px;
   text-align: left;
   cursor: pointer;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 18px;
   padding: 12px 14px;
   background: linear-gradient(180deg, var(--oasis-surface-raised), var(--oasis-surface));
@@ -86,13 +105,14 @@
   font: inherit;
   opacity: 0.82;
   transform: translateY(0);
-  transition: transform 160ms ease, opacity 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  transition: transform 160ms ease, opacity 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
 }
 
 .stage:hover,
 .stage:focus-visible {
   opacity: 1;
   transform: translateY(-2px);
+  border-color: var(--oasis-accent-border);
 }
 
 /* Active stage lifts like pressed clay. Transform and opacity only. */
@@ -100,6 +120,7 @@
   opacity: 1;
   transform: translateY(-3px);
   background: linear-gradient(180deg, var(--oasis-surface-raised), var(--oasis-accent-soft));
+  border-color: var(--oasis-accent-border);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
     inset 0 -2px 8px rgba(23, 114, 69, 0.12),
@@ -132,8 +153,8 @@
 
 .blobIcon {
   display: inline-flex;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
 }
 
 .blobIcon svg {

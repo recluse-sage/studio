@@ -16,6 +16,20 @@ describe("intake validation", () => {
     expect(r.ok).toBe(true);
   });
 
+  it("accepts Free and currency ranged budgets as plain text", () => {
+    for (const budget of [
+      "Free",
+      "Under $500",
+      "$500 to $1500",
+      "Above $1500",
+      "Under ₦150,000",
+      "₦150,000 to ₦500,000",
+      "Above ₦500,000",
+    ]) {
+      expect(validateIntakeInput({ ...base, budget }).ok).toBe(true);
+    }
+  });
+
   it("rejects missing business name", () => {
     const r = validateIntakeInput({ ...base, businessName: "" });
     expect(r.ok).toBe(false);

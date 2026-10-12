@@ -3,7 +3,10 @@
 // Intake fields: businessName, businessType, taskDescription, timeline, budget,
 // contactMethod, contactValue, website honeypot, turnstileToken. Frequency was
 // removed. Quiz goal folds into taskDescription via quizToIntakePrefill and
-// buildTaskDescriptionFromQuiz in src/shared/quiz.ts. Turnstile stays fail closed.
+// buildTaskDescriptionFromQuiz in src/shared/quiz.ts. Budget is plain text and
+// accepts Free plus dollar ranges or naira ranges for Nigeria. Country for the
+// currency rule stays client side and is never stored, so no new column.
+// Turnstile stays fail closed.
 // Public: GET /api/public/availability -> 200 AvailabilityPublicResponse, public max-age 60.
 // Public: GET /api/public/display -> 200 { proofVisible: boolean }, public max-age 60. Proof hidden by default.
 // Public: GET /api/public/work-items -> 200 WorkItemsResponse with approved proof plus labeled samples only, kind on every item, public max-age 60.

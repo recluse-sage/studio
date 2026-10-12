@@ -35,6 +35,11 @@
   --oasis-header-bg: rgba(251, 250, 247, 0.9);
   --oasis-hero-glow: #e9f3ea;
   --oasis-card-shadow: 0 1px 2px rgba(20, 24, 20, 0.06), 0 12px 32px rgba(20, 24, 20, 0.08);
+  --oasis-glass-tint: rgba(255, 255, 255, 0.42);
+  --oasis-glass-border: rgba(20, 24, 20, 0.1);
+  --oasis-glass-highlight: rgba(255, 255, 255, 0.65);
+  --oasis-glass-shadow: 0 1px 2px rgba(20, 24, 20, 0.06), 0 20px 48px rgba(20, 24, 20, 0.12);
+  --oasis-btn-min: 48px;
   --oasis-font-display: "Space Grotesk", "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --oasis-font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --oasis-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -77,5 +82,10 @@
   --oasis-header-bg: rgba(11, 15, 13, 0.88);
   --oasis-hero-glow: #10241a;
   --oasis-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.4);
+  --oasis-glass-tint: rgba(21, 29, 25, 0.55);
+  --oasis-glass-border: rgba(255, 255, 255, 0.1);
+  --oasis-glass-highlight: rgba(255, 255, 255, 0.16);
+  --oasis-glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 20px 48px rgba(0, 0, 0, 0.45);
+  --oasis-btn-min: 48px;
   color-scheme: dark;
 }

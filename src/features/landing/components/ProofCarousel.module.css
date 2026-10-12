@@ -136,6 +136,12 @@
   transform: translateY(1px);
 }
 
+.nav svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
 .status {
   margin: 0;
   margin-right: auto;

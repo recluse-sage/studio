@@ -1,3 +1,4 @@
+import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react";
 import classes from "./LandingFooter.module.css";
 import type { AvailabilitySummary } from "../types";
 
@@ -14,9 +15,7 @@ export function LandingFooter({
 }: LandingFooterProps) {
   void showAvailability;
   const year = new Date().getFullYear();
-  const statusLine = availability
-    ? `${availability.label}. ${availability.nextWindow}`
-    : "Intake is open. Send a note and we will confirm timing.";
+  const showStatus = availability != null;
 
   return (
     <footer className={classes.footer}>
@@ -31,10 +30,12 @@ export function LandingFooter({
             We are oasis.dev, a studio solving problems for small, medium, and
             enterprise business by building tools, websites, and automations.
           </p>
-          <p className={classes.status}>
-            <span className={classes.statusDot} aria-hidden="true" />
-            {statusLine}
-          </p>
+          {showStatus && availability ? (
+            <p className={classes.status}>
+              <span className={classes.statusDot} aria-hidden="true" />
+              {availability.label}. {availability.nextWindow}
+            </p>
+          ) : null}
         </div>
 
         <nav className={classes.nav} aria-label="Footer">
@@ -65,14 +66,24 @@ export function LandingFooter({
             Start with the short intake. We read every note and reply with plain next steps.
           </p>
           <a href={contactHref} className={classes.contactLink}>
-            Start the intake
-            <span aria-hidden="true">→</span>
+            <span>Start the intake</span>
+            <ArrowRight weight="thin" aria-hidden="true" className={classes.contactIcon} />
           </a>
         </div>
 
-        <p className={classes.small}>
-          © {year} Oasis.dev. Work is shown publicly only with client permission.
-        </p>
+        <div className={classes.bottom}>
+          <p className={classes.small}>
+            © {year} Oasis.dev. Work is shown publicly only with client permission.
+          </p>
+          <a
+            href="https://oasis.dev"
+            className={classes.builtBy}
+            aria-label="Built by Oasis, visit oasis.dev"
+          >
+            <span>Built by Oasis</span>
+            <ArrowUpRight weight="thin" aria-hidden="true" className={classes.builtIcon} />
+          </a>
+        </div>
       </div>
     </footer>
   );

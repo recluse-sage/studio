@@ -3,9 +3,20 @@
 // UI and server share these field names. Designer builds against this contract.
 //
 // Five questions: goal, budget band, timeline, comfort, existing assets.
+// Each question carries an explanation (why it matters) and one concrete
+// example (a small shop story). UI should show both to keep the quiz clear.
 // Branching: goal decides whether assets or comfort comes first.
 // recommend() scores answers to one fit plus a runner up with plain reasons.
 // Low fit is honest: it still returns a fit but says to talk first.
+// Back navigation is UI state only. This module never stores step history.
+//
+// Currency rule for the budget question:
+// Nigeria gets naira ranges, every other country gets dollar ranges.
+// detectBudgetCurrency returns NGN only for NG, NGA, or Nigeria
+// (case insensitive, trimmed). Missing, blank, or any other value returns USD.
+// Both currencies include a Free option and a Not sure option.
+// The selected budget is stored as plain text in the intake budget field,
+// so no new intake column is needed. Country itself is never stored.
 
 export type QuizFit = "website" | "tool" | "automation";
 
@@ -20,6 +31,8 @@ export interface QuizOption {
 export interface QuizQuestion {
   id: QuizQuestionId;
   title: string;
+  explanation: string;
+  example: string;
   help?: string;
   options: QuizOption[];
 }
@@ -32,10 +45,102 @@ export interface QuizRecommendation {
   why: string[];
 }
 
+export type BudgetCurrency = "NGN" | "USD";
+
+export const FREE_BUDGET_VALUE = "free";
+
+function normalizeCountryInput(countryCode?: string | null): string {
+  return (countryCode || "").trim().toUpperCase();
+}
+
+// Currency detector. Nigeria gets NGN, all others get USD.
+// Accepts NG, NGA, and the full name Nigeria for robustness.
+// Trims and uppercases first, so " ng " still maps to NGN.
+export function detectBudgetCurrency(
+  countryCode?: string | null,
+): BudgetCurrency {
+  const code = normalizeCountryInput(countryCode);
+  if (code === "NG" || code === "NGA" || code === "NIGERIA") return "NGN";
+  return "USD";
+}
+
+export const USD_BUDGET_OPTIONS: readonly QuizOption[] = [
+  {
+    value: "free",
+    label: "Free",
+    hint: "You need a no cost start or a free plan first.",
+  },
+  {
+    value: "under-500",
+    label: "Under $500",
+    hint: "Best for a small starter site.",
+  },
+  {
+    value: "500-1500",
+    label: "$500 to $1500",
+    hint: "Fits a focused tool or a stronger site.",
+  },
+  {
+    value: "1500-plus",
+    label: "Above $1500",
+    hint: "Fits a helper with several steps.",
+  },
+  {
+    value: "not-sure",
+    label: "Not sure yet",
+    hint: "We will scope to a small first step.",
+  },
+];
+
+export const NGN_BUDGET_OPTIONS: readonly QuizOption[] = [
+  {
+    value: "free",
+    label: "Free",
+    hint: "You need a no cost start or a free plan first.",
+  },
+  {
+    value: "ng-under-150k",
+    label: "Under ₦150,000",
+    hint: "Best for a small starter site.",
+  },
+  {
+    value: "ng-150-500k",
+    label: "₦150,000 to ₦500,000",
+    hint: "Fits a focused tool or a stronger site.",
+  },
+  {
+    value: "ng-500k-plus",
+    label: "Above ₦500,000",
+    hint: "Fits a helper with several steps.",
+  },
+  {
+    value: "not-sure",
+    label: "Not sure yet",
+    hint: "We will scope to a small first step.",
+  },
+];
+
+// Returns the budget options for a country. Nigeria gets naira ranges,
+// every other country gets dollar ranges. Both sets include Free.
+// UI should call this with the visitor country when known, and fall back
+// to the default (USD) when the country is missing.
+export function getBudgetOptions(
+  countryCode?: string | null,
+): QuizOption[] {
+  const currency = detectBudgetCurrency(countryCode);
+  const source =
+    currency === "NGN" ? NGN_BUDGET_OPTIONS : USD_BUDGET_OPTIONS;
+  return source.map((o) => ({ ...o }));
+}
+
 export const QUESTIONS: readonly QuizQuestion[] = [
   {
     id: "goal",
     title: "What do you want this to do for your shop or service?",
+    explanation:
+      "The goal picks the fit. A site builds trust, a tool takes orders, and a helper cuts repeat work.",
+    example:
+      "Example: A tailor picks take orders because customers repeat sizes on chat.",
     help: "Pick the closest one. You can explain more in the intake.",
     options: [
       {
@@ -68,21 +173,30 @@ export const QUESTIONS: readonly QuizQuestion[] = [
   {
     id: "budget",
     title: "What budget band fits this first build?",
+    explanation:
+      "Budget sets the size of the first step. A small band keeps cost and risk low.",
+    example:
+      "Example: A food seller picks the middle band to cover a menu page plus a simple order form.",
     help: "A small first step keeps cost and risk low.",
     options: [
       {
+        value: "free",
+        label: "Free",
+        hint: "You need a no cost start or a free plan first.",
+      },
+      {
         value: "under-500",
-        label: "Under 500",
+        label: "Under $500",
         hint: "Best for a small starter site.",
       },
       {
         value: "500-1500",
-        label: "500 to 1500",
+        label: "$500 to $1500",
         hint: "Fits a focused tool or a stronger site.",
       },
       {
         value: "1500-plus",
-        label: "Above 1500",
+        label: "Above $1500",
         hint: "Fits a helper with several steps.",
       },
       {
@@ -95,6 +209,10 @@ export const QUESTIONS: readonly QuizQuestion[] = [
   {
     id: "timeline",
     title: "When do you need the first version in use?",
+    explanation:
+      "Timeline sets how small the first version must be. A near date means a focused start.",
+    example:
+      "Example: A plumber needs a booking page live within four weeks before the busy season.",
     help: "Small and focused ships fastest.",
     options: [
       {
@@ -117,6 +235,10 @@ export const QUESTIONS: readonly QuizQuestion[] = [
   {
     id: "comfort",
     title: "How do you feel about new tools?",
+    explanation:
+      "Comfort keeps the build usable. We keep the human step where it matters.",
+    example:
+      "Example: A stylist picks prefer a human touch so calls and personal replies stay front and center.",
     help: "We keep the human step where it matters.",
     options: [
       {
@@ -139,6 +261,10 @@ export const QUESTIONS: readonly QuizQuestion[] = [
   {
     id: "assets",
     title: "What do you already have ready?",
+    explanation:
+      "Ready material shortens the build. Photos, prices, or a step list give the work a clear scope.",
+    example:
+      "Example: A baker has cake photos and a price list ready on her phone.",
     help: "Ready material shortens the build.",
     options: [
       {
@@ -165,6 +291,40 @@ export const QUESTIONS: readonly QuizQuestion[] = [
   },
 ];
 
+// Returns the budget question for a country, with the right currency options.
+// Keeps title, explanation, example, and help identical across currencies.
+export function getBudgetQuestion(
+  countryCode?: string | null,
+): QuizQuestion {
+  const base = getQuestionById("budget");
+  const options = getBudgetOptions(countryCode);
+  if (!base) {
+    return {
+      id: "budget",
+      title: "What budget band fits this first build?",
+      explanation:
+        "Budget sets the size of the first step. A small band keeps cost and risk low.",
+      example:
+        "Example: A food seller picks the middle band to cover a menu page plus a simple order form.",
+      help: "A small first step keeps cost and risk low.",
+      options,
+    };
+  }
+  return { ...base, options };
+}
+
+// Returns all five questions with the budget options localized for a country.
+// Order and ids stay stable so branching in getNextQuestionId is unchanged.
+// Defaults to USD ranges when the country is missing or unknown.
+export function getQuestionsForCountry(
+  countryCode?: string | null,
+): QuizQuestion[] {
+  const budget = getBudgetQuestion(countryCode);
+  return QUESTIONS.map((q) =>
+    q.id === "budget" ? budget : { ...q, options: q.options.map((o) => ({ ...o })) },
+  );
+}
+
 export function getQuestionById(id: QuizQuestionId): QuizQuestion | null {
   for (const q of QUESTIONS) {
     if (q.id === id) return q;
@@ -186,6 +346,7 @@ export function quizGoalLabel(goalValue: string | undefined | null): string | nu
 // Branching order. Goal first, then budget and timeline.
 // When the goal is cutting repeat work, assets come before comfort
 // because the repeat steps shape the helper. Otherwise comfort first.
+// Back movement is UI state and is not tracked here.
 export function getNextQuestionId(answers: QuizAnswers): QuizQuestionId | null {
   if (!answers.goal) return "goal";
   if (!answers.budget) return "budget";
@@ -223,6 +384,14 @@ function optionLabel(questionId: QuizQuestionId, value: string | undefined): str
   for (const o of q.options) {
     if (o.value === value) return o.label;
   }
+  // Budget has two currency sets. Fall back to the combined label map
+  // so naira answers still produce a readable reason line.
+  if (questionId === "budget") {
+    const fallback = BUDGET_PREFILL[value];
+    if (typeof fallback === "string" && fallback.length > 0) return fallback;
+    const ng = NGN_BUDGET_OPTIONS.find((o) => o.value === value);
+    if (ng) return ng.label;
+  }
   return null;
 }
 
@@ -258,6 +427,8 @@ function isLowFit(answers: QuizAnswers, scores: ScoreMap): boolean {
 
 // Transparent scoring. Each answer adds plain points, and every point
 // gets one plain reason line. No hidden model, no exaggeration.
+// Budget scoring treats naira bands the same as their dollar equivalents.
+// Free adds no points but gets an honest reason about a no cost start.
 export function recommend(answers: QuizAnswers): QuizRecommendation {
   const safe: QuizAnswers = {
     goal: typeof answers.goal === "string" ? answers.goal : undefined,
@@ -304,26 +475,30 @@ export function recommend(answers: QuizAnswers): QuizRecommendation {
   }
 
   const budgetLabel = optionLabel("budget", safe.budget);
-  if (safe.budget === "under-500") {
+  if (safe.budget === "under-500" || safe.budget === "ng-under-150k") {
     addScores(scores, { website: 1 });
     why.push(
       "Budget band" +
         (budgetLabel ? " (" + budgetLabel + ")" : "") +
         " fits a small starter site best.",
     );
-  } else if (safe.budget === "500-1500") {
+  } else if (safe.budget === "500-1500" || safe.budget === "ng-150-500k") {
     addScores(scores, { website: 1, tool: 1 });
     why.push(
       "Budget band" +
         (budgetLabel ? " (" + budgetLabel + ")" : "") +
         " fits a focused tool or a stronger site.",
     );
-  } else if (safe.budget === "1500-plus") {
+  } else if (safe.budget === "1500-plus" || safe.budget === "ng-500k-plus") {
     addScores(scores, { tool: 1, automation: 1 });
     why.push(
       "Budget band" +
         (budgetLabel ? " (" + budgetLabel + ")" : "") +
         " can cover a helper with several steps.",
+    );
+  } else if (safe.budget === "free") {
+    why.push(
+      "Free budget means we look for a no cost start first, then scope a small paid step only if needed.",
     );
   } else if (safe.budget === "not-sure") {
     why.push("Budget is still open, so we scope to a small first step.");
@@ -409,6 +584,8 @@ export function recommend(answers: QuizAnswers): QuizRecommendation {
 // Intake unification. The quiz has no separate endpoint. The goal answer
 // folds into the intake task description as a plain prefix, so the inbox
 // keeps one flow: problem in, talk, solution, build, ship, use, share.
+// Budget folds into the intake budget text field. Naira and dollar labels
+// plus Free all fit within the 60 char intake limit, so no schema change.
 export interface QuizIntakePrefill {
   taskDescriptionPrefix: string;
   timeline: string | null;
@@ -416,9 +593,13 @@ export interface QuizIntakePrefill {
 }
 
 const BUDGET_PREFILL: Record<string, string | null> = {
-  "under-500": "Under 500",
-  "500-1500": "500 to 1500",
-  "1500-plus": "Above 1500",
+  free: "Free",
+  "under-500": "Under $500",
+  "500-1500": "$500 to $1500",
+  "1500-plus": "Above $1500",
+  "ng-under-150k": "Under ₦150,000",
+  "ng-150-500k": "₦150,000 to ₦500,000",
+  "ng-500k-plus": "Above ₦500,000",
   "not-sure": null,
 };
 

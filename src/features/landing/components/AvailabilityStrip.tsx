@@ -1,3 +1,4 @@
+import { ArrowRight } from "@phosphor-icons/react";
 import { StatusBadge } from "../../../components/StatusBadge/StatusBadge";
 import type { AvailabilitySummary } from "../types";
 import classes from "./AvailabilityStrip.module.css";
@@ -22,8 +23,8 @@ export function AvailabilityStrip({ availability }: AvailabilityStripProps) {
           <p className={classes.note}>{availability.note}</p>
         </div>
         <a href="#intake" className={classes.link}>
-          Save a spot with the intake
-          <span aria-hidden="true">→</span>
+          <span>Save a spot with the intake</span>
+          <ArrowRight weight="thin" aria-hidden="true" className={classes.icon} />
         </a>
       </div>
     </section>

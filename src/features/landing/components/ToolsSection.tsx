@@ -1,4 +1,17 @@
 import { useMemo, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle,
+  Clock,
+  Compass,
+  Flag,
+  FolderOpen,
+  Smiley,
+  Target,
+  Wallet,
+} from "@phosphor-icons/react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
 import {
   QUESTIONS,
@@ -15,12 +28,20 @@ import classes from "./ToolsSection.module.css";
  * This file renders flow only. It never duplicates the rules.
  */
 
-type QuizOption = { value: string; label: string };
+type QuizOption = { value: string; label: string; hint?: string };
 type QuizQuestion = {
   id: string;
   label: string;
   hint?: string;
   options: QuizOption[];
+};
+
+const QUESTION_ICONS: Record<string, typeof Target> = {
+  goal: Target,
+  budget: Wallet,
+  timeline: Clock,
+  comfort: Smiley,
+  assets: FolderOpen,
 };
 
 function toOptions(raw: unknown): QuizOption[] {
@@ -37,7 +58,11 @@ function toOptions(raw: unknown): QuizOption[] {
       const labelRaw = o.label ?? o.title ?? o.text ?? o.name;
       const value = typeof valueRaw === "string" && valueRaw.trim().length > 0 ? valueRaw : null;
       const label = typeof labelRaw === "string" && labelRaw.trim().length > 0 ? labelRaw : value;
-      if (value && label) out.push({ value, label });
+      if (value && label) {
+        const hintRaw = o.hint;
+        const hint = typeof hintRaw === "string" && hintRaw.trim().length > 0 ? hintRaw : undefined;
+        out.push({ value, label, hint });
+      }
     }
   }
   return out;
@@ -234,6 +259,8 @@ export function ToolsSection() {
     return { current: false, done: history.includes(key) };
   }
 
+  const QuestionIcon = current ? (QUESTION_ICONS[current.id] ?? Target) : Target;
+
   return (
     <section id="tools" className={classes.section} aria-labelledby="tools-title">
       <div className={classes.inner}>
@@ -253,23 +280,19 @@ export function ToolsSection() {
             <ol className={classes.steps} aria-label="Wizard steps">
               {stepLabels.map((item, i) => {
                 const s = stepState(item.key, i);
+                const isLast = i === stepLabels.length - 1;
                 return (
                   <li key={item.key} className={classes.stepItem} data-current={s.current} data-done={s.done}>
                     <span className={classes.stepDot} aria-hidden="true">
                       {s.done ? (
-                        <svg viewBox="0 0 12 12" focusable="false">
-                          <path
-                            d="m2.5 6.2 2.2 2.2 4.8-5"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
+                        <Check weight="thin" focusable="false" />
+                      ) : i === 0 ? (
+                        <Compass weight="thin" focusable="false" />
+                      ) : isLast ? (
+                        <Flag weight="thin" focusable="false" />
                       ) : (
                         <span className={classes.stepNumber} aria-hidden="true">
-                          {i === 0 ? "•" : i === stepLabels.length - 1 ? "✓" : String(i)}
+                          {String(i)}
                         </span>
                       )}
                     </span>
@@ -293,10 +316,7 @@ export function ToolsSection() {
               {!started && !finished ? (
                 <div className={classes.intro}>
                   <span className={classes.stageIcon} aria-hidden="true">
-                    <svg viewBox="0 0 20 20" focusable="false">
-                      <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
-                      <path d="M10 6.5v3.5l2.5 1.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    </svg>
+                    <Compass weight="thin" focusable="false" />
                   </span>
                   <p className={classes.introText}>
                     Three short questions about the work that repeats. Your answers stay on this page.
@@ -306,21 +326,38 @@ export function ToolsSection() {
 
               {current && !finished ? (
                 <fieldset className={classes.group}>
-                  <legend className={classes.question}>{current.label}</legend>
+                  <legend className={classes.questionRow}>
+                    <span className={classes.stageIcon} aria-hidden="true">
+                      <QuestionIcon weight="thin" focusable="false" />
+                    </span>
+                    <span className={classes.question}>{current.label}</span>
+                  </legend>
                   {current.hint ? <p className={classes.hint}>{current.hint}</p> : null}
-                  <div className={classes.options}>
-                    {current.options.map((option) => (
-                      <label key={option.value} className={classes.option}>
-                        <input
-                          type="radio"
-                          name={`quiz-${current.id}`}
-                          value={option.value}
-                          checked={answers[current.id] === option.value}
-                          onChange={() => setAnswers((prev) => ({ ...prev, [current.id]: option.value }))}
-                        />
-                        {option.label}
-                      </label>
-                    ))}
+                  <div className={classes.options} role="group" aria-label={current.label}>
+                    {current.options.map((option) => {
+                      const selected = answers[current.id] === option.value;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={classes.option}
+                          data-selected={selected}
+                          aria-pressed={selected}
+                          onClick={() => {
+                            setAnswers((prev) => ({ ...prev, [current.id]: option.value }));
+                            setError(null);
+                          }}
+                        >
+                          <span className={classes.optionCheck} aria-hidden="true">
+                            {selected ? <Check weight="thin" focusable="false" /> : null}
+                          </span>
+                          <span className={classes.optionText}>
+                            <span className={classes.optionLabel}>{option.label}</span>
+                            {option.hint ? <span className={classes.optionHint}>{option.hint}</span> : null}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </fieldset>
               ) : null}
@@ -328,17 +365,7 @@ export function ToolsSection() {
               {finished && recommendation ? (
                 <div className={classes.result} role="status" aria-live="polite">
                   <span className={classes.stageIcon} aria-hidden="true">
-                    <svg viewBox="0 0 20 20" focusable="false">
-                      <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
-                      <path
-                        d="m7.5 10.2 1.8 1.8 3.4-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <CheckCircle weight="thin" focusable="false" />
                   </span>
                   <h3 className={classes.resultTitle}>{fitLabel(recommendation.fit)}.</h3>
                   {why.length > 0 ? (
@@ -354,7 +381,8 @@ export function ToolsSection() {
                   </p>
                   <div className={classes.resultActions}>
                     <button type="button" className={classes.primary} onClick={useInIntake}>
-                      Use this in the intake
+                      <span>Use this in the intake</span>
+                      <ArrowRight weight="thin" aria-hidden="true" className={classes.btnIcon} />
                     </button>
                     <button type="button" className={classes.ghost} onClick={reset}>
                       Start over
@@ -373,17 +401,20 @@ export function ToolsSection() {
                 <div className={classes.nav}>
                   {started ? (
                     <button type="button" className={classes.ghost} onClick={goBack}>
-                      Back
+                      <ArrowLeft weight="thin" aria-hidden="true" className={classes.btnIcon} />
+                      <span>Back</span>
                     </button>
                   ) : null}
                   <button type="button" className={classes.primary} onClick={goNext}>
-                    Next
+                    <span>Next</span>
+                    <ArrowRight weight="thin" aria-hidden="true" className={classes.btnIcon} />
                   </button>
                 </div>
               ) : (
                 <div className={classes.nav}>
                   <button type="button" className={classes.ghost} onClick={goBack}>
-                    Back
+                    <ArrowLeft weight="thin" aria-hidden="true" className={classes.btnIcon} />
+                    <span>Back</span>
                   </button>
                 </div>
               )}

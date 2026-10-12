@@ -77,7 +77,7 @@
   font-weight: 500;
   font-size: 0.95rem;
   justify-self: start;
-  transition: color 120ms ease;
+  transition: color 140ms ease;
 }
 
 .link:hover {
@@ -108,18 +108,72 @@
   font-weight: 600;
   text-decoration: none;
   justify-self: start;
+  border-radius: 6px;
 }
 
 .contactLink:hover {
   text-decoration: underline;
 }
 
+.contactIcon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  transition: transform 160ms ease;
+}
+
+.contactLink:hover .contactIcon {
+  transform: translateX(3px);
+}
+
+.bottom {
+  border-top: 1px solid var(--oasis-border);
+  padding-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  justify-content: space-between;
+}
+
 .small {
   margin: 0;
   color: var(--oasis-text-muted);
   font-size: 0.86rem;
-  border-top: 1px solid var(--oasis-border);
-  padding-top: 20px;
+}
+
+/* Built by Oasis hover reveal. Arrow slides in on hover. */
+.builtBy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--oasis-touch-min);
+  padding: 6px 2px;
+  color: var(--oasis-text-muted);
+  font-family: var(--oasis-font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: color 140ms ease;
+}
+
+.builtBy:hover {
+  color: var(--oasis-text);
+}
+
+.builtIcon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  opacity: 0.4;
+  transform: translate(-2px, 2px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.builtBy:hover .builtIcon {
+  opacity: 1;
+  transform: translate(0, 0);
 }
 
 @media (min-width: 768px) {
@@ -129,7 +183,21 @@
     gap: 40px;
     align-items: start;
   }
-  .small {
+  .bottom {
     grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .contactLink,
+  .builtBy,
+  .contactIcon,
+  .builtIcon {
+    transition: none;
+  }
+  .contactLink:hover .contactIcon,
+  .builtBy:hover .builtIcon {
+    transform: none;
   }
 }

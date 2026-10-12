@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  ChatCircle,
+  CheckCircle,
+  Crosshair,
+  PaperPlaneTilt,
+  ShareNetwork,
+  Wrench,
+} from "@phosphor-icons/react";
 import classes from "./SignalVisual.module.css";
 
 /**
@@ -14,94 +22,42 @@ const STAGES = [
     index: "01",
     label: "Problem",
     text: "You bring a problem.",
-    icon: (
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <circle cx="10" cy="10" r="2.2" fill="currentColor" />
-      </svg>
-    ),
+    Icon: Crosshair,
   },
   {
     id: "talk",
     index: "02",
     label: "Talk",
     text: "We talk it through.",
-    icon: (
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <path
-          d="M3 5.5h14v8H9.5L6 16.5v-3H3v-8Z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
-        <circle cx="7.5" cy="9.5" r="1" fill="currentColor" />
-        <circle cx="10.5" cy="9.5" r="1" fill="currentColor" />
-        <circle cx="13.5" cy="9.5" r="1" fill="currentColor" />
-      </svg>
-    ),
+    Icon: ChatCircle,
   },
   {
     id: "solution",
     index: "03",
     label: "Solution",
     text: "We find the fit.",
-    icon: (
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <path
-          d="m7.5 10.2 1.8 1.8 3.4-4"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    Icon: CheckCircle,
   },
   {
     id: "build",
     index: "04",
     label: "Build",
     text: "We build it.",
-    icon: (
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <rect x="3.5" y="10" width="6" height="6" rx="1.8" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <rect x="10.5" y="4" width="6" height="6" rx="1.8" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      </svg>
-    ),
+    Icon: Wrench,
   },
   {
     id: "ship",
     index: "05",
     label: "Ship",
     text: "We ship it to you.",
-    icon: (
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <path
-          d="M3 10.5 17 4l-4.5 13-2.8-5.2L3 10.5Z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    Icon: PaperPlaneTilt,
   },
   {
     id: "use-share",
     index: "06",
     label: "Use and share",
     text: "You use it and share it.",
-    icon: (
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <circle cx="5.5" cy="10" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <circle cx="14.5" cy="5.5" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <circle cx="14.5" cy="14.5" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <path d="m7.8 9 4.2-2.2M7.8 11l4.2 2.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    ),
+    Icon: ShareNetwork,
   },
 ] as const;
 
@@ -166,7 +122,9 @@ export function SignalVisual() {
               aria-label={`Stage ${stage.index}: ${stage.label}. ${stage.text}`}
             >
               <span className={classes.blob} aria-hidden="true">
-                <span className={classes.blobIcon}>{stage.icon}</span>
+                <span className={classes.blobIcon}>
+                  <stage.Icon weight="thin" focusable="false" />
+                </span>
               </span>
               <span className={classes.stageText}>
                 <span className={classes.stageIndex} aria-hidden="true">

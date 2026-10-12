@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  min-height: 64px;
+  min-height: 68px;
 }
 
 .brand {
@@ -23,6 +23,7 @@
   align-items: center;
   min-height: var(--oasis-touch-min);
   text-decoration: none;
+  border-radius: 8px;
 }
 
 .wordmark {
@@ -52,7 +53,7 @@
 
 .link {
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   text-decoration: none;
   color: var(--oasis-text-secondary);
   font-size: 0.95rem;
@@ -60,12 +61,16 @@
   min-height: var(--oasis-touch-min);
   display: inline-flex;
   align-items: center;
-  transition: background-color 120ms ease, color 120ms ease;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
 }
 
 .link:hover {
   background: var(--oasis-surface);
   color: var(--oasis-text);
+}
+
+.link:active {
+  transform: translateY(1px);
 }
 
 .actions {
@@ -75,20 +80,51 @@
   gap: 10px;
 }
 
+/* Primary glass CTA. Solid fallback first, then glass layers. */
 .cta {
   display: none;
+  min-height: var(--oasis-btn-min);
+  align-items: center;
   background: var(--oasis-accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent);
   color: var(--oasis-accent-contrast);
   border: 1px solid var(--oasis-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   font-weight: 600;
+  border-radius: 12px;
+  transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.cta:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent-strong);
+  border-color: var(--oasis-accent-strong);
+  color: var(--oasis-accent-contrast);
+}
+
+.cta:active {
+  transform: translateY(1px);
 }
 
 .burger {
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 12px;
   background: transparent;
   width: var(--oasis-touch-min);
   height: var(--oasis-touch-min);
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.burger:hover {
+  background: var(--oasis-surface);
+  border-color: var(--oasis-border);
 }
 
 .mobileNav {
@@ -97,6 +133,18 @@
   display: grid;
   gap: 2px;
   background: var(--oasis-bg);
+  animation: oasis-menu-in 160ms ease both;
+}
+
+@keyframes oasis-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .mobileLink,
@@ -109,11 +157,28 @@
   font-weight: 600;
   color: var(--oasis-text);
   border-bottom: 1px solid var(--oasis-border);
+  border-radius: 6px;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.mobileLink:hover {
+  background: var(--oasis-surface);
 }
 
 .mobileCta {
   color: var(--oasis-accent);
   border-bottom: 0;
+  justify-content: space-between;
+}
+
+.mobileCta:hover {
+  background: var(--oasis-accent-soft);
+}
+
+.mobileCtaIcon {
+  width: 22px;
+  height: 22px;
+  flex: none;
 }
 
 @media (min-width: 860px) {
@@ -128,5 +193,18 @@
   }
   .mobileNav {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .cta,
+  .burger,
+  .mobileLink,
+  .mobileCta {
+    transition: none;
+  }
+  .mobileNav {
+    animation: none;
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { ArrowClockwise } from "@phosphor-icons/react";
 import classes from "./TurnstileWidget.module.css";
 
 export type TurnstileWidgetHandle = {
@@ -63,6 +64,7 @@ function loadTurnstileScript(): Promise<void> {
 /**
  * Minimal accessible explicit Turnstile widget.
  * No key is hardcoded. Parent passes turnstileSiteKey from public config.
+ * Centered and unlabeled by design. Retry appears only on error or expiry.
  */
 export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: TurnstileWidgetProps) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -71,6 +73,7 @@ export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: Turnst
   const onExpiredRef = useRef(onExpired);
   const onErrorRef = useRef(onError);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "failed">("loading");
+  const [needsRetry, setNeedsRetry] = useState(false);
 
   onTokenRef.current = onToken;
   onExpiredRef.current = onExpired;
@@ -83,12 +86,14 @@ export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: Turnst
     }
     let alive = true;
     setLoadState("loading");
+    setNeedsRetry(false);
     loadTurnstileScript()
       .then(() => {
         if (!alive) return;
         const el = boxRef.current;
         if (!el || !window.turnstile) {
           setLoadState("failed");
+          setNeedsRetry(true);
           return;
         }
         el.innerHTML = "";
@@ -96,18 +101,31 @@ export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: Turnst
           const id = window.turnstile.render(el, {
             sitekey: siteKey,
             theme: "auto",
-            callback: (token: string) => onTokenRef.current(token),
-            "expired-callback": () => onExpiredRef.current?.(),
-            "error-callback": () => onErrorRef.current?.(),
+            callback: (token: string) => {
+              setNeedsRetry(false);
+              onTokenRef.current(token);
+            },
+            "expired-callback": () => {
+              setNeedsRetry(true);
+              onExpiredRef.current?.();
+            },
+            "error-callback": () => {
+              setNeedsRetry(true);
+              onErrorRef.current?.();
+            },
           });
           widgetIdRef.current = id;
           setLoadState("ready");
         } catch {
           setLoadState("failed");
+          setNeedsRetry(true);
         }
       })
       .catch(() => {
-        if (alive) setLoadState("failed");
+        if (alive) {
+          setLoadState("failed");
+          setNeedsRetry(true);
+        }
       });
     return () => {
       alive = false;
@@ -121,13 +139,38 @@ export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: Turnst
     };
   }, [siteKey]);
 
-  function handleReset() {
+  function handleRetry() {
+    setNeedsRetry(false);
+    setLoadState("loading");
+    onTokenRef.current("");
     try {
       if (widgetIdRef.current && window.turnstile) {
         window.turnstile.reset(widgetIdRef.current);
+        setLoadState("ready");
+      } else if (boxRef.current && window.turnstile && siteKey) {
+        boxRef.current.innerHTML = "";
+        const id = window.turnstile.render(boxRef.current, {
+          sitekey: siteKey,
+          theme: "auto",
+          callback: (token: string) => {
+            setNeedsRetry(false);
+            onTokenRef.current(token);
+          },
+          "expired-callback": () => {
+            setNeedsRetry(true);
+            onExpiredRef.current?.();
+          },
+          "error-callback": () => {
+            setNeedsRetry(true);
+            onErrorRef.current?.();
+          },
+        });
+        widgetIdRef.current = id;
+        setLoadState("ready");
       }
     } catch {
-      /* ignore reset errors */
+      setLoadState("failed");
+      setNeedsRetry(true);
     }
   }
 
@@ -141,9 +184,14 @@ export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: Turnst
 
   return (
     <div className={classes.wrap}>
+      <span className="oasis-sr-only" id="turnstile-label">
+        Spam verification
+      </span>
       <div
         ref={boxRef}
-        aria-label="Spam verification"
+        className={classes.box}
+        role="group"
+        aria-labelledby="turnstile-label"
         aria-busy={loadState === "loading"}
       />
       {loadState === "loading" ? (
@@ -153,20 +201,20 @@ export function TurnstileWidget({ siteKey, onToken, onExpired, onError }: Turnst
       ) : null}
       {loadState === "failed" ? (
         <p role="alert" className={classes.note}>
-          Verification could not load. Check your connection and reload the page.
+          Verification could not load. Check your connection and try again.
         </p>
       ) : null}
-      <button
-        type="button"
-        className={classes.reset}
-        onClick={() => {
-          onTokenRef.current("");
-          handleReset();
-        }}
-        aria-label="Reset verification"
-      >
-        Reset verification
-      </button>
+      {needsRetry ? (
+        <button
+          type="button"
+          className={classes.retry}
+          onClick={handleRetry}
+          aria-label="Retry verification"
+        >
+          <ArrowClockwise weight="thin" aria-hidden="true" className={classes.retryIcon} />
+          <span>Retry verification</span>
+        </button>
+      ) : null}
     </div>
   );
 }

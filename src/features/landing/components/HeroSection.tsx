@@ -1,6 +1,7 @@
-import { Button, List, ThemeIcon } from "@mantine/core";
+import { Button } from "@mantine/core";
+import { Check } from "@phosphor-icons/react";
 import { StatusBadge } from "../../../components/StatusBadge/StatusBadge";
-import { SignalVisual } from "./SignalVisual";
+import { HeroScene } from "./hero-scene/HeroScene";
 import type { AvailabilitySummary } from "../types";
 import classes from "./HeroSection.module.css";
 
@@ -8,12 +9,21 @@ export type HeroSectionProps = {
   availability: AvailabilitySummary | null;
 };
 
+const ASSURANCES = [
+  "You talk with us from first note to launch",
+  "Scope, timing, and cost in writing before we build",
+  "Short form that is easy to fill on your phone",
+];
+
 export function HeroSection({ availability }: HeroSectionProps) {
   return (
     <section className={classes.hero} aria-labelledby="hero-title">
       <div className={classes.inner}>
         <div className={classes.visualWrap}>
-          <SignalVisual />
+          {/* Six stage hero scene per docs/hero-architecture.md. Owns stage
+              state, tab copy panels, and the temporary comparison popup.
+              SignalVisual remains in the tree unused and superseded. */}
+          <HeroScene />
         </div>
 
         <div className={classes.copy}>
@@ -40,35 +50,16 @@ export function HeroSection({ availability }: HeroSectionProps) {
               See services
             </Button>
           </div>
-          <List className={classes.checks} spacing="xs" size="sm" withPadding={false}>
-            <List.Item
-              icon={
-                <ThemeIcon size={22} radius="xl" className={classes.checkIcon}>
-                  ✓
-                </ThemeIcon>
-              }
-            >
-              You talk with us from first note to launch
-            </List.Item>
-            <List.Item
-              icon={
-                <ThemeIcon size={22} radius="xl" className={classes.checkIcon}>
-                  ✓
-                </ThemeIcon>
-              }
-            >
-              Scope, timing, and cost in writing before we build
-            </List.Item>
-            <List.Item
-              icon={
-                <ThemeIcon size={22} radius="xl" className={classes.checkIcon}>
-                  ✓
-                </ThemeIcon>
-              }
-            >
-              Short form that is easy to fill on your phone
-            </List.Item>
-          </List>
+          <ul className={classes.checks}>
+            {ASSURANCES.map((line) => (
+              <li key={line} className={classes.checkRow}>
+                <span className={classes.checkIcon} aria-hidden="true">
+                  <Check weight="thin" focusable="false" />
+                </span>
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

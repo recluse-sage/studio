@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Alert, Button, Select, Textarea, TextInput } from "@mantine/core";
+import { PaperPlaneTilt } from "@phosphor-icons/react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
 import { submitIntake, DEFAULT_INTAKE_ENDPOINT } from "../api";
 import { BUSINESS_TYPE_OPTIONS, CONTACT_METHOD_OPTIONS } from "../types";
@@ -359,12 +360,10 @@ export function IntakeForm({
               loading={state.status === "sending"}
               disabled={state.status === "sending" || !hasSiteKey}
               className={classes.submit}
+              leftSection={<PaperPlaneTilt weight="thin" aria-hidden="true" />}
             >
               {state.status === "sending" ? "Sending" : "Send intake"}
             </Button>
-            <p className={classes.privacy}>
-              Your details are used to review and reply to this request. The verification check runs on the server.
-            </p>
           </div>
         </form>
       </div>

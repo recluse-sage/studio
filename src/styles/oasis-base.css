@@ -50,7 +50,9 @@ a {
   border-radius: 4px;
 }
 
-/* Comfortable touch targets for primary controls and nav. */
+/* Shared button rhythm. Groups keep equal heights.
+   Primary is glass, secondary is outline, quiet is a text link.
+   Motion is transform and opacity only. Press settles by 1px. */
 button,
 a[role="button"],
 input[type="submit"],

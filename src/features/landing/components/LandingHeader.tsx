@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Burger, Button } from "@mantine/core";
+import { ArrowRight } from "@phosphor-icons/react";
 import { ColorSchemeToggle } from "../../../components/ColorSchemeToggle/ColorSchemeToggle";
 import classes from "./LandingHeader.module.css";
 
@@ -31,7 +32,7 @@ export function LandingHeader({ intakeHref = "#intake", showAvailability = true 
   }, [open ]);
 
   return (
-    <header className={classes.header}>
+    <header className={classes.header} data-open={open}>
       <div className={classes.inner}>
         <a href="#top" className={classes.brand} aria-label="Oasis home">
           <span className={classes.wordmark} aria-hidden="true">
@@ -90,7 +91,8 @@ export function LandingHeader({ intakeHref = "#intake", showAvailability = true 
             className={classes.mobileCta}
             onClick={() => setOpen(false)}
           >
-            Start intake
+            <span>Start intake</span>
+            <ArrowRight weight="thin" aria-hidden="true" className={classes.mobileCtaIcon} />
           </a>
         </nav>
       ) : null}

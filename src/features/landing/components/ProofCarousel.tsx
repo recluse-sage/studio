@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import type { KeyboardEvent } from "react";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
 import {
   fetchPublicWorkItems,
@@ -118,7 +119,7 @@ function CarouselFrame({
             onClick={() => onGo(index - 1)}
             aria-label="Previous slide"
           >
-            <span aria-hidden="true">←</span>
+            <CaretLeft weight="thin" aria-hidden="true" focusable="false" />
           </button>
           <p className={classes.status} role="status" aria-live="polite">
             Slide {index + 1} of {count}
@@ -144,7 +145,7 @@ function CarouselFrame({
             onClick={() => onGo(index + 1)}
             aria-label="Next slide"
           >
-            <span aria-hidden="true">→</span>
+            <CaretRight weight="thin" aria-hidden="true" focusable="false" />
           </button>
         </div>
       ) : (

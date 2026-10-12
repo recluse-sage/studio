@@ -32,6 +32,17 @@ export type IntakeSource = "landing" | "offline-admin" | "admin-manual";
 
 export type EmailNotificationState = "pending" | "sent" | "failed";
 
+// Intake field audit, kept minimal for phase one.
+// businessName labels the build and the inbox row.
+// businessType shapes the fit without extra questions.
+// taskDescription holds the single problem, including the quiz goal prefix.
+// timeline and budget scope the first step. Budget is plain text up to 60
+// chars so it accepts Free plus dollar or naira ranges with no new column.
+// Country for the quiz currency rule stays client side only and is never
+// stored, which keeps the schema stable. No new intake field is added.
+// contactMethod plus contactValue cover the talk step.
+// website is a honeypot and turnstileToken is verification only. Neither is
+// stored. Source and status are set by the server, never by the client.
 export interface IntakeCreateRequest {
   businessName: string;
   businessType: BusinessType;

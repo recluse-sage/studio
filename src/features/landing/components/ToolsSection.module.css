@@ -74,8 +74,8 @@
 }
 
 .stepDot svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   display: block;
 }
 
@@ -105,6 +105,7 @@
   border-radius: var(--oasis-radius-xl);
   background: var(--oasis-surface-raised);
   box-shadow: var(--oasis-card-shadow);
+  border: 1px solid var(--oasis-border);
   padding: 22px 20px;
   display: grid;
   gap: 18px;
@@ -162,12 +163,23 @@
   min-width: 0;
 }
 
+.questionRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  width: 100%;
+}
+
 .question {
   font-weight: 600;
   font-size: 1.08rem;
   line-height: 1.45;
   color: var(--oasis-text);
-  padding: 0;
+  padding: 4px 0 0;
+  margin: 0;
 }
 
 .hint {
@@ -176,41 +188,91 @@
   font-size: 0.92rem;
 }
 
+/* Equal height option buttons. No radio circles. */
 .options {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  align-items: stretch;
 }
 
 .option {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  min-height: var(--oasis-touch-min);
-  padding: 10px 14px;
+  min-height: 60px;
+  height: 100%;
+  padding: 14px 16px;
   border: 1px solid var(--oasis-border);
   border-radius: var(--oasis-radius-md);
   background: var(--oasis-bg);
   color: var(--oasis-text-secondary);
   font-size: 0.97rem;
+  line-height: 1.45;
   cursor: pointer;
-  transition: border-color 120ms ease, background-color 120ms ease;
+  text-align: left;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
 }
 
 .option:hover {
   border-color: var(--oasis-accent-border);
+  background: var(--oasis-surface-raised);
+  color: var(--oasis-text);
 }
 
-.option:has(input:checked) {
+.option:active {
+  transform: translateY(1px);
+}
+
+.option[data-selected="true"] {
   border-color: var(--oasis-accent);
   background: var(--oasis-accent-soft);
   color: var(--oasis-text);
 }
 
-.option input {
-  width: 20px;
-  height: 20px;
+.optionCheck {
   flex: none;
-  accent-color: var(--oasis-accent);
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--oasis-border-strong);
+  color: transparent;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.option[data-selected="true"] .optionCheck {
+  background: var(--oasis-accent);
+  border-color: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+}
+
+.optionCheck svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.optionText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.optionLabel {
+  font-weight: 600;
+  color: inherit;
+}
+
+.optionHint {
+  font-size: 0.88rem;
+  color: var(--oasis-text-muted);
+}
+
+.option[data-selected="true"] .optionHint {
+  color: var(--oasis-text-secondary);
 }
 
 .fieldError {
@@ -224,23 +286,45 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  align-items: stretch;
 }
 
+.btnIcon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* Primary glass with solid fallback. Secondary outline. Equal heights. */
 .primary {
-  min-height: var(--oasis-touch-min);
-  padding: 10px 22px;
+  min-height: var(--oasis-btn-min);
+  padding: 12px 22px;
   border-radius: var(--oasis-radius-md);
   border: 1px solid var(--oasis-accent);
   background: var(--oasis-accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 55%),
+    var(--oasis-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--oasis-accent-contrast);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 120ms ease, transform 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 140ms ease, transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
 
 .primary:hover {
-  background: var(--oasis-accent-strong);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%),
+    var(--oasis-accent-strong);
   border-color: var(--oasis-accent-strong);
 }
 
@@ -249,20 +333,29 @@
 }
 
 .ghost {
-  min-height: var(--oasis-touch-min);
-  padding: 10px 20px;
+  min-height: var(--oasis-btn-min);
+  padding: 12px 20px;
   border-radius: var(--oasis-radius-md);
   border: 1px solid var(--oasis-border-strong);
   background: transparent;
   color: var(--oasis-text);
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: border-color 120ms ease, background-color 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
 }
 
 .ghost:hover {
   border-color: var(--oasis-accent);
   background: var(--oasis-accent-soft);
+}
+
+.ghost:active {
+  transform: translateY(1px);
 }
 
 .result {
@@ -281,12 +374,6 @@
   font-size: 1.15rem;
   line-height: 1.4;
   color: var(--oasis-text);
-}
-
-.resultText {
-  margin: 0;
-  color: var(--oasis-text-secondary);
-  font-size: 0.97rem;
 }
 
 .why {
@@ -324,6 +411,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  align-items: stretch;
+}
+
+.resultActions > * {
+  min-height: var(--oasis-btn-min);
 }
 
 @media (min-width: 720px) {
@@ -332,6 +424,9 @@
   }
   .options {
     grid-template-columns: 1fr 1fr;
+  }
+  .nav .primary {
+    min-width: 180px;
   }
 }
 

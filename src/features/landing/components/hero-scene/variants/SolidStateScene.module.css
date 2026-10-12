@@ -1,0 +1,55 @@
+/* Solid state motion manners. Same contract as Cairn: drift always, one idle
+   sweep only at stage 6, will-change only while tweening. */
+
+.scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.drift {
+  will-change: auto;
+}
+
+.idleSweep {
+  will-change: auto;
+}
+
+[data-tweening="1"] .drift .mv {
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="on"] .drift {
+    animation: solid-drift 16s ease-in-out infinite alternate;
+  }
+  [data-stage="5"][data-motion="on"] .idleSweep {
+    animation: solid-sweep 6s linear infinite;
+  }
+}
+
+@keyframes solid-drift {
+  from {
+    transform: translateX(5px);
+  }
+  to {
+    transform: translateX(-5px);
+  }
+}
+
+@keyframes solid-sweep {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(560px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .idleSweep {
+    animation: none;
+  }
+}

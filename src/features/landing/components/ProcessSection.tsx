@@ -1,3 +1,12 @@
+import {
+  ChatCircle,
+  CheckCircle,
+  Crosshair,
+  PaperPlaneTilt,
+  ShareNetwork,
+  Target,
+  Wrench,
+} from "@phosphor-icons/react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
 import { Reveal } from "./Reveal";
 import type { ProcessStep } from "../types";
@@ -46,6 +55,21 @@ const FALLBACK: ProcessStep[] = [
   },
 ];
 
+const ICONS = [Crosshair, ChatCircle, Target, Wrench, CheckCircle, ShareNetwork] as const;
+const ID_ICONS: Record<string, (typeof ICONS)[number]> = {
+  problem: Crosshair,
+  talk: ChatCircle,
+  solution: Target,
+  build: Wrench,
+  "build-ship": PaperPlaneTilt,
+  use: CheckCircle,
+  share: ShareNetwork,
+};
+
+function iconFor(id: string, position: number) {
+  return ID_ICONS[id] ?? ICONS[position % ICONS.length] ?? Crosshair;
+}
+
 export function ProcessSection({ steps }: ProcessSectionProps) {
   const list = steps.length > 0 ? steps : FALLBACK;
   return (
@@ -58,21 +82,27 @@ export function ProcessSection({ steps }: ProcessSectionProps) {
           description="Six clear stages. You stay in control at each one."
         />
         <ol className={classes.list}>
-          {list.map((step, position) => (
-            <li key={step.id} className={classes.row}>
-              <Reveal delay={Math.min(position, 3) * 70}>
-                <div className={classes.rowInner}>
-                  <span className={classes.index} aria-hidden="true">
-                    {step.index}
-                  </span>
-                  <div>
-                    <h3 className={classes.itemTitle}>{step.title}</h3>
-                    <p className={classes.itemText}>{step.description}</p>
+          {list.map((step, position) => {
+            const Icon = iconFor(step.id, position);
+            return (
+              <li key={step.id} className={classes.row}>
+                <Reveal delay={Math.min(position, 3) * 70}>
+                  <div className={classes.rowInner}>
+                    <span className={classes.iconWrap} aria-hidden="true">
+                      <Icon weight="thin" focusable="false" />
+                    </span>
+                    <div className={classes.text}>
+                      <p className={classes.index} aria-hidden="true">
+                        {step.index}
+                      </p>
+                      <h3 className={classes.itemTitle}>{step.title}</h3>
+                      <p className={classes.itemText}>{step.description}</p>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
-            </li>
-          ))}
+                </Reveal>
+              </li>
+            );
+          })}
         </ol>
         <p className={classes.closer}>
           Questions before you write? <a href="#intake" className={classes.closerLink}>Send the intake</a> and ask in one line.

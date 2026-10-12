@@ -4,6 +4,7 @@ import type { LinksFunction } from "react-router";
 import "@mantine/core/styles.css";
 // Shared Oasis tokens owned by the designer lane. Read only here, never edited here.
 import "../src/styles/oasis-tokens.css";
+import "../src/styles/oasis-hero-tokens.css";
 import "../src/styles/oasis-base.css";
 
 // Route import paths (easy to update if the designer moves files):
