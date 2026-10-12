@@ -53,6 +53,8 @@ True process flow, locked 2026-10-09, replaces the old note scope build proof ve
 
 ## Done (reference only)
 
+- Hero scene system live 2026-10-12 with three variants plus visible comparison popup (choice plus removal still pending).
+
 - D1 plus migrations, Access, Turnstile keys, live deploy, backup worker plus token, tokenless CI, design system doc, guided admin home, honest tools plus labeled proof carousel.
 
 ## Change notes 2026-10-09 (fixer lane)
