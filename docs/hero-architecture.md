@@ -637,3 +637,10 @@ first, and a desktop-only review will miss it.
 
 **When the choice is made**, execute the removal protocol in §13.3, then update this section
 to record the decision and the date.
+
+### Rejection record — 2026-10-14
+
+- All three variants (Cairn, Solid State, Grid) — **rejected**.
+- Comparison popup — **removed**.
+- Reason: direction change.
+- Replacement: pending.

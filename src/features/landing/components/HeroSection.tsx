@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import { Check } from "@phosphor-icons/react";
 import { StatusBadge } from "../../../components/StatusBadge/StatusBadge";
-import { HeroScene } from "./hero-scene/HeroScene";
+import { SignalVisual } from "./SignalVisual";
 import type { AvailabilitySummary } from "../types";
 import classes from "./HeroSection.module.css";
 
@@ -20,10 +20,7 @@ export function HeroSection({ availability }: HeroSectionProps) {
     <section className={classes.hero} aria-labelledby="hero-title">
       <div className={classes.inner}>
         <div className={classes.visualWrap}>
-          {/* Six stage hero scene per docs/hero-architecture.md. Owns stage
-              state, tab copy panels, and the temporary comparison popup.
-              SignalVisual remains in the tree unused and superseded. */}
-          <HeroScene />
+          <SignalVisual />
         </div>
 
         <div className={classes.copy}>
