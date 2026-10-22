@@ -16,6 +16,7 @@ export interface D1Like {
       run(): Promise<unknown>;
     };
   };
+  batch?(statements: unknown[]): Promise<unknown[]>;
 }
 
 export interface OasisEnv {

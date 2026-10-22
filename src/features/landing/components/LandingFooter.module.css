@@ -98,21 +98,41 @@
   max-width: 24rem;
 }
 
-.contactLink {
+.contactButton {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: var(--oasis-touch-min);
-  padding: 6px 0;
-  color: var(--oasis-accent);
+  justify-content: center;
+  gap: 10px;
+  min-height: var(--oasis-btn-min);
+  padding: 12px 22px;
+  margin-top: 12px;
+  border-radius: 12px;
+  background: var(--oasis-accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
   font-weight: 600;
+  font-size: 1rem;
   text-decoration: none;
   justify-self: start;
-  border-radius: 6px;
+  transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease;
 }
 
-.contactLink:hover {
-  text-decoration: underline;
+.contactButton:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent-strong);
+  border-color: var(--oasis-accent-strong);
+  color: var(--oasis-accent-contrast);
+}
+
+.contactButton:active {
+  transform: translateY(1px);
 }
 
 .contactIcon {
@@ -122,7 +142,7 @@
   transition: transform 160ms ease;
 }
 
-.contactLink:hover .contactIcon {
+.contactButton:hover .contactIcon {
   transform: translateX(3px);
 }
 
@@ -190,13 +210,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .link,
-  .contactLink,
+  .contactButton,
   .builtBy,
   .contactIcon,
   .builtIcon {
     transition: none;
   }
-  .contactLink:hover .contactIcon,
+  .contactButton:active,
+  .contactButton:hover .contactIcon,
   .builtBy:hover .builtIcon {
     transform: none;
   }

@@ -11,3 +11,4 @@ dist/
 wrangler/
 .dev/
 .qa-artifacts/
+.slim/deepwork/

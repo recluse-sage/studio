@@ -1,0 +1,185 @@
+.wrap {
+  display: grid;
+  gap: 24px;
+}
+
+.status {
+  margin: 0;
+  color: var(--oasis-text-muted);
+  font-size: 0.95rem;
+}
+
+.stateBox {
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-lg);
+  background: var(--oasis-surface);
+  padding: 24px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.stateTitle {
+  margin: 0;
+  font-weight: 650;
+  font-size: 1rem;
+  color: var(--oasis-text);
+}
+
+.stateText {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: var(--oasis-measure);
+}
+
+.stateActions {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ghostButton {
+  min-height: var(--oasis-btn-min);
+  border-color: var(--oasis-border-strong);
+  color: var(--oasis-text);
+}
+
+.primaryButton {
+  min-height: var(--oasis-btn-min);
+  background: var(--oasis-accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent);
+  border: 1px solid var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.primaryButton:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent-strong);
+  border-color: var(--oasis-accent-strong);
+  color: var(--oasis-accent-contrast);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.cardItem {
+  min-width: 0;
+}
+
+.card {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-lg);
+  background: var(--oasis-surface);
+  padding: 22px 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  background: var(--oasis-surface-raised);
+  box-shadow: var(--oasis-card-shadow);
+}
+
+.card:active {
+  transform: translateY(0);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--oasis-text);
+  text-wrap: balance;
+}
+
+.cardExcerpt {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.97rem;
+  line-height: 1.6;
+  max-width: var(--oasis-measure);
+}
+
+.cardMeta {
+  margin: 4px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: var(--oasis-text-muted);
+  font-size: 0.88rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--oasis-pill-bg);
+  border: 1px solid var(--oasis-pill-border);
+  color: var(--oasis-pill-text);
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.cardLink {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--oasis-accent);
+  font-weight: 600;
+}
+
+.arrow {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  transition: transform 140ms ease;
+}
+
+.card:hover .arrow {
+  transform: translateX(4px);
+}
+
+@media (min-width: 768px) {
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card {
+    padding: 24px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .arrow {
+    transition: none;
+  }
+  .card:hover,
+  .card:hover .arrow {
+    transform: none;
+  }
+}

@@ -15,6 +15,7 @@ import {
   handlePublicDisplay,
   handlePublicWorkItems,
 } from "./handlers/admin.ts";
+import { handleAdminPosts, handlePublicPosts } from "./handlers/posts.ts";
 
 // Single integration entry for the Worker entrypoint.
 // Parent wires: import { handleApiRequest } from "../server/worker.ts"
@@ -39,6 +40,12 @@ export async function handleApiRequest(
   }
   if (path === "/api/public/work-items") {
     return handlePublicWorkItems(request, env);
+  }
+  if (path === "/api/public/posts" || path.startsWith("/api/public/posts/")) {
+    return handlePublicPosts(request, env);
+  }
+  if (path === "/api/admin/posts" || path.startsWith("/api/admin/posts/")) {
+    return handleAdminPosts(request, env);
   }
   if (path === "/api/admin/overview") {
     return handleAdminOverview(request, env);

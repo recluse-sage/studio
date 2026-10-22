@@ -66,3 +66,7 @@ No deploy before Access and D1 setup are complete. No custom domain purchase is 
 Account note: client sites initially use distinct Worker names under the same `oasishub` hostname. Each client gets a separate Worker and D1. Their data stays separate but account quotas are shared. Moving a client to its own Cloudflare account changes its URL. `oasis.pages.dev` and Pages stay out of the production path.
 
 Pricing note: Cloudflare, Resend, and related services have free tiers and paid limits that can change. Check current provider pricing before launch. This repo makes no no-cost claim.
+
+## Scheduler
+
+Posts use draft, scheduled, published, unpublished with canonical UTC `publish_at`. Admin sends date plus time plus IANA zone and the server stores canonical UTC. Hourly cron at minute 7 flips due scheduled rows to published with one cron audit row. Public post APIs return published only. Runtime `GET /sitemap.xml` serves static paths plus published posts with max-age 300. Overview includes `scheduledDue` for the badge count. See migration `0004_posts.sql` and `src/server/handlers/posts.ts`.

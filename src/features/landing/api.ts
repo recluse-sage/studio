@@ -3,6 +3,8 @@ import type {
   BusinessType,
   ContactMethod,
   IntakeFormValues,
+  PostItem,
+  PostKind,
   WorkItem,
   WorkItemKind,
 } from "./types";
@@ -11,6 +13,7 @@ export const DEFAULT_INTAKE_ENDPOINT = "/api/intakes";
 export const DEFAULT_PUBLIC_AVAILABILITY_ENDPOINT = "/api/public/availability";
 export const DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT = "/api/public/work-items";
 export const DEFAULT_PUBLIC_DISPLAY_ENDPOINT = "/api/public/display";
+export const DEFAULT_PUBLIC_POSTS_ENDPOINT = "/api/public/posts";
 export const DEFAULT_ADMIN_DISPLAY_ENDPOINT = "/api/admin/display";
 
 export type DisplaySettings = {
@@ -300,6 +303,92 @@ export async function fetchPublicAvailability(
       nextWindow: typeof source.nextWindow === "string" ? source.nextWindow : "",
       note: typeof source.note === "string" ? source.note : "",
     };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET public posts. Used by the blog index and the know-how library.
+ * The endpoint is coming. Until it exists, this returns an empty list
+ * and the UI shows an honest empty state. Never throws, never invents posts.
+ */
+export async function fetchPublicPosts(
+  endpoint: string = DEFAULT_PUBLIC_POSTS_ENDPOINT,
+  signal?: AbortSignal,
+): Promise<{ items: PostItem[]; total: number }> {
+  const empty = { items: [], total: 0 };
+  try {
+    const res = await fetch(endpoint, { signal });
+    if (!res.ok) return empty;
+    const raw = (await res.json()) as {
+      items?: Array<Record<string, unknown>>;
+      posts?: Array<Record<string, unknown>>;
+      total?: number;
+    };
+    if (!raw || typeof raw !== "object") return empty;
+    const list = Array.isArray(raw.items) ? raw.items : Array.isArray(raw.posts) ? raw.posts : null;
+    if (!list) return empty;
+    const items: PostItem[] = [];
+    for (const r of list) {
+      if (!r || typeof r !== "object") continue;
+      const id = typeof r.id === "string" ? r.id : typeof r.slug === "string" ? r.slug : null;
+      const slug = typeof r.slug === "string" ? r.slug : typeof r.id === "string" ? r.id : null;
+      const title = typeof r.title === "string" ? r.title : null;
+      if (!id || !slug || !title) continue;
+      const kindRaw = typeof r.kind === "string" ? r.kind : "post";
+      const kind: PostKind = kindRaw === "know-how" ? "know-how" : "post";
+      const minutesRaw = r.readingMinutes ?? r.reading_minutes ?? r.minsRead ?? null;
+      const readingMinutes =
+        typeof minutesRaw === "number" && Number.isFinite(minutesRaw) && minutesRaw > 0
+          ? Math.round(minutesRaw)
+          : null;
+      items.push({
+        id,
+        slug,
+        title,
+        excerpt: typeof r.excerpt === "string" ? r.excerpt : typeof r.summary === "string" ? r.summary : null,
+        body: typeof r.body === "string" ? r.body : typeof r.content === "string" ? r.content : null,
+        kind,
+        publishedAt:
+          typeof r.publishedAt === "string"
+            ? r.publishedAt
+            : typeof r.published_at === "string"
+              ? r.published_at
+              : typeof r.createdAt === "string"
+                ? r.createdAt
+                : null,
+        readingMinutes,
+      });
+    }
+    return { items, total: items.length };
+  } catch {
+    return empty;
+  }
+}
+
+function estimateReadingMinutes(text: string | null): number {
+  if (!text) return 3;
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  if (words <= 0) return 3;
+  return Math.max(1, Math.round(words / 200));
+}
+
+export function readingMinutesFor(item: Pick<PostItem, "body" | "excerpt" | "readingMinutes">): number {
+  if (typeof item.readingMinutes === "number" && item.readingMinutes > 0) return item.readingMinutes;
+  return estimateReadingMinutes(item.body ?? item.excerpt);
+}
+
+export function formatPostDate(value: string | null): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
   } catch {
     return null;
   }

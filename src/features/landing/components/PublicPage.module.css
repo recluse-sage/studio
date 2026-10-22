@@ -1,0 +1,44 @@
+.page {
+  background: var(--oasis-bg);
+  color: var(--oasis-text);
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 50;
+  background: var(--oasis-text);
+  color: var(--oasis-bg);
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 650;
+}
+
+.skip:focus {
+  top: 12px;
+}
+
+.main {
+  display: block;
+  width: 100%;
+}
+
+.inner {
+  max-width: var(--oasis-max-width);
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+  display: grid;
+  gap: 24px;
+  align-content: start;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: 56px 24px 80px;
+  }
+}

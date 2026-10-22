@@ -1,5 +1,6 @@
 import { createRequestHandler } from "react-router";
 import { handleApiRequest } from "../src/server/worker.ts";
+import { handleSitemap, runScheduledPublish } from "../src/server/handlers/posts.ts";
 import { verifyAccessJwt } from "../src/server/access.ts";
 import type { OasisEnv } from "../src/server/env.ts";
 
@@ -60,6 +61,12 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname;
 
+    // Runtime sitemap: static paths plus published posts with lastmod.
+    // Origin comes from the request URL with https and host guard.
+    if (pathname === "/sitemap.xml") {
+      return handleSitemap(request, env as OasisEnv);
+    }
+
     // Private APIs: never return an asset fallback. Always return the API response,
     // including JSON 404s for unknown /api/* paths.
     if (isApiPath(pathname)) {
@@ -88,5 +95,8 @@ export default {
     return requestHandler(request, {
       cloudflare: { env, ctx },
     });
+  },
+  async scheduled(_event, env, _ctx) {
+    await runScheduledPublish(env as OasisEnv);
   },
 } satisfies ExportedHandler<Env>;

@@ -683,3 +683,292 @@ export function validateDisplayInput(raw: unknown): {
   }
   return { ok: true, data: { proofVisible: raw.proofVisible } };
 }
+
+export const POST_STATUSES = [
+  "draft",
+  "scheduled",
+  "published",
+  "unpublished",
+] as const;
+
+export const POST_KINDS = ["post", "know-how"] as const;
+
+function normalizePostKindValue(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const v = value.trim();
+  if (v === "post") return "post";
+  if (v === "know-how" || v === "knowhow") return "know-how";
+  return null;
+}
+
+const POST_SLUG_RE = /^[a-z0-9-]{2,60}$/;
+const CANONICAL_UTC_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
+function isCanonicalUtcValue(value: string): boolean {
+  if (!CANONICAL_UTC_RE.test(value)) return false;
+  return !Number.isNaN(Date.parse(value));
+}
+
+function validZoneName(zone: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: zone }).format(
+      new Date(Date.UTC(2020, 0, 1)),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function daysInMonthFor(year: number, month: number): number {
+  if (month === 2) {
+    const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    return leap ? 29 : 28;
+  }
+  if ([4, 6, 9, 11].includes(month)) return 30;
+  return 31;
+}
+
+function zonedToUtcLocal(
+  date: string,
+  time: string,
+  zone: string,
+): string | null {
+  const d = date.trim();
+  const t = time.trim();
+  const z = zone.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+  if (!/^\d{2}:\d{2}(:\d{2})?$/.test(t)) return null;
+  if (!z || z.length > 80 || !validZoneName(z)) return null;
+  const year = Number(d.slice(0, 4));
+  const month = Number(d.slice(5, 7));
+  const day = Number(d.slice(8, 10));
+  const hour = Number(t.slice(0, 2));
+  const minute = Number(t.slice(3, 5));
+  const second = t.length > 5 ? Number(t.slice(6, 8)) : 0;
+  if (month < 1 || month > 12) return null;
+  if (day < 1 || day > daysInMonthFor(year, month)) return null;
+  if (hour > 23 || minute > 59 || second > 59) return null;
+  let utcMs = Date.UTC(year, month - 1, day, hour, minute, second);
+  for (let i = 0; i < 3; i++) {
+    let parts: Intl.DateTimeFormatPart[];
+    try {
+      parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: z,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+        hourCycle: "h23",
+      }).formatToParts(new Date(utcMs));
+    } catch {
+      return null;
+    }
+    const get = (type: string): string | undefined =>
+      parts.find((p) => p.type === type)?.value;
+    const py = Number(get("year"));
+    const pm = Number(get("month"));
+    const pd = Number(get("day"));
+    let ph = Number(get("hour"));
+    if (ph === 24) ph = 0;
+    const pmi = Number(get("minute"));
+    const ps = Number(get("second"));
+    if ([py, pm, pd, ph, pmi, ps].some((n) => !Number.isFinite(n))) return null;
+    const wallAsUtc = Date.UTC(py, pm - 1, pd, ph, pmi, ps);
+    const intendedAsUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+    const diff = intendedAsUtc - wallAsUtc;
+    if (diff === 0) break;
+    utcMs += diff;
+  }
+  if (!Number.isFinite(utcMs)) return null;
+  const iso = new Date(utcMs).toISOString();
+  return isCanonicalUtcValue(iso) ? iso : null;
+}
+
+function resolvePostPublishAt(rec: Record<string, unknown>): {
+  ok: boolean;
+  error?: string;
+  value?: string | null;
+} {
+  const hasLocal =
+    rec.publishDate !== undefined ||
+    rec.publishTime !== undefined ||
+    rec.timeZone !== undefined;
+  if (hasLocal) {
+    const date = typeof rec.publishDate === "string" ? rec.publishDate.trim() : "";
+    const zone = typeof rec.timeZone === "string" ? rec.timeZone.trim() : "";
+    let time = typeof rec.publishTime === "string" ? rec.publishTime.trim() : "";
+    if (!date) return { ok: false, error: "Publish date is required." };
+    if (!zone) return { ok: false, error: "Time zone is required." };
+    if (!time) time = "09:00";
+    const iso = zonedToUtcLocal(date, time, zone);
+    if (!iso) return { ok: false, error: "Publish time is invalid." };
+    return { ok: true, value: iso };
+  }
+  const v = rec.publishAt;
+  if (v === undefined || v === null || v === "") return { ok: true, value: null };
+  if (typeof v !== "string") {
+    return { ok: false, error: "Publish time must be canonical UTC." };
+  }
+  const s = v.trim();
+  if (!isCanonicalUtcValue(s)) {
+    return { ok: false, error: "Publish time must be canonical UTC." };
+  }
+  return { ok: true, value: s };
+}
+
+export const POST_ALLOWED_FIELDS = [
+  "title",
+  "slug",
+  "body",
+  "status",
+  "kind",
+  "publishAt",
+  "publishDate",
+  "publishTime",
+  "timeZone",
+] as const;
+
+export interface ValidPostInput {
+  title: string;
+  slug: string;
+  body: string | null;
+  status: string;
+  kind: string;
+  publishAt: string | null;
+}
+
+export function validatePostInput(raw: unknown): {
+  ok: boolean;
+  error?: string;
+  data?: ValidPostInput;
+} {
+  if (!isRecord(raw)) return { ok: false, error: "Invalid post data." };
+  if (findUnknownFields(raw, POST_ALLOWED_FIELDS).length > 0) {
+    return { ok: false, error: "Invalid post data." };
+  }
+  const title = requiredStr(raw.title, 3, 160);
+  if (!title) return { ok: false, error: "Post title is required." };
+  if (typeof raw.slug !== "string" || !POST_SLUG_RE.test(raw.slug.trim())) {
+    return { ok: false, error: "Post slug is invalid." };
+  }
+  const slug = (raw.slug as string).trim();
+  let body: string | null = null;
+  if (raw.body !== undefined && raw.body !== null && raw.body !== "") {
+    if (typeof raw.body !== "string") return { ok: false, error: "Post body is invalid." };
+    const t = (raw.body as string).trim();
+    if (t.length > 20000) return { ok: false, error: "Post body is too long." };
+    body = t.length === 0 ? null : t;
+  }
+  const status =
+    raw.status === undefined
+      ? "draft"
+      : typeof raw.status === "string" &&
+          (POST_STATUSES as readonly string[]).includes(raw.status)
+        ? raw.status
+        : null;
+  if (!status) return { ok: false, error: "Post status is invalid." };
+  const kind =
+    raw.kind === undefined || raw.kind === null || raw.kind === ""
+      ? "post"
+      : normalizePostKindValue(raw.kind);
+  if (!kind) return { ok: false, error: "Post kind is invalid." };
+  const resolved = resolvePostPublishAt(raw);
+  if (!resolved.ok) return { ok: false, error: resolved.error || "Publish time is invalid." };
+  if (status === "scheduled" && !resolved.value) {
+    return { ok: false, error: "Schedule time is required." };
+  }
+  return { ok: true, data: { title, slug, body, status, kind, publishAt: resolved.value ?? null } };
+}
+
+export function validatePostPatch(raw: unknown): {
+  ok: boolean;
+  error?: string;
+  data?: {
+    title?: string;
+    slug?: string;
+    body?: string | null;
+    status?: string;
+    kind?: string;
+    publishAt?: string | null;
+    hasPublishFields?: boolean;
+  };
+} {
+  if (!isRecord(raw)) return { ok: false, error: "Invalid post data." };
+  if (findUnknownFields(raw, POST_ALLOWED_FIELDS).length > 0) {
+    return { ok: false, error: "Invalid post data." };
+  }
+  const out: {
+    title?: string;
+    slug?: string;
+    body?: string | null;
+    status?: string;
+    kind?: string;
+    publishAt?: string | null;
+    hasPublishFields?: boolean;
+  } = {};
+  if (raw.title !== undefined) {
+    const t = requiredStr(raw.title, 3, 160);
+    if (!t) return { ok: false, error: "Post title is required." };
+    out.title = t;
+  }
+  if (raw.slug !== undefined) {
+    if (typeof raw.slug !== "string" || !POST_SLUG_RE.test(raw.slug.trim())) {
+      return { ok: false, error: "Post slug is invalid." };
+    }
+    out.slug = (raw.slug as string).trim();
+  }
+  if (raw.body !== undefined) {
+    if (raw.body === null || raw.body === "") {
+      out.body = null;
+    } else if (typeof raw.body !== "string") {
+      return { ok: false, error: "Post body is invalid." };
+    } else {
+      const t = (raw.body as string).trim();
+      if (t.length > 20000) return { ok: false, error: "Post body is too long." };
+      out.body = t.length === 0 ? null : t;
+    }
+  }
+  if (raw.status !== undefined) {
+    if (
+      typeof raw.status !== "string" ||
+      !(POST_STATUSES as readonly string[]).includes(raw.status)
+    ) {
+      return { ok: false, error: "Post status is invalid." };
+    }
+    out.status = raw.status;
+  }
+  if (raw.kind !== undefined) {
+    const k = normalizePostKindValue(raw.kind);
+    if (!k) return { ok: false, error: "Post kind is invalid." };
+    out.kind = k;
+  }
+  const hasPublish =
+    raw.publishAt !== undefined ||
+    raw.publishDate !== undefined ||
+    raw.publishTime !== undefined ||
+    raw.timeZone !== undefined;
+  if (hasPublish) {
+    const resolved = resolvePostPublishAt(raw);
+    if (!resolved.ok) return { ok: false, error: resolved.error || "Publish time is invalid." };
+    out.publishAt = resolved.value ?? null;
+    out.hasPublishFields = true;
+    if (out.status === "scheduled" && !out.publishAt) {
+      return { ok: false, error: "Schedule time is required." };
+    }
+  }
+  if (
+    out.title === undefined &&
+    out.slug === undefined &&
+    out.body === undefined &&
+    out.status === undefined &&
+    out.kind === undefined &&
+    !hasPublish
+  ) {
+    return { ok: false, error: "Nothing to update." };
+  }
+  return { ok: true, data: out };
+}

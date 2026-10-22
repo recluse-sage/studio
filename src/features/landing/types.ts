@@ -16,6 +16,8 @@ export type ServiceItem = {
   points: string[];
   linkHref: string;
   linkLabel: string;
+  nextStep?: string;
+  timeCost?: string;
 };
 
 export type ProcessStep = {
@@ -23,6 +25,7 @@ export type ProcessStep = {
   index: string;
   title: string;
   description: string;
+  need?: string;
 };
 
 export type BusinessType =
@@ -101,4 +104,20 @@ export type WorkItem = {
   relatedToolId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+};
+
+/* Public posts and know-how. Fed only by GET /api/public/posts when present.
+   Empty list means the endpoint is missing or no posts are published yet. */
+
+export type PostKind = "post" | "know-how";
+
+export type PostItem = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  body: string | null;
+  kind: PostKind;
+  publishedAt: string | null;
+  readingMinutes: number | null;
 };

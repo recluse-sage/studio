@@ -13,24 +13,30 @@ const FALLBACK: ServiceItem[] = [
     title: "Websites",
     description: "A clear small site that explains the offer and turns visits into calls or bookings.",
     points: ["One page or a few pages", "Call, map, and hours easy to find", "Clear titles and descriptions for search"],
-    linkHref: "#intake",
+    linkHref: "/#intake",
     linkLabel: "Ask about a website",
+    nextStep: "What happens next: send the intake and we reply with scope, timing, and cost in writing.",
+    timeCost: "Time cost: the intake takes about 3 minutes.",
   },
   {
     id: "tools",
     title: "Tools",
     description: "A small helper that does one job well, like a quote builder or booking helper.",
     points: ["One task, done simply", "Works well on phones", "Easy for staff to use"],
-    linkHref: "#intake",
+    linkHref: "/#intake",
     linkLabel: "Ask about a tool",
+    nextStep: "What happens next: send the intake and we reply with the smallest useful build.",
+    timeCost: "Time cost: the intake takes about 3 minutes.",
   },
   {
     id: "automations",
     title: "Automations",
     description: "Link steps like intake, booking, and follow-up so they need less manual work.",
     points: ["Intake to reply in fewer steps", "Reminders without manual chasing", "A clear log of what ran"],
-    linkHref: "#intake",
+    linkHref: "/#intake",
     linkLabel: "Ask about automation",
+    nextStep: "What happens next: send the intake and we map the steps that can run without manual work.",
+    timeCost: "Time cost: the intake takes about 3 minutes.",
   },
 ];
 
@@ -75,6 +81,12 @@ export function ServicesSection({ services }: ServicesSectionProps) {
                     <li key={point}>{point}</li>
                   ))}
                 </ul>
+                {service.nextStep || service.timeCost ? (
+                  <div className={classes.guidance} aria-label={`Guidance for ${service.title}`}>
+                    {service.nextStep ? <p className={classes.guideNext}>{service.nextStep}</p> : null}
+                    {service.timeCost ? <p className={classes.guideTime}>{service.timeCost}</p> : null}
+                  </div>
+                ) : null}
                 <span className={classes.cardLink}>
                   <span>{service.linkLabel}</span>
                   <ArrowRight weight="thin" focusable="false" className={classes.arrow} aria-hidden="true" />

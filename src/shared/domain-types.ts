@@ -252,6 +252,7 @@ export interface AdminOverviewResponse {
   outreachNeedingReply: number;
   lastBackupDrillAt: string | null;
   overdueFollowUps: number;
+  scheduledDue: number;
 }
 
 export interface AdminSystemResponse {
@@ -288,6 +289,59 @@ export interface DisplaySettingsResponse {
 
 export interface DisplayUpdateRequest {
   proofVisible: boolean;
+}
+
+export type PostStatus = "draft" | "scheduled" | "published" | "unpublished";
+
+export type PostKind = "post" | "know-how";
+
+export interface PostRecord {
+  id: string;
+  slug: string;
+  title: string;
+  body: string | null;
+  status: PostStatus;
+  kind: PostKind;
+  publishAt: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PostCreateRequest {
+  title: string;
+  slug: string;
+  body?: string;
+  status?: PostStatus;
+  kind?: PostKind | "knowhow";
+  publishAt?: string;
+  publishDate?: string;
+  publishTime?: string;
+  timeZone?: string;
+}
+
+export interface PostUpdateRequest {
+  title?: string;
+  slug?: string;
+  body?: string | null;
+  status?: PostStatus;
+  kind?: PostKind | "knowhow";
+  publishAt?: string | null;
+  publishDate?: string;
+  publishTime?: string;
+  timeZone?: string;
+}
+
+export interface PublicPostRecord {
+  id: string;
+  slug: string;
+  title: string;
+  body: string | null;
+  kind: PostKind;
+  publishAt: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PagedResponse<T> {

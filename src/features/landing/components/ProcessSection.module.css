@@ -102,6 +102,14 @@
   max-width: 38rem;
 }
 
+.need {
+  margin: 8px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--oasis-text-muted);
+  max-width: 38rem;
+}
+
 .closer {
   margin: 0;
   color: var(--oasis-text-secondary);

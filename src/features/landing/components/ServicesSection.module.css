@@ -105,6 +105,29 @@
   gap: 6px;
 }
 
+.guidance {
+  margin: 10px 0 0;
+  border-top: 1px solid var(--oasis-border);
+  padding-top: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.guideNext {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.guideTime {
+  margin: 0;
+  font-family: var(--oasis-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--oasis-text-muted);
+}
+
 .cardLink {
   margin-top: 8px;
   display: inline-flex;

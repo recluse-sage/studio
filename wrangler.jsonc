@@ -13,7 +13,8 @@
     "not_found_handling": "none",
     // Worker first only for APIs and the private admin shell.
     // Public "/" and hashed "/assets/*" stay asset-first for speed and SEO.
-    "run_worker_first": ["/api/*", "/admin", "/admin/*"]
+    // Runtime /sitemap.xml stays worker-first so published posts appear.
+    "run_worker_first": ["/api/*", "/admin", "/admin/*", "/sitemap.xml"]
   },
   "d1_databases": [
     {
@@ -34,6 +35,8 @@
       "simple": { "limit": 60, "period": 60 }
     }
   ],
+  // Hourly scheduler for due posts. Runs the scheduled handler in workers/app.ts.
+  "triggers": { "crons": ["7 * * * *"] },
   "vars": {
     // PUBLIC_SITE_URL is intentionally not a runtime var here. It is a public
     // Build variable (Workers Builds dashboard, shell env locally), not a secret.

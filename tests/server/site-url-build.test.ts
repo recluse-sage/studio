@@ -8,9 +8,14 @@ const read = (p: string) => readFileSync(join(root, p), "utf8");
 
 // Contract for the single public site URL build source.
 // PUBLIC_SITE_URL is the one build-time value. VITE_PUBLIC_SITE_URL is derived
-// in vite.config.ts. Sitemap/robots come from the same value on each build.
+// in vite.config.ts. Robots Sitemap line comes from the same value on each build.
+// Revision 2026-10: sitemap moved from a build-time static file to a runtime
+// Worker response at GET /sitemap.xml with published posts included. The build
+// script now only syncs the robots Sitemap line and removes any old static
+// file. The Worker derives the origin from the request URL with an https and
+// hostname guard, serves max-age 300, and runs worker-first via wrangler.
 describe("site url build source", () => {
-  it("build generates sitemap before prerendering", () => {
+  it("build syncs robots before prerendering", () => {
     const pkg = JSON.parse(read("package.json")) as { scripts: Record<string, string> };
     const build = pkg.scripts.build ?? "";
     expect(build).toContain("scripts/generate-sitemap.mjs");
@@ -47,7 +52,7 @@ describe("site url build source", () => {
     expect(runtimeAssignments).toEqual([]);
   });
 
-  it("keeps / prerendered and asset-first", () => {
+  it("keeps / prerendered and asset-first, with sitemap worker-first", () => {
     const rrConfig = read("react-router.config.ts");
     expect(rrConfig).toContain('"/"');
     const wrangler = read("wrangler.jsonc");
@@ -58,6 +63,7 @@ describe("site url build source", () => {
     expect(match).not.toBeNull();
     const list = match?.[1] ?? "";
     expect(list).toContain("/api/*");
+    expect(list).toContain("/sitemap.xml");
     expect(list).not.toContain('"/"');
     expect(list).not.toContain("/assets/*");
   });
@@ -66,5 +72,22 @@ describe("site url build source", () => {
     const script = read("scripts/generate-sitemap.mjs");
     expect(script).toContain("process.env.PUBLIC_SITE_URL");
     expect(script).toContain("SKIP: PUBLIC_SITE_URL is empty");
+  });
+
+  it("sitemap script no longer emits a static file", () => {
+    const script = read("scripts/generate-sitemap.mjs");
+    expect(script).toContain("runtime sitemap");
+    expect(script).toContain("removeGeneratedSitemap");
+    expect(script).not.toContain("writeFileSync(sitemapPath");
+  });
+
+  it("worker serves runtime sitemap plus hourly cron", () => {
+    const worker = read("workers/app.ts");
+    expect(worker).toContain("/sitemap.xml");
+    expect(worker).toContain("handleSitemap");
+    expect(worker).toContain("scheduled");
+    expect(worker).toContain("runScheduledPublish");
+    const wrangler = read("wrangler.jsonc");
+    expect(wrangler).toContain('"crons": ["7 * * * *"]');
   });
 });

@@ -268,7 +268,7 @@ export function ToolsSection() {
           id="tools"
           eyebrow="Tools"
           title="Find the right next step"
-          description="Answer a few quick questions and we will suggest a useful next step."
+          description="Takes about one minute. Answer a few quick questions and we will suggest a useful next step."
         />
 
         {questions.length === 0 ? (
@@ -319,7 +319,7 @@ export function ToolsSection() {
                     <Compass weight="thin" focusable="false" />
                   </span>
                   <p className={classes.introText}>
-                    Three short questions about the work that repeats. Your answers stay on this page.
+                    Three short questions. Takes about one minute. Your answers stay on this page.
                   </p>
                 </div>
               ) : null}

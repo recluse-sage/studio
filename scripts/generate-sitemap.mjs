@@ -1,10 +1,13 @@
-// Generates public/sitemap.xml only when PUBLIC_SITE_URL is set to a real URL.
+// Keeps the robots Sitemap line in sync with PUBLIC_SITE_URL.
 // PUBLIC_SITE_URL is the single public Build variable (Workers Builds dashboard,
 // shell env for local builds). VITE_PUBLIC_SITE_URL is derived from it in
-// vite.config.ts, so canonical tags and this sitemap always match.
+// vite.config.ts, so canonical tags and the robots Sitemap line always match.
 // Runs automatically before prerendering via `npm run build`.
 // Withheld by design until the owner sets the canonical domain.
-// Never includes /admin, /admin/*, or /api/*. Only public prerendered routes.
+// Revision: runtime sitemap now serves GET /sitemap.xml from the Worker with
+// published posts included. This script no longer emits a static file. It only
+// updates the robots Sitemap line and removes any old generated static file.
+// Never includes /admin, /admin/*, or /api/*. The Worker adds published posts.
 // Usage: PUBLIC_SITE_URL="https://oasis-dev.oasishub.workers.dev" npm run build
 // To change the URL, update it in Workers Builds, then rebuild/redeploy.
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
@@ -28,8 +31,12 @@ function updateRobots(sitemapUrl) {
 
 function removeGeneratedSitemap() {
   if (!existsSync(sitemapPath)) return;
-  const existing = readFileSync(sitemapPath, "utf8");
-  if (existing.includes(sitemapMarker)) unlinkSync(sitemapPath);
+  try {
+    const existing = readFileSync(sitemapPath, "utf8");
+    if (existing.includes(sitemapMarker)) unlinkSync(sitemapPath);
+  } catch {
+    // Missing file is fine. Runtime sitemap covers the response.
+  }
 }
 
 if (!raw) {
@@ -56,17 +63,10 @@ try {
   process.exit(0);
 }
 
-// Public prerender list mirrors react-router.config.ts prerender. Keep in sync.
-const publicPaths = ["/"];
-
+// Runtime sitemap serves the response. Keep only the robots line here.
 const siteOrigin = siteUrl.origin;
 const sitemapUrl = `${siteOrigin}/sitemap.xml`;
-const urls = publicPaths
-  .map((p) => `  <url><loc>${siteOrigin}${p === "/" ? "/" : p}</loc></url>`)
-  .join("\n");
 
-const xml = `<?xml version="1.0" encoding="UTF-8"?>\n${sitemapMarker}\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
-
-writeFileSync(sitemapPath, xml);
+removeGeneratedSitemap();
 updateRobots(sitemapUrl);
-console.log(`OK: wrote sitemap with ${publicPaths.length} public URL(s) for ${siteUrl}.`);
+console.log(`OK: runtime sitemap ready for ${siteUrl}. Robots points to ${sitemapUrl}.`);

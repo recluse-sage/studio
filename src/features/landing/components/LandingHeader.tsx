@@ -10,14 +10,16 @@ export type LandingHeaderProps = {
 };
 
 const NAV = [
-  { href: "#services", label: "Services" },
-  { href: "#tools", label: "Tools" },
-  { href: "#intake", label: "Intake" },
-  { href: "#process", label: "Process" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#services", label: "Services" },
+  { href: "/#tools", label: "Tools" },
+  { href: "/#intake", label: "Intake" },
+  { href: "/#process", label: "Process" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/blog", label: "Blog" },
+  { href: "/know-how", label: "Know-how" },
 ];
 
-export function LandingHeader({ intakeHref = "#intake", showAvailability = true }: LandingHeaderProps) {
+export function LandingHeader({ intakeHref = "/#intake", showAvailability = true }: LandingHeaderProps) {
   const [open, setOpen] = useState(false);
   void showAvailability;
   const items = NAV;

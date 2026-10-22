@@ -237,6 +237,17 @@ export async function handleAdminOverview(
       for (const r of rows) m[r.status] = Number(r.n) || 0;
       return m;
     };
+    let scheduledDue = 0;
+    try {
+      const due = await env.DB.prepare(
+        "SELECT COUNT(*) AS n FROM posts WHERE status = 'scheduled' AND publish_at <= ?",
+      )
+        .bind(nowIso())
+        .first<{ n: number }>();
+      scheduledDue = Number(due?.n) || 0;
+    } catch {
+      scheduledDue = 0;
+    }
     return adminJson({
       intakesByStatus: toMap(
         (intakeRows.results || []) as { status: string; n: number }[],
@@ -256,6 +267,7 @@ export async function handleAdminOverview(
       outreachNeedingReply: Number(needingReply?.n) || 0,
       lastBackupDrillAt,
       overdueFollowUps,
+      scheduledDue,
     });
   } catch {
     return adminError("Could not load overview.", 500, "db-error");

@@ -80,11 +80,14 @@
   gap: 10px;
 }
 
-/* Primary glass CTA. Solid fallback first, then glass layers. */
+/* Primary glass CTA. Solid fallback first, then glass layers.
+   Visible on all sizes, compact on phones, full on desktop. */
 .cta {
-  display: none;
+  display: inline-flex;
   min-height: var(--oasis-btn-min);
   align-items: center;
+  padding-inline: 14px;
+  font-size: 0.9rem;
   background: var(--oasis-accent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%),
@@ -186,13 +189,28 @@
     display: flex;
   }
   .cta {
-    display: inline-flex;
+    padding-inline: 18px;
+    font-size: 1rem;
   }
   .burger {
     display: none;
   }
   .mobileNav {
     display: none;
+  }
+}
+
+@media (max-width: 859px) {
+  .inner {
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  .actions {
+    gap: 8px;
+  }
+  .cta {
+    min-height: 44px;
+    white-space: nowrap;
   }
 }
 

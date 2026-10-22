@@ -1,0 +1,204 @@
+.article {
+  max-width: var(--oasis-article-max);
+  width: 100%;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.kicker {
+  margin: 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--oasis-touch-min);
+  color: var(--oasis-text-muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.backLink:hover {
+  color: var(--oasis-text);
+  text-decoration: underline;
+}
+
+.backLink svg {
+  width: 18px;
+  height: 18px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--oasis-font-display);
+  font-weight: 600;
+  font-size: var(--oasis-article-title);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--oasis-text);
+  text-wrap: balance;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: var(--oasis-text-muted);
+  font-size: 0.9rem;
+}
+
+.date {
+  font-family: var(--oasis-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--oasis-pill-bg);
+  border: 1px solid var(--oasis-pill-border);
+  color: var(--oasis-pill-text);
+  font-family: var(--oasis-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.shieldRow {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-surface);
+  color: var(--oasis-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  padding: 12px 14px;
+  max-width: var(--oasis-measure);
+}
+
+.shieldIcon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
+  color: var(--oasis-accent);
+}
+
+.body {
+  display: grid;
+  gap: 16px;
+  color: var(--oasis-text-secondary);
+  font-size: var(--oasis-article-body);
+  line-height: var(--oasis-article-leading);
+  max-width: var(--oasis-measure);
+}
+
+.body p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.status {
+  margin: 0;
+  color: var(--oasis-text-muted);
+  font-size: 0.95rem;
+}
+
+.stateBox {
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-lg);
+  background: var(--oasis-surface);
+  padding: 24px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.stateTitle {
+  margin: 0;
+  font-weight: 650;
+  font-size: 1rem;
+  color: var(--oasis-text);
+}
+
+.stateText {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: var(--oasis-measure);
+}
+
+.stateActions {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ghostButton {
+  min-height: var(--oasis-btn-min);
+  border-color: var(--oasis-border-strong);
+  color: var(--oasis-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.backButton {
+  min-height: var(--oasis-btn-min);
+  color: var(--oasis-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primaryButton {
+  min-height: var(--oasis-btn-min);
+  background: var(--oasis-accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent);
+  border: 1px solid var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+  font-weight: 600;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primaryButton:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 52%),
+    var(--oasis-accent-strong);
+  border-color: var(--oasis-accent-strong);
+  color: var(--oasis-accent-contrast);
+}
+
+.cta {
+  margin-top: 12px;
+  border-top: 1px solid var(--oasis-border);
+  padding-top: 20px;
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.ctaText {
+  margin: 0;
+  color: var(--oasis-text-secondary);
+  font-size: 0.97rem;
+  line-height: 1.6;
+  max-width: var(--oasis-measure);
+}

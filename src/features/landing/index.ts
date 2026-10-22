@@ -11,7 +11,21 @@ export { TurnstileWidget } from "./components/TurnstileWidget";
 export { LandingFooter } from "./components/LandingFooter";
 export { SignalVisual } from "./components/SignalVisual";
 export { Reveal } from "./components/Reveal";
-export { submitIntake, fetchPublicAvailability, fetchPublicWorkItems, DEFAULT_INTAKE_ENDPOINT, DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT } from "./api";
+export { FaqSection, FAQS, buildFaqJsonLd } from "./components/FaqSection";
+export { PublicPage } from "./components/PublicPage";
+export { PostsIndex } from "./components/PostsIndex";
+export { ArticleView } from "./components/ArticleView";
+export {
+  submitIntake,
+  fetchPublicAvailability,
+  fetchPublicWorkItems,
+  fetchPublicPosts,
+  readingMinutesFor,
+  formatPostDate,
+  DEFAULT_INTAKE_ENDPOINT,
+  DEFAULT_PUBLIC_WORK_ITEMS_ENDPOINT,
+  DEFAULT_PUBLIC_POSTS_ENDPOINT,
+} from "./api";
 export type {
   AvailabilityStatus,
   AvailabilitySummary,
@@ -19,6 +33,8 @@ export type {
   ProcessStep,
   WorkItem,
   WorkItemKind,
+  PostItem,
+  PostKind,
   BusinessType,
   ContactMethod,
   IntakeFormValues,

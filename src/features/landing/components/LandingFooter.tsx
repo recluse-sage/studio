@@ -9,7 +9,7 @@ export type LandingFooterProps = {
 };
 
 export function LandingFooter({
-  contactHref = "#intake",
+  contactHref = "/#intake",
   showAvailability = true,
   availability = null,
 }: LandingFooterProps) {
@@ -40,20 +40,26 @@ export function LandingFooter({
 
         <nav className={classes.nav} aria-label="Footer">
           <p className={classes.navTitle}>Explore</p>
-          <a href="#services" className={classes.link}>
+          <a href="/#services" className={classes.link}>
             Services
           </a>
-          <a href="#tools" className={classes.link}>
+          <a href="/#tools" className={classes.link}>
             Tools
           </a>
-          <a href="#intake" className={classes.link}>
+          <a href="/#intake" className={classes.link}>
             Intake
           </a>
-          <a href="#process" className={classes.link}>
+          <a href="/#process" className={classes.link}>
             Process
           </a>
-          <a href="#faq" className={classes.link}>
+          <a href="/#faq" className={classes.link}>
             FAQ
+          </a>
+          <a href="/blog" className={classes.link}>
+            Blog
+          </a>
+          <a href="/know-how" className={classes.link}>
+            Know-how
           </a>
           <a href="#top" className={classes.link}>
             Back to top
@@ -65,7 +71,7 @@ export function LandingFooter({
           <p className={classes.contactText}>
             Start with the short intake. We read every note and reply with plain next steps.
           </p>
-          <a href={contactHref} className={classes.contactLink}>
+          <a href={contactHref} className={classes.contactButton}>
             <span>Start the intake</span>
             <ArrowRight weight="thin" aria-hidden="true" className={classes.contactIcon} />
           </a>

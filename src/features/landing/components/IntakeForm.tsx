@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Alert, Button, Select, Textarea, TextInput } from "@mantine/core";
-import { PaperPlaneTilt } from "@phosphor-icons/react";
+import { PaperPlaneTilt, ShieldCheck } from "@phosphor-icons/react";
 import { SectionHeading } from "../../../components/SectionHeading/SectionHeading";
 import { submitIntake, DEFAULT_INTAKE_ENDPOINT } from "../api";
 import { BUSINESS_TYPE_OPTIONS, CONTACT_METHOD_OPTIONS } from "../types";
@@ -188,6 +188,9 @@ export function IntakeForm({
             >
               What repeating task hurts most <span aria-hidden="true">*</span>
             </label>
+            <p className={classes.helper} id="intake-taskDescription-help">
+              One or two sentences is enough. Say what repeats and where it steals time.
+            </p>
             {prefillNote ? (
               <p className={classes.prefillNote} role="status">
                 Filled from your guided check. Edit it freely before sending.
@@ -205,6 +208,7 @@ export function IntakeForm({
               error={fieldErrors.taskDescription}
               aria-invalid={Boolean(fieldErrors.taskDescription)}
               aria-labelledby="intake-taskDescription-label"
+              aria-describedby="intake-taskDescription-help"
               classNames={{ root: classes.controlRoot, input: classes.input }}
             />
           </div>
@@ -218,6 +222,9 @@ export function IntakeForm({
               >
                 Business type <span aria-hidden="true">*</span>
               </label>
+              <p className={classes.helper} id="intake-businessType-help">
+                Pick the closest fit. It helps us reply with relevant next steps.
+              </p>
               <Select
                 id="intake-businessType"
                 name="businessType"
@@ -229,6 +236,7 @@ export function IntakeForm({
                 error={fieldErrors.businessType}
                 aria-invalid={Boolean(fieldErrors.businessType)}
                 aria-labelledby="intake-businessType-label"
+                aria-describedby="intake-businessType-help"
                 classNames={{ root: classes.controlRoot, input: classes.input }}
               />
             </div>
@@ -240,6 +248,9 @@ export function IntakeForm({
               >
                 Business name <span aria-hidden="true">*</span>
               </label>
+              <p className={classes.helper} id="intake-businessName-help">
+                The name customers know you by.
+              </p>
               <TextInput
                 id="intake-businessName"
                 name="businessName"
@@ -251,6 +262,7 @@ export function IntakeForm({
                 error={fieldErrors.businessName}
                 aria-invalid={Boolean(fieldErrors.businessName)}
                 aria-labelledby="intake-businessName-label"
+                aria-describedby="intake-businessName-help"
                 classNames={{ root: classes.controlRoot, input: classes.input }}
               />
             </div>
@@ -265,6 +277,9 @@ export function IntakeForm({
               >
                 Best reply channel <span aria-hidden="true">*</span>
               </label>
+              <p className={classes.helper} id="intake-contactMethod-help">
+                Choose where you actually answer. We reply there.
+              </p>
               <Select
                 id="intake-contactMethod"
                 name="contactMethod"
@@ -277,6 +292,7 @@ export function IntakeForm({
                 error={fieldErrors.contactMethod}
                 aria-invalid={Boolean(fieldErrors.contactMethod)}
                 aria-labelledby="intake-contactMethod-label"
+                aria-describedby="intake-contactMethod-help"
                 classNames={{ root: classes.controlRoot, input: classes.input }}
               />
             </div>
@@ -288,6 +304,9 @@ export function IntakeForm({
               >
                 Best contact <span aria-hidden="true">*</span>
               </label>
+              <p className={classes.helper} id="intake-contactValue-help">
+                Double check spelling so our reply reaches you.
+              </p>
               <TextInput
                 id="intake-contactValue"
                 name="contactValue"
@@ -299,6 +318,7 @@ export function IntakeForm({
                 error={fieldErrors.contactValue}
                 aria-invalid={Boolean(fieldErrors.contactValue)}
                 aria-labelledby="intake-contactValue-label"
+                aria-describedby="intake-contactValue-help"
                 classNames={{ root: classes.controlRoot, input: classes.input }}
               />
             </div>
@@ -364,6 +384,10 @@ export function IntakeForm({
             >
               {state.status === "sending" ? "Sending" : "Send intake"}
             </Button>
+            <p className={classes.trust} role="note">
+              <ShieldCheck weight="thin" aria-hidden="true" className={classes.trustIcon} />
+              <span>We read every note ourselves. We aim to reply within two working days.</span>
+            </p>
           </div>
         </form>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { LandingPage } from "../../src/features/landing/LandingPage";
+import { buildFaqJsonLd } from "../../src/features/landing/components/FaqSection";
 import { fetchPublicAvailability } from "../../src/features/landing/api";
 import type { AvailabilitySummary } from "../../src/features/landing/types";
 import type { LinksFunction, MetaFunction } from "react-router";
@@ -59,14 +60,21 @@ export default function HomeRoute() {
   }, []);
 
   const turnstileSiteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY ?? "").trim() || undefined;
+  const faqJsonLd = buildFaqJsonLd();
 
   return (
-    <LandingPage
-      availability={availability}
-      services={data.services}
-      steps={data.steps}
-      intakeEndpoint={data.intakeEndpoint}
-      turnstileSiteKey={turnstileSiteKey}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <LandingPage
+        availability={availability}
+        services={data.services}
+        steps={data.steps}
+        intakeEndpoint={data.intakeEndpoint}
+        turnstileSiteKey={turnstileSiteKey}
+      />
+    </>
   );
 }

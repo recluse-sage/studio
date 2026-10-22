@@ -175,3 +175,16 @@ Sample concepts are always labeled as samples, never as client proof. See sectio
 - The old static prototype is preserved under
   `Personal/oasis.dev/legacy-prototype/`. It is archival only, not the production
   app, and must not be treated as the final architecture.
+
+## 15. Post scheduler
+
+- Posts table in migration 0004 with slug, title, body, draft plus scheduled
+  plus published plus unpublished, canonical UTC publish_at with GLOB check,
+  and index on status plus publish_at.
+- Admin sends date plus time plus IANA zone. Server converts to canonical UTC.
+  DST is handled with Intl. Gap times stay canonical.
+- Hourly cron flips due rows with one predicate guarded update plus one cron
+  audit row per run. Flip is idempotent and safe for double publish.
+- Public post APIs return published only. Runtime sitemap serves static paths
+  plus published posts with lastmod and max-age 300. Overview adds
+  scheduledDue count for the badge.

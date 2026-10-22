@@ -22,36 +22,42 @@ const FALLBACK: ProcessStep[] = [
     index: "01",
     title: "You bring a problem",
     description: "Tell us the work that repeats or the outcome you need.",
+    need: "We need from you: one or two sentences about the repeating work.",
   },
   {
     id: "talk",
     index: "02",
     title: "We talk it through",
     description: "A short conversation so we understand the problem and the context.",
+    need: "We need from you: 15 minutes on your preferred channel.",
   },
   {
     id: "solution",
     index: "03",
     title: "We find the solution",
     description: "We agree the smallest useful fix and put scope, timing, and cost in writing.",
+    need: "We need from you: your yes on the written scope before we build.",
   },
   {
     id: "build-ship",
     index: "04",
     title: "We build and ship",
     description: "We build it, you review it on your phone, then we ship it to you.",
+    need: "We need from you: quick feedback when you review on your phone.",
   },
   {
     id: "use",
     index: "05",
     title: "You use it",
     description: "You run it in daily work with a practical handoff. You own the result.",
+    need: "We need from you: trying it in daily work and telling us what sticks.",
   },
   {
     id: "share",
     index: "06",
     title: "You share it",
     description: "When it helps, you share it with people. With permission, it can become proof.",
+    need: "We need from you: permission before anything is shown as proof.",
   },
 ];
 
@@ -97,6 +103,7 @@ export function ProcessSection({ steps }: ProcessSectionProps) {
                       </p>
                       <h3 className={classes.itemTitle}>{step.title}</h3>
                       <p className={classes.itemText}>{step.description}</p>
+                      {step.need ? <p className={classes.need}>{step.need}</p> : null}
                     </div>
                   </div>
                 </Reveal>
