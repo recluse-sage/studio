@@ -26,6 +26,7 @@ export function AdminShell({ active, onNavigate, counts, ownerEmail, children }:
 
   const items: NavItem[] = [
     { id: "dashboard", label: "Dashboard", hint: "Status and next actions" },
+    { id: "properties", label: "Properties", hint: "Registry of every Oasis property" },
     { id: "intake", label: "Intake", hint: "Inbox from the landing form", badge: counts?.newIntakes },
     { id: "outreach", label: "Outreach", hint: "Businesses to contact", badge: counts?.outreachNeedingReply },
     { id: "tools", label: "Tools", hint: "Client tool registry" },

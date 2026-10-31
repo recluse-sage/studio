@@ -2,6 +2,7 @@
 
 export type AdminViewId =
   | "dashboard"
+  | "properties"
   | "intake"
   | "outreach"
   | "tools"

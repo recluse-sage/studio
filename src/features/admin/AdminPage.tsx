@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AdminShell } from "./components/AdminShell";
 import { DashboardView } from "./components/DashboardView";
 import { IntakeView } from "./components/IntakeView";
+import { PropertiesPanel } from "./components/PropertiesPanel";
 import { OutreachView } from "./components/OutreachView";
 import { ToolsView } from "./components/ToolsView";
 import { AvailabilityView } from "./components/AvailabilityView";
@@ -154,6 +155,8 @@ export function AdminPage({
           onNavigate={setView}
         />
       ) : null}
+
+      {view === "properties" ? <PropertiesPanel denied={denied} onRetry={onRetry} /> : null}
 
       {view === "intake" ? (
         <IntakeView

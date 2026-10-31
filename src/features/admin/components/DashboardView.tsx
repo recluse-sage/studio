@@ -45,6 +45,7 @@ function toneFor(status: AvailabilityState["status"]): "open" | "warning" | "clo
 function toAdminView(view: string): AdminViewId {
   if (
     view === "dashboard" ||
+    view === "properties" ||
     view === "intake" ||
     view === "outreach" ||
     view === "tools" ||
