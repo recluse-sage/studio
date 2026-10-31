@@ -17,6 +17,19 @@ const STATUS_LABEL: Record<PropertyRecord["status"], string> = {
   unknown: "Unknown",
 };
 
+const HEALTH_LABEL: Record<PropertyRecord["health"], string> = {
+  up: "Reporter up",
+  down: "Reporter down",
+  unknown: "No report yet",
+};
+
+function formatMetricKey(key: string): string {
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .trim();
+}
+
 export function PropertiesPanel({ items = PROPERTIES, denied = null, onRetry }: PropertiesPanelProps) {
   if (denied) return <SecureAccessState status={denied} onRetry={onRetry} />;
 
@@ -65,7 +78,20 @@ export function PropertiesPanel({ items = PROPERTIES, denied = null, onRetry }: 
               </Group>
               <Group gap="xl" mt="xs" className={classes.meta}>
                 <Text size="sm" className={classes.muted}>
-                  Last report: <span className={classes.value}>{row.lastReport ?? "never"}</span>
+                  Last report:{" "}
+                  <span className={classes.value}>
+                    {row.lastReportAt ?? row.lastReport ?? "never"}
+                  </span>
+                </Text>
+                <Text size="sm" className={classes.muted}>
+                  <span
+                    className={classes.healthDot}
+                    data-health={row.health ?? "unknown"}
+                    aria-hidden="true"
+                  />{" "}
+                  <span className={classes.value}>
+                    {HEALTH_LABEL[row.health ?? "unknown"]}
+                  </span>
                 </Text>
                 {row.links.home ? (
                   <Anchor href={row.links.home} target="_blank" rel="noreferrer" size="sm">
@@ -77,6 +103,16 @@ export function PropertiesPanel({ items = PROPERTIES, denied = null, onRetry }: 
                   </Text>
                 )}
               </Group>
+              {row.metrics && Object.entries(row.metrics).length > 0 ? (
+                <div className={classes.chips} aria-label={`${row.name} metrics`}>
+                  {Object.entries(row.metrics).map(([key, value]) => (
+                    <span key={key} className={classes.chip}>
+                      {formatMetricKey(key)}:{" "}
+                      <span className={classes.chipValue}>{value}</span>
+                    </span>
+                  ))}
+                </div>
+              ) : null}
               {row.notes ? (
                 <Text mt="xs" size="sm" className={classes.note}>
                   {row.notes}

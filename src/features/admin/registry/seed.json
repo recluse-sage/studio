@@ -5,6 +5,9 @@
     "kind": "marketing site",
     "status": "healthy",
     "lastReport": null,
+    "lastReportAt": null,
+    "health": "unknown",
+    "metrics": {},
     "links": { "home": "https://selimabdulsalam.com" },
     "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1."
   },
@@ -14,6 +17,9 @@
     "kind": "product",
     "status": "healthy",
     "lastReport": null,
+    "lastReportAt": null,
+    "health": "unknown",
+    "metrics": {},
     "links": { "home": "https://foragebyoasis.tech" },
     "notes": "Product vault. Live reporter planned in phase 2, manual row until then."
   },
@@ -23,6 +29,9 @@
     "kind": "skill",
     "status": "healthy",
     "lastReport": null,
+    "lastReportAt": null,
+    "health": "unknown",
+    "metrics": {},
     "links": { "home": null },
     "notes": "Skill. No live surface to link yet."
   },
@@ -32,6 +41,9 @@
     "kind": "catalog",
     "status": "healthy",
     "lastReport": null,
+    "lastReportAt": null,
+    "health": "unknown",
+    "metrics": {},
     "links": { "home": null },
     "notes": "4 listings. Stats entered by hand for now, no public API."
   },
@@ -41,6 +53,9 @@
     "kind": "app",
     "status": "planned",
     "lastReport": null,
+    "lastReportAt": null,
+    "health": "unknown",
+    "metrics": {},
     "links": { "home": null },
     "notes": "Planned. Born reporting when the app exists."
   }
