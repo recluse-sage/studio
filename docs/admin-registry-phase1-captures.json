@@ -1,0 +1,198 @@
+{
+  "generatedAt": "2026-11-19T08:03:48.112Z",
+  "seedOrder": [
+    "apex",
+    "forage",
+    "upwork-catalog",
+    "designtaste-by-oasis",
+    "shopify-app"
+  ],
+  "seedApex": {
+    "id": "apex",
+    "name": "Apex",
+    "kind": "marketing site",
+    "lifecycle": "live",
+    "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "dot": "unknown",
+    "lastReportLine": "No report yet",
+    "downNotice": null,
+    "servedAt": null,
+    "lastSuccessfulFetchAt": null,
+    "homeUrl": "https://selimabdulsalam.com",
+    "slots": [
+      {
+        "kind": "pending"
+      }
+    ]
+  },
+  "emptyStates": {
+    "noReport": "No report yet",
+    "notEntered": "Not entered yet",
+    "unconnected": "Unconnected"
+  },
+  "homeUrls": {
+    "apex": "https://selimabdulsalam.com",
+    "forage": "https://foragebyoasis.tech",
+    "upwork-catalog": null,
+    "designtaste-by-oasis": null,
+    "shopify-app": null
+  },
+  "notes": {
+    "apex": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "forage": "Product vault. Live reporter planned in phase 2, manual row until then.",
+    "upwork-catalog": "4 listings. Stats entered by hand for now, no public API.",
+    "designtaste-by-oasis": "Skill. No live surface to link yet.",
+    "shopify-app": "Planned. Not built yet. Born reporting when the app exists."
+  },
+  "validZero": {
+    "id": "apex",
+    "name": "Apex",
+    "kind": "marketing site",
+    "lifecycle": "live",
+    "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "dot": "up",
+    "lastReportLine": "Last report 2026-11-19T08:00:00.000Z \u00b7 fresh \u00b7 Fetched 2026-11-19T08:05:00.000Z",
+    "downNotice": null,
+    "servedAt": "2026-11-19T08:00:00.000Z",
+    "lastSuccessfulFetchAt": "2026-11-19T08:05:00.000Z",
+    "homeUrl": "https://selimabdulsalam.com",
+    "slots": [
+      {
+        "kind": "numbers",
+        "items": [
+          {
+            "label": "Blog posts",
+            "value": 0,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": null
+          },
+          {
+            "label": "Inbound notes",
+            "value": 0,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": "0 contact notes plus 0 Berry Blast orders"
+          }
+        ]
+      }
+    ]
+  },
+  "offlineDown": {
+    "id": "apex",
+    "name": "Apex",
+    "kind": "marketing site",
+    "lifecycle": "live",
+    "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "dot": "down",
+    "lastReportLine": "Last report 2026-11-19T08:00:00.000Z \u00b7 stale \u00b7 Fetched 2026-11-19T08:05:00.000Z",
+    "downNotice": "Reporter down, showing last known",
+    "servedAt": "2026-11-19T08:00:00.000Z",
+    "lastSuccessfulFetchAt": "2026-11-19T08:05:00.000Z",
+    "homeUrl": "https://selimabdulsalam.com",
+    "slots": [
+      {
+        "kind": "numbers",
+        "items": [
+          {
+            "label": "Blog posts",
+            "value": 16,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": null
+          },
+          {
+            "label": "Inbound notes",
+            "value": 12,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": "7 contact notes plus 5 Berry Blast orders"
+          }
+        ]
+      }
+    ]
+  },
+  "deniedPartial": {
+    "notice": "Apex numbers are unavailable. The other rows below still show their saved registry details.",
+    "rows": [
+      "apex",
+      "forage",
+      "upwork-catalog",
+      "designtaste-by-oasis",
+      "shopify-app"
+    ],
+    "apex": {
+      "id": "apex",
+      "name": "Apex",
+      "kind": "marketing site",
+      "lifecycle": "live",
+      "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+      "dot": "unknown",
+      "lastReportLine": "No report yet",
+      "downNotice": null,
+      "servedAt": null,
+      "lastSuccessfulFetchAt": null,
+      "homeUrl": "https://selimabdulsalam.com",
+      "slots": [
+        {
+          "kind": "pending"
+        }
+      ]
+    }
+  },
+  "browserPass": {
+    "date": "2026-11-19",
+    "harness": "npx vite --config vite.spike.config.ts --port 5174 --host 127.0.0.1 (vite 7.3.7, no Cloudflare plugin, no workerd)",
+    "browser": "headless system Chrome 150.0.7871.187 via puppeteer-core, viewport 1280x900",
+    "urls": [
+      "http://127.0.0.1:5174/admin/registry",
+      "http://127.0.0.1:5174/admin/registry?story=seed",
+      "http://127.0.0.1:5174/admin/registry?story=offline"
+    ],
+    "procedure": "clear localStorage, load (expect dark default), screenshot dark, click .registry-theme-toggle, screenshot light, reload, confirm localStorage value persists and data-mantine-color-scheme matches, screenshot light-reloaded. Registry story adds toggle-back to dark plus reload.",
+    "results": [
+      {
+        "story": "registry",
+        "dark": "docs/browser-pass-2026-11-19/registry-dark.png",
+        "light": "docs/browser-pass-2026-11-19/registry-light.png",
+        "lightReloaded": "docs/browser-pass-2026-11-19/registry-light-reloaded.png",
+        "darkReloaded": "docs/browser-pass-2026-11-19/registry-dark-reloaded.png",
+        "consoleErrors": 6,
+        "pageErrors": 0,
+        "persistence": "pass (light persists, dark persists on toggle-back)",
+        "note": "6 console errors are 2x 404 to /api/admin/registry per load across 3 loads. Spike has no Workers runtime so /api returns 404. Client catches and keeps 5 rows with No report yet. No pageerror. Expected worker-only gap."
+      },
+      {
+        "story": "seed",
+        "dark": "docs/browser-pass-2026-11-19/seed-dark.png",
+        "light": "docs/browser-pass-2026-11-19/seed-light.png",
+        "lightReloaded": "docs/browser-pass-2026-11-19/seed-light-reloaded.png",
+        "consoleErrors": 0,
+        "pageErrors": 0,
+        "persistence": "pass",
+        "note": "Deterministic seed path. Zero console errors. 5 rows, Apex shows No report yet with pending slot."
+      },
+      {
+        "story": "offline",
+        "dark": "docs/browser-pass-2026-11-19/offline-dark.png",
+        "light": "docs/browser-pass-2026-11-19/offline-light.png",
+        "lightReloaded": "docs/browser-pass-2026-11-19/offline-light-reloaded.png",
+        "consoleErrors": 0,
+        "pageErrors": 0,
+        "persistence": "pass",
+        "note": "Deterministic fixture path. Zero console errors. Apex shows 16 blog posts and 0 inbound notes with stale freshness. Down-after-poll transition is unit-covered and needs 15min poll, not browser-waited."
+      }
+    ],
+    "unstyledFlash": "none observed. All 10 PNGs show styled registry cards in both themes.",
+    "consoleLog": "docs/browser-pass-2026-11-19/console-summary.json",
+    "remainsWorkerOnly": [
+      "real Access app login",
+      "runtime 403 partial denial with Try again",
+      "real network poll with live reporter payload and fresh servedAt"
+    ]
+  }
+}

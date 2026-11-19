@@ -31,6 +31,7 @@
 // GET, PUT /api/admin/availability -> 200 AvailabilityAdminResponse.
 // GET, PUT /api/admin/display -> 200 { proofVisible: boolean }, private no-store, audit display.update.
 // GET /api/admin/usage?toolKey=&limit=&offset= -> 200 PagedResponse aggregates only.
+// GET /api/admin/registry -> 200 counts-only apex report, Access JWT required, private no-store. Phase 1 fixture-backed.
 // GET, POST /api/admin/proof-notes -> 200 PagedResponse with kind on every item. POST accepts optional kind, default ops-note.
 // PATCH /api/admin/proof-notes/:id permission transitions only, writes proof.update audit with before and after.
 // Proof kinds: proof, sample-concept, ops-note, backup-drill.
@@ -63,6 +64,7 @@ export const API_ROUTES = {
   displayUpdate: "PUT /api/admin/display",
   publicDisplay: "GET /api/public/display",
   usageRead: "GET /api/admin/usage",
+  registryRead: "GET /api/admin/registry",
   proofList: "GET /api/admin/proof-notes",
   proofCreate: "POST /api/admin/proof-notes",
   proofUpdate: "PATCH /api/admin/proof-notes/:id",
