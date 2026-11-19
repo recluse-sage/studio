@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Registry route scope. Uses Oasis tokens only. No global reset here. */
+
+.registry-scope {
+  background: var(--oasis-bg);
+  color: var(--oasis-text);
+  font-family: var(--oasis-font-body);
+}
+
+.registry-scope .registry-card {
+  background: var(--oasis-surface-raised);
+  border: 1px solid var(--oasis-border);
+  border-radius: var(--oasis-radius-md);
+  box-shadow: var(--oasis-card-shadow);
+}
+
+.registry-scope .registry-muted {
+  color: var(--oasis-text-muted);
+}
+
+.registry-scope .registry-secondary {
+  color: var(--oasis-text-secondary);
+}
+
+.registry-scope .registry-accent {
+  color: var(--oasis-accent);
+}
+
+.registry-scope .registry-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 9999px;
+  background: var(--oasis-signal-dot);
+}
+
+.registry-scope .registry-dot-up {
+  background: var(--oasis-success);
+}
+
+.registry-scope .registry-dot-down {
+  background: var(--oasis-danger);
+}
+
+.registry-scope .registry-dot-unknown {
+  background: var(--oasis-signal-dot);
+}
+
+.registry-scope .registry-badge {
+  background: var(--oasis-pill-bg);
+  border: 1px solid var(--oasis-pill-border);
+  color: var(--oasis-pill-text);
+  border-radius: 9999px;
+  font-family: var(--oasis-font-mono);
+}
