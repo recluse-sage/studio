@@ -130,4 +130,85 @@ describe("registry seed plus lifetime headlines", () => {
     });
     expect(markRegistryReportDown(next!, "fetch failed").health).toBe("down");
   });
+
+  it("derives stale freshness from a fresh fetch of an old servedAt", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const servedAt = "2026-10-31T21:03:32.584Z";
+    const fetchedAt = new Date().toISOString();
+    const report = parseApexReport({
+      property: "apex",
+      counts: { berryBlastTotal: 0, contactNotes: 0, blogPosts: 16 },
+      lastDeployHash: null,
+      servedAt,
+    });
+    expect(report).not.toBeNull();
+    const next = applyApexReportToRegistry(apex, report!, fetchedAt);
+    expect(next.health).toBe("up");
+    expect(next.sources[APEX_SOURCE]?.freshness).toBe("stale");
+    expect(next.sources[APEX_SOURCE]?.servedAt).toBe(servedAt);
+    expect(next.sources[APEX_SOURCE]?.lastSuccessfulFetchAt).toBe(fetchedAt);
+    expect(next.lastReportAt).toBe(servedAt);
+    expect(next.lastSuccessfulFetchAt).toBe(fetchedAt);
+  });
+
+  it("keeps freshness fresh inside the 15-minute cadence", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const servedAt = "2026-11-19T08:00:00.000Z";
+    const fetchedAt = "2026-11-19T08:05:00.000Z";
+    const report = parseApexReport({
+      property: "apex",
+      counts: { berryBlastTotal: 1, contactNotes: 2, blogPosts: 16 },
+      lastDeployHash: null,
+      servedAt,
+    });
+    expect(report).not.toBeNull();
+    const next = applyApexReportToRegistry(apex, report!, fetchedAt);
+    expect(next.sources[APEX_SOURCE]?.freshness).toBe("fresh");
+    expect(next.sources[APEX_SOURCE]?.servedAt).toBe(servedAt);
+    expect(next.lastSuccessfulFetchAt).toBe(fetchedAt);
+  });
+
+  it("falls back to servedAt when fetchedAt is null", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const servedAt = "2026-11-19T08:00:00.000Z";
+    const report = parseApexReport({
+      property: "apex",
+      counts: { berryBlastTotal: 1, contactNotes: 2, blogPosts: 16 },
+      lastDeployHash: null,
+      servedAt,
+    });
+    expect(report).not.toBeNull();
+    const next = applyApexReportToRegistry(apex, report!, null);
+    expect(next.sources[APEX_SOURCE]?.freshness).toBe("fresh");
+    expect(next.lastSuccessfulFetchAt).toBe(servedAt);
+  });
+
+  it("reads the down discriminator from the reporter source, not the record", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const recordLevelOnly = {
+      ...apex,
+      lastSuccessfulFetchAt: "2026-10-31T21:03:32.584Z",
+    };
+    const stayed = markRegistryReportDown(recordLevelOnly, "fetch failed");
+    expect(stayed.sources[APEX_SOURCE]?.connectivity).toBe("unconnected");
+    expect(stayed.sources[APEX_SOURCE]?.freshness).toBe("never");
+    expect(stayed.health).toBe("unknown");
+
+    const servedAt = new Date().toISOString();
+    const report = parseApexReport({
+      property: "apex",
+      counts: { berryBlastTotal: 1, contactNotes: 2, blogPosts: 16 },
+      lastDeployHash: null,
+      servedAt,
+    });
+    const live = applyApexReportToRegistry(apex, report!, servedAt);
+    const down = markRegistryReportDown(live, "fetch failed");
+    expect(down.sources[APEX_SOURCE]?.connectivity).toBe("down");
+    expect(down.sources[APEX_SOURCE]?.freshness).toBe("stale");
+    expect(down.health).toBe("down");
+  });
 });

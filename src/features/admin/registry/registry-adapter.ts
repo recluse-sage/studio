@@ -11,6 +11,21 @@ import {
 
 export const APEX_SOURCE = "reporter";
 
+/* Reporter poll cadence per spec 2.1: 15 minutes. Fresh means the reporter
+   claim is inside cadence of the fetch; stale means past cadence with the
+   age shown via the two timestamps. */
+export const APEX_POLL_CADENCE_MS = 15 * 60 * 1000;
+
+function freshnessForReport(
+  servedAt: string,
+  fetchedAt: string,
+): "fresh" | "stale" {
+  const servedMs = Date.parse(servedAt);
+  const fetchedMs = Date.parse(fetchedAt);
+  if (!Number.isFinite(servedMs) || !Number.isFinite(fetchedMs)) return "fresh";
+  return fetchedMs - servedMs <= APEX_POLL_CADENCE_MS ? "fresh" : "stale";
+}
+
 /* Field names that must never reach the registry view. Counts only, no PII.
    parseApexReport already drops unknown fields; this strips them explicitly
    so the counts-only rule holds even before validation. */
@@ -55,12 +70,18 @@ export function apexInboundHeadline(
 }
 
 /* Apply a validated apex report to a registry row. Sets lifetime headlines,
-   marks the reporter source connected, and records lastSuccessfulFetchAt.
-   Only count fields are copied; nothing else from the payload is kept. */
+   marks the reporter source connected, and records served vs fetched times.
+   fetchedAt is when this dashboard fetched the payload; null falls back to
+   the reporter servedAt claim. Freshness is derived from the claim age
+   against the 15-minute cadence, so a fresh fetch of an old servedAt
+   renders stale with both times shown, per spec 3.8. Only count fields
+   are copied; nothing else from the payload is kept. */
 export function applyApexReportToRegistry(
   record: RegistryRecord,
   report: ApexReport,
+  fetchedAt?: string | null,
 ): RegistryRecord {
+  const fetched = fetchedAt ?? report.servedAt;
   const headlines: [HeadlineNumber, HeadlineNumber] = [
     apexBlogPostsHeadline(report.counts, report.servedAt),
     apexInboundHeadline(report.counts, report.servedAt),
@@ -69,14 +90,14 @@ export function applyApexReportToRegistry(
     ...record,
     health: "up",
     lastReportAt: report.servedAt,
-    lastSuccessfulFetchAt: report.servedAt,
+    lastSuccessfulFetchAt: fetched,
     sources: {
       ...record.sources,
       [APEX_SOURCE]: withSourceState(record.sources[APEX_SOURCE], {
         connectivity: "connected",
-        freshness: "fresh",
-        lastSuccessfulFetchAt: report.servedAt,
-        lastReportAt: report.servedAt,
+        freshness: freshnessForReport(report.servedAt, fetched),
+        lastSuccessfulFetchAt: fetched,
+        servedAt: report.servedAt,
         reason: null,
       }),
     },
@@ -94,20 +115,22 @@ export function applyApexReportToRegistry(
 export function applyApexPayloadToRegistry(
   record: RegistryRecord,
   json: unknown,
+  fetchedAt?: string | null,
 ): RegistryRecord | null {
   const report = parseApexReport(stripPiiFields(json));
   if (!report) return null;
-  return applyApexReportToRegistry(record, report);
+  return applyApexReportToRegistry(record, report, fetchedAt);
 }
 
 /* Mark the apex row down after a failed fetch. Keeps last-known numbers and
-   headlines. Down requires a prior success; without one the source stays
-   unconnected and health stays unknown. */
+   headlines. Down requires a prior success on the reporter source itself;
+   without one the source stays unconnected and health stays as it was. */
 export function markRegistryReportDown(
   record: RegistryRecord,
   reason: string,
 ): RegistryRecord {
-  const hadPriorSuccess = record.lastSuccessfulFetchAt !== null;
+  const hadPriorSuccess =
+    record.sources[APEX_SOURCE]?.lastSuccessfulFetchAt != null;
   return {
     ...record,
     health: hadPriorSuccess ? "down" : record.health,
@@ -115,7 +138,7 @@ export function markRegistryReportDown(
       ...record.sources,
       [APEX_SOURCE]: withSourceState(record.sources[APEX_SOURCE], {
         connectivity: "down",
-        freshness: "stale",
+        ...(hadPriorSuccess ? { freshness: "stale" as const } : {}),
         reason,
       }),
     },
