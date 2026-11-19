@@ -6,8 +6,13 @@ import {
   applyApexPayloadToRegistry,
   applyApexReportToRegistry,
   markRegistryReportDown,
+  nextApexRecordAfterFetch,
   stripPiiFields,
 } from "../../src/features/admin/registry/registry-adapter";
+import {
+  REGISTRY_COPY,
+  describeRegistryRow,
+} from "../../src/features/admin/registry/registry-view";
 import { parseApexReport } from "../../src/features/admin/registry/reporter";
 import { buildRegistrySeed } from "../../src/features/admin/registry/registry-seed";
 import fixture from "../../src/features/admin/registry/apex-report.fixture.json";
@@ -210,5 +215,141 @@ describe("registry seed plus lifetime headlines", () => {
     expect(down.sources[APEX_SOURCE]?.connectivity).toBe("down");
     expect(down.sources[APEX_SOURCE]?.freshness).toBe("stale");
     expect(down.health).toBe("down");
+  });
+
+  it("renders 0 with lifetime plus servedAt on valid zero", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const servedAt = new Date().toISOString();
+    const fetchedAt = new Date().toISOString();
+    const next = nextApexRecordAfterFetch(
+      apex,
+      {
+        property: "apex",
+        counts: { berryBlastTotal: 0, contactNotes: 0, blogPosts: 0 },
+        lastDeployHash: null,
+        servedAt,
+      },
+      fetchedAt,
+      "fetch failed",
+    );
+    expect(next.headlines[0]).toMatchObject({
+      value: 0,
+      window: "lifetime",
+      updatedAt: servedAt,
+    });
+    expect(next.headlines[1]).toMatchObject({
+      value: 0,
+      window: "lifetime",
+      updatedAt: servedAt,
+    });
+    expect(next.health).toBe("up");
+    expect(next.lastReportAt).toBe(servedAt);
+    expect(next.lastSuccessfulFetchAt).toBe(fetchedAt);
+    expect(next.sources[APEX_SOURCE]?.connectivity).toBe("connected");
+    const view = describeRegistryRow(next);
+    expect(view.downNotice).toBeNull();
+    expect(view.lastReportLine).toContain(servedAt);
+    for (const slot of view.slots) {
+      if (slot.kind === "numbers") {
+        for (const headline of slot.items) {
+          expect(headline.window).toBe("lifetime");
+        }
+      }
+    }
+    const serialized = JSON.stringify(view);
+    expect(serialized).not.toContain("Not yet");
+  });
+
+  it("keeps last known and shows down notice on fetch failure", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const servedAt = "2026-11-19T08:00:00.000Z";
+    const fetchedAt = "2026-11-19T08:05:00.000Z";
+    const live = nextApexRecordAfterFetch(
+      apex,
+      {
+        property: "apex",
+        counts: { berryBlastTotal: 5, contactNotes: 7, blogPosts: 16 },
+        lastDeployHash: null,
+        servedAt,
+      },
+      fetchedAt,
+      "fetch failed",
+    );
+    const failedAt = "2026-11-19T08:20:00.000Z";
+    const down = nextApexRecordAfterFetch(live, null, failedAt, "fetch failed");
+    expect(down.headlines[0]).toMatchObject({ value: 16, window: "lifetime" });
+    expect(down.headlines[1]).toMatchObject({ value: 12, window: "lifetime" });
+    expect(down.health).toBe("down");
+    expect(down.sources[APEX_SOURCE]?.connectivity).toBe("down");
+    expect(down.lastReportAt).toBe(servedAt);
+    expect(down.lastSuccessfulFetchAt).toBe(fetchedAt);
+    const view = describeRegistryRow(down);
+    expect(view.downNotice).toBe(REGISTRY_COPY.downNotice);
+    const serialized = JSON.stringify(view);
+    expect(serialized).toContain(REGISTRY_COPY.downNotice);
+    expect(serialized).toContain(servedAt);
+    expect(serialized).toContain(fetchedAt);
+    for (const slot of view.slots) {
+      if (slot.kind === "numbers") {
+        for (const headline of slot.items) {
+          expect(headline.value).not.toBe(0);
+          expect(headline.value).not.toBeNull();
+        }
+      }
+    }
+    const cold = nextApexRecordAfterFetch(
+      apex,
+      null,
+      failedAt,
+      "fetch failed",
+    );
+    expect(cold.sources[APEX_SOURCE]?.connectivity).toBe("unconnected");
+    expect(describeRegistryRow(cold).downNotice).toBeNull();
+  });
+
+  it("recovery refetch restores connected without rebuild", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const live = nextApexRecordAfterFetch(
+      apex,
+      {
+        property: "apex",
+        counts: { berryBlastTotal: 5, contactNotes: 7, blogPosts: 16 },
+        lastDeployHash: null,
+        servedAt: "2026-11-19T08:00:00.000Z",
+      },
+      "2026-11-19T08:05:00.000Z",
+      "fetch failed",
+    );
+    const down = nextApexRecordAfterFetch(
+      live,
+      null,
+      "2026-11-19T08:20:00.000Z",
+      "fetch failed",
+    );
+    expect(down.sources[APEX_SOURCE]?.connectivity).toBe("down");
+    const recoveredAt = "2026-11-19T08:35:00.000Z";
+    const recoveredServedAt = "2026-11-19T08:30:00.000Z";
+    const recovered = nextApexRecordAfterFetch(
+      down,
+      {
+        property: "apex",
+        counts: { berryBlastTotal: 6, contactNotes: 7, blogPosts: 17 },
+        lastDeployHash: null,
+        servedAt: recoveredServedAt,
+      },
+      recoveredAt,
+      "fetch failed",
+    );
+    expect(recovered.id).toBe("apex");
+    expect(recovered.name).toBe(live.name);
+    expect(recovered.sources[APEX_SOURCE]?.connectivity).toBe("connected");
+    expect(recovered.lastReportAt).toBe(recoveredServedAt);
+    expect(recovered.lastSuccessfulFetchAt).toBe(recoveredAt);
+    expect(recovered.headlines[0]).toMatchObject({ value: 17 });
+    expect(recovered.headlines[1]).toMatchObject({ value: 13 });
+    expect(describeRegistryRow(recovered).downNotice).toBeNull();
   });
 });

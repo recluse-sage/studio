@@ -144,3 +144,21 @@ export function markRegistryReportDown(
     },
   };
 }
+
+/* Single-step poll transition for the apex row. Testable composition of the
+   parse-apply path and the down path. A valid payload applies with servedAt
+   from the payload claim and fetchedAt from this dashboard fetch. Anything
+   else (null, invalid shape, failed fetch) goes down, which keeps last-known
+   numbers and only flips to down with a prior success. Never zeroes. */
+export function nextApexRecordAfterFetch(
+  record: RegistryRecord,
+  payload: unknown,
+  fetchedAt: string,
+  failureReason: string,
+): RegistryRecord {
+  if (payload !== null && payload !== undefined) {
+    const next = applyApexPayloadToRegistry(record, payload, fetchedAt);
+    if (next) return next;
+  }
+  return markRegistryReportDown(record, failureReason);
+}
