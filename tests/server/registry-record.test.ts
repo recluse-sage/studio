@@ -21,7 +21,7 @@ describe("registry record normalize", () => {
           connectivity: "connected",
           freshness: "fresh",
           lastSuccessfulFetchAt: "2026-10-31T21:03:32.584Z",
-          lastReportAt: "2026-10-31T21:03:32.584Z",
+          servedAt: "2026-10-31T21:03:32.584Z",
           reason: null,
         },
       },
@@ -152,7 +152,7 @@ describe("registry record normalize", () => {
         connectivity: "connected",
         freshness: "fresh",
         lastSuccessfulFetchAt: "2026-10-31T21:03:32.584Z",
-        lastReportAt: "2026-10-31T21:03:32.584Z",
+        servedAt: "2026-10-31T21:03:32.584Z",
         reason: null,
       },
       { connectivity: "down", reason: "fetch failed" },
@@ -161,5 +161,138 @@ describe("registry record normalize", () => {
     expect(downWithPrior.lastSuccessfulFetchAt).toBe(
       "2026-10-31T21:03:32.584Z",
     );
+  });
+
+  it("pins spec 3.1 freshness vocabulary to never, not unknown", () => {
+    const missing = normalizeRegistryRecord({
+      id: "apex",
+      name: "Apex",
+      kind: "marketing site",
+      sources: { reporter: { connectivity: "unconnected" } },
+    });
+    expect(missing.sources["reporter"]?.freshness).toBe("never");
+    const legacy = normalizeRegistryRecord({
+      id: "apex",
+      name: "Apex",
+      kind: "marketing site",
+      sources: { reporter: { connectivity: "connected", freshness: "unknown" } },
+    });
+    expect(legacy.sources["reporter"]?.freshness).toBe("never");
+    expect(withSourceState(null, { connectivity: "connected" }).freshness).toBe(
+      "never",
+    );
+  });
+
+  it("pins spec 3.1 SourceState servedAt claim with reason additive", () => {
+    const next = normalizeRegistryRecord({
+      id: "apex",
+      name: "Apex",
+      kind: "marketing site",
+      sources: {
+        reporter: {
+          connectivity: "connected",
+          freshness: "fresh",
+          lastSuccessfulFetchAt: "2026-10-31T21:03:32.584Z",
+          servedAt: "2026-10-31T21:03:30.000Z",
+          reason: "poll ok",
+        },
+      },
+    });
+    expect(next.sources["reporter"]?.servedAt).toBe(
+      "2026-10-31T21:03:30.000Z",
+    );
+    expect(next.sources["reporter"]?.reason).toBe("poll ok");
+    expect("lastReportAt" in (next.sources["reporter"] ?? {})).toBe(false);
+  });
+
+  it("keeps the valid headline sibling when the other value is null", () => {
+    const next = normalizeRegistryRecord({
+      id: "apex",
+      name: "Apex",
+      kind: "marketing site",
+      headlines: [
+        {
+          label: "Blog posts",
+          value: 16,
+          window: "lifetime",
+          updatedAt: "2026-10-31T21:03:32.584Z",
+          source: "reporter",
+          tooltip: null,
+        },
+        {
+          label: "Inbound notes",
+          value: null,
+          window: "lifetime",
+          updatedAt: null,
+          source: "reporter",
+          tooltip: null,
+        },
+      ],
+    });
+    expect(next.headlines).toHaveLength(2);
+    expect(next.headlines[0]?.value).toBe(16);
+    expect(next.headlines[1]?.value).toBeNull();
+    expect(isRegistryRecord(next)).toBe(true);
+  });
+
+  it("pins the spec 3.1 six-value headline source union", () => {
+    for (const source of [
+      "reporter",
+      "cloudflare",
+      "manual",
+      "repo",
+      "metrics-endpoint",
+      "none",
+    ]) {
+      const next = normalizeRegistryRecord({
+        id: "apex",
+        name: "Apex",
+        kind: "marketing site",
+        headlines: [
+          {
+            label: "A",
+            value: 1,
+            window: "lifetime",
+            updatedAt: null,
+            source,
+            tooltip: null,
+          },
+          {
+            label: "B",
+            value: 2,
+            window: "lifetime",
+            updatedAt: null,
+            source,
+            tooltip: null,
+          },
+        ],
+      });
+      expect(next.headlines).toHaveLength(2);
+      expect(next.headlines[0]?.source).toBe(source);
+    }
+    const bogus = normalizeRegistryRecord({
+      id: "apex",
+      name: "Apex",
+      kind: "marketing site",
+      headlines: [
+        {
+          label: "A",
+          value: 1,
+          window: "lifetime",
+          updatedAt: null,
+          source: "wire",
+          tooltip: null,
+        },
+        {
+          label: "B",
+          value: 2,
+          window: "lifetime",
+          updatedAt: null,
+          source: "reporter",
+          tooltip: null,
+        },
+      ],
+    });
+    expect(bogus.headlines).toEqual([]);
   });
 });

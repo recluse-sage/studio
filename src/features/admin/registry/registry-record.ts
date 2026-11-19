@@ -9,22 +9,30 @@ export type PropertyHealth = "up" | "down" | "unknown";
 
 export type SourceConnectivity = "connected" | "down" | "unconnected";
 
-export type SourceFreshness = "fresh" | "stale" | "unknown";
+export type SourceFreshness = "fresh" | "stale" | "never";
 
 export type SourceState = {
   connectivity: SourceConnectivity;
   freshness: SourceFreshness;
   lastSuccessfulFetchAt: string | null;
-  lastReportAt: string | null;
+  servedAt: string | null;
   reason: string | null;
 };
 
+export type HeadlineSource =
+  | "reporter"
+  | "cloudflare"
+  | "manual"
+  | "repo"
+  | "metrics-endpoint"
+  | "none";
+
 export type HeadlineNumber = {
   label: string;
-  value: number;
+  value: number | null;
   window: string | null;
   updatedAt: string | null;
-  source: string;
+  source: HeadlineSource;
   tooltip: string | null;
 };
 
@@ -66,7 +74,7 @@ function isConnectivity(value: unknown): value is SourceConnectivity {
 }
 
 function isFreshness(value: unknown): value is SourceFreshness {
-  return value === "fresh" || value === "stale" || value === "unknown";
+  return value === "fresh" || value === "stale" || value === "never";
 }
 
 function asStringOrNull(value: unknown): string | null {
@@ -93,9 +101,9 @@ function normalizeSourceState(value: unknown): SourceState {
     connectivity: isConnectivity(r.connectivity)
       ? r.connectivity
       : "unconnected",
-    freshness: isFreshness(r.freshness) ? r.freshness : "unknown",
+    freshness: isFreshness(r.freshness) ? r.freshness : "never",
     lastSuccessfulFetchAt: asStringOrNull(r.lastSuccessfulFetchAt),
-    lastReportAt: asStringOrNull(r.lastReportAt),
+    servedAt: asStringOrNull(r.servedAt),
     reason: asStringOrNull(r.reason),
   };
 }
@@ -109,16 +117,29 @@ function normalizeSources(value: unknown): Record<string, SourceState> {
   return out;
 }
 
+const HEADLINE_SOURCES: readonly HeadlineSource[] = [
+  "reporter",
+  "cloudflare",
+  "manual",
+  "repo",
+  "metrics-endpoint",
+  "none",
+];
+
+function isHeadlineSource(value: unknown): value is HeadlineSource {
+  return HEADLINE_SOURCES.includes(value as HeadlineSource);
+}
+
 function isHeadlineNumber(value: unknown): value is HeadlineNumber {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const r = value as Record<string, unknown>;
   return (
     typeof r.label === "string" &&
-    typeof r.value === "number" &&
-    Number.isFinite(r.value) &&
+    ((typeof r.value === "number" && Number.isFinite(r.value)) ||
+      r.value === null) &&
     (typeof r.window === "string" || r.window === null) &&
     (typeof r.updatedAt === "string" || r.updatedAt === null) &&
-    typeof r.source === "string" &&
+    isHeadlineSource(r.source) &&
     (typeof r.tooltip === "string" || r.tooltip === null || r.tooltip === undefined)
   );
 }
@@ -237,9 +258,9 @@ export function withSourceState(
   const base: SourceState =
     prev ?? {
       connectivity: "unconnected",
-      freshness: "unknown",
+      freshness: "never",
       lastSuccessfulFetchAt: null,
-      lastReportAt: null,
+      servedAt: null,
       reason: null,
     };
   const merged: SourceState = {
@@ -249,8 +270,7 @@ export function withSourceState(
       patch.lastSuccessfulFetchAt !== undefined
         ? patch.lastSuccessfulFetchAt
         : base.lastSuccessfulFetchAt,
-    lastReportAt:
-      patch.lastReportAt !== undefined ? patch.lastReportAt : base.lastReportAt,
+    servedAt: patch.servedAt !== undefined ? patch.servedAt : base.servedAt,
     reason: patch.reason !== undefined ? patch.reason : base.reason,
   };
   if (merged.connectivity === "down" && merged.lastSuccessfulFetchAt === null) {

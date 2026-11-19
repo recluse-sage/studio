@@ -19,9 +19,9 @@ export const REGISTRY_ORDER = [
 function unconnectedSource(): SourceState {
   return {
     connectivity: "unconnected",
-    freshness: "unknown",
+    freshness: "never",
     lastSuccessfulFetchAt: null,
-    lastReportAt: null,
+    servedAt: null,
     reason: null,
   };
 }
