@@ -14,6 +14,8 @@ export default [
   // Private owner admin. Client rendered, never prerendered, never in sitemap.
   // Worker gates this path with Cloudflare Access before serving the shell.
   route("admin/*", "routes/admin.tsx"),
+  // TEMPORARY spike 1 harness. Delete before merging the spike.
+  route("spike-properties", "routes/spike-properties.tsx"),
   // Catch all 404. Last so /, /work, and /admin/* keep their boundaries.
   route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;
