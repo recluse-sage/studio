@@ -152,4 +152,15 @@ describe("admin registry access negatives", () => {
     const routedText = await routed!.text();
     expect(routedText).not.toContain("blogPosts");
   });
+
+  it("marks the Phase 1 payload as fixture-backed", async () => {
+    const res = await handleAdminRegistry(
+      req("/api/admin/registry", { "Cf-Access-Jwt-Assertion": "good-token" }),
+      env(),
+      goodOverrides(),
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.fixture).toBe(true);
+  });
 });

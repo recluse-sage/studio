@@ -14,6 +14,7 @@ export const REGISTRY_COPY = {
   downNotice: "Reporter down, showing last known",
   notEntered: "Not entered yet",
   unconnected: "Unconnected",
+  sampleData: "Sample data",
   configErrorTitle: "Registry misconfigured",
   configErrorBody:
     "The registry seed must ship five properties in fixed order. This card shows instead of an empty page.",
@@ -32,6 +33,7 @@ export type RegistryRowView = {
   lifecycle: RegistryRecord["lifecycle"];
   notes: string;
   dot: "up" | "down" | "unknown";
+  sampleData: boolean;
   lastReportLine: string;
   downNotice: string | null;
   servedAt: string | null;
@@ -103,6 +105,7 @@ export function describeRegistryRow(record: RegistryRecord): RegistryRowView {
     lifecycle: record.lifecycle,
     notes: record.notes,
     dot: record.health,
+    sampleData: record.fixture === true,
     lastReportLine: lastReportLineFor(record),
     downNotice: downNoticeFor(record),
     servedAt: record.lastReportAt,

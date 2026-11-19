@@ -352,4 +352,38 @@ describe("registry seed plus lifetime headlines", () => {
     expect(recovered.headlines[1]).toMatchObject({ value: 13 });
     expect(describeRegistryRow(recovered).downNotice).toBeNull();
   });
+
+  it("pins the Sample data label to the fixture flag", () => {
+    const rows = buildRegistrySeed();
+    const apex = rows.find((row) => row.id === "apex")!;
+    const servedAt = "2026-11-19T08:00:00.000Z";
+    const fetchedAt = "2026-11-19T08:05:00.000Z";
+    const flagged = nextApexRecordAfterFetch(
+      apex,
+      {
+        property: "apex",
+        counts: { berryBlastTotal: 0, contactNotes: 0, blogPosts: 16 },
+        lastDeployHash: null,
+        servedAt,
+        fixture: true,
+      },
+      fetchedAt,
+      "fetch failed",
+    );
+    expect(flagged.fixture).toBe(true);
+    expect(describeRegistryRow(flagged).sampleData).toBe(true);
+    const unflagged = nextApexRecordAfterFetch(
+      apex,
+      {
+        property: "apex",
+        counts: { berryBlastTotal: 0, contactNotes: 0, blogPosts: 16 },
+        lastDeployHash: null,
+        servedAt,
+      },
+      fetchedAt,
+      "fetch failed",
+    );
+    expect(unflagged.fixture).toBe(false);
+    expect(describeRegistryRow(unflagged).sampleData).toBe(false);
+  });
 });

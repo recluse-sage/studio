@@ -35,6 +35,9 @@ export function RegistryRow({ record }: { record: RegistryRecord }) {
         <span className="registry-badge px-2 py-0.5 text-xs">
           {view.kind || "uncategorized"}
         </span>
+        {view.sampleData ? (
+          <span className="registry-badge px-2 py-0.5 text-xs">Sample data</span>
+        ) : null}
         {view.lifecycle === "planned" ? (
           <span className="registry-badge px-2 py-0.5 text-xs">planned</span>
         ) : null}

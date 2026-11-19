@@ -80,6 +80,7 @@ export function applyApexReportToRegistry(
   record: RegistryRecord,
   report: ApexReport,
   fetchedAt?: string | null,
+  fixture = false,
 ): RegistryRecord {
   const fetched = fetchedAt ?? report.servedAt;
   const headlines: [HeadlineNumber, HeadlineNumber] = [
@@ -89,6 +90,7 @@ export function applyApexReportToRegistry(
   return {
     ...record,
     health: "up",
+    fixture,
     lastReportAt: report.servedAt,
     lastSuccessfulFetchAt: fetched,
     sources: {
@@ -117,9 +119,14 @@ export function applyApexPayloadToRegistry(
   json: unknown,
   fetchedAt?: string | null,
 ): RegistryRecord | null {
+  const fixture =
+    !!json &&
+    typeof json === "object" &&
+    !Array.isArray(json) &&
+    (json as Record<string, unknown>).fixture === true;
   const report = parseApexReport(stripPiiFields(json));
   if (!report) return null;
-  return applyApexReportToRegistry(record, report, fetchedAt);
+  return applyApexReportToRegistry(record, report, fetchedAt, fixture);
 }
 
 /* Mark the apex row down after a failed fetch. Keeps last-known numbers and

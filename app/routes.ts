@@ -18,8 +18,6 @@ export default [
   // already covers /admin/*, so this path inherits the same Access gate.
   route("admin/registry", "routes/admin-registry.tsx"),
   route("admin/*", "routes/admin.tsx"),
-  // TEMPORARY spike 1 harness. Delete before merging the spike.
-  route("spike-properties", "routes/spike-properties.tsx"),
   // Catch all 404. Last so /, /work, and /admin/* keep their boundaries.
   route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

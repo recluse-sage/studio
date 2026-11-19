@@ -38,5 +38,6 @@ export async function handleAdminRegistry(
     counts: { berryBlastTotal: 0, contactNotes: 0, blogPosts: 16 },
     lastDeployHash: null,
     servedAt: nowIso(),
+    fixture: true,
   });
 }

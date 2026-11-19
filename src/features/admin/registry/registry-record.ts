@@ -43,6 +43,7 @@ export type RegistryRecord = {
   lifecycle: PropertyLifecycle;
   status: PropertyStatus;
   health: PropertyHealth;
+  fixture: boolean;
   sources: Record<string, SourceState>;
   lastReportAt: string | null;
   lastSuccessfulFetchAt: string | null;
@@ -202,6 +203,7 @@ export function normalizeRegistryRecord(entry: unknown): RegistryRecord {
     id: typeof r.id === "string" ? r.id : "",
     name: typeof r.name === "string" ? r.name : "",
     kind: typeof r.kind === "string" ? r.kind : "",
+    fixture: r.fixture === true,
     lifecycle,
     status,
     health: isHealth(r.health) ? r.health : "unknown",

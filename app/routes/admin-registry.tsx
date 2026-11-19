@@ -57,7 +57,7 @@ function createPhase1Fetcher(story: RegistryStory): () => Promise<unknown> {
       if (calls > 1) {
         throw new Error("Apex reporter unreachable (offline story)");
       }
-      return fixture;
+      return { ...fixture, fixture: true };
     }
     let res: Response;
     try {
