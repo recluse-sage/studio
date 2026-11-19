@@ -137,4 +137,137 @@
   color: var(--oasis-text);
   padding: 0.5rem 1rem;
   cursor: pointer;
+  font: inherit;
+}
+
+.registry-scope .registry-nav-tab,
+.registry-scope .registry-theme-toggle {
+  font-family: var(--oasis-font-mono);
+}
+
+/* Row list and cards. Every rule sets its own box values so nothing depends
+   on a global reset. Buttons set font explicitly for the same reason. */
+
+.registry-scope .registry-row {
+  list-style: none;
+  padding: 1rem 1.25rem;
+}
+
+.registry-scope .registry-headlines {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.registry-scope .registry-headline-pair {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.registry-scope .registry-headline {
+  border: 1px solid var(--oasis-border);
+  border-style: solid;
+  border-radius: var(--oasis-radius-sm);
+  background: var(--oasis-surface);
+  padding: 0.75rem;
+}
+
+.registry-scope .registry-headline-label {
+  font-family: var(--oasis-font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--oasis-text-muted);
+  margin: 0;
+}
+
+.registry-scope .registry-headline p {
+  margin: 0.25rem 0 0;
+}
+
+.registry-scope .registry-headline p:first-child {
+  margin-top: 0;
+}
+
+.registry-scope .registry-headline-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.registry-scope .registry-headline-window {
+  font-family: var(--oasis-font-mono);
+  font-size: 0.75rem;
+  color: var(--oasis-accent);
+}
+
+.registry-scope .registry-headline-updated {
+  font-size: 0.75rem;
+}
+
+.registry-scope .registry-down {
+  border: 1px solid var(--oasis-warning);
+  border-style: solid;
+  border-left: 4px solid var(--oasis-warning);
+  border-radius: var(--oasis-radius-sm);
+  background: var(--oasis-warning-soft);
+  padding: 0.75rem;
+  margin: 0;
+}
+
+.registry-scope .registry-error {
+  border-left: 4px solid var(--oasis-danger);
+  border-style: solid;
+  padding: 1.25rem;
+}
+
+.registry-scope .registry-error h2 {
+  font-size: 1.125rem;
+  margin: 0 0 0.5rem;
+}
+
+.registry-scope .registry-error p {
+  margin: 0;
+}
+
+.registry-scope .registry-denied h2 {
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.registry-scope .registry-denied p {
+  margin: 0.75rem 0 0;
+}
+
+.registry-scope .registry-denied .registry-retry {
+  margin-top: 0.75rem;
+}
+
+.registry-scope .registry-detail-toggle {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--oasis-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.registry-scope .registry-detail-panel dl {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+
+.registry-scope .registry-detail-panel dt {
+  font-family: var(--oasis-font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.registry-scope .registry-detail-panel dd {
+  margin: 0;
 }

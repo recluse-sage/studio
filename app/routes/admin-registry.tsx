@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import type { LinksFunction, MetaFunction } from "react-router";
 import { RegistryShell } from "../../src/features/admin/components/RegistryShell";
+import {
+  RegistryConfigErrorCard,
+  RegistryRow,
+} from "../../src/features/admin/components/RegistryRow";
 import { buildRegistrySeed } from "../../src/features/admin/registry/registry-seed";
+import { describeRegistryRows } from "../../src/features/admin/registry/registry-view";
 import type { RegistryRecord } from "../../src/features/admin/registry/registry-record";
 import type { DeniedStatus } from "../../src/features/admin/types";
 import registryHref from "../../src/features/admin/registry/registry.css?url";
@@ -37,19 +42,18 @@ export default function AdminRegistryRoute() {
     setDenied(null);
   }
 
+  const view = rows === null ? null : describeRegistryRows(rows);
+
   return (
     <RegistryShell denied={denied} onRetry={handleRetry}>
-      {rows === null ? (
+      {view === null ? (
         <p className="registry-muted">Loading registry.</p>
+      ) : view.configError ? (
+        <RegistryConfigErrorCard />
       ) : (
-        <ul className="flex flex-col gap-2">
-          {rows.map((row) => (
-            <li key={row.id} className="registry-card px-4 py-3">
-              <span className="font-medium">{row.name}</span>{" "}
-              <span className="registry-badge px-2 py-0.5 text-xs">
-                {row.kind || "uncategorized"}
-              </span>
-            </li>
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          {rows!.map((record) => (
+            <RegistryRow key={record.id} record={record} />
           ))}
         </ul>
       )}
