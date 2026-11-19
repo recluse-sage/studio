@@ -115,7 +115,17 @@ export default function AdminRegistryRoute() {
         if (cancelled) return;
         const deniedStatus = deniedFromError(error);
         if (deniedStatus !== null) {
+          // Partial denial per spec 5.2. Suppress only the apex numbers by
+          // resetting the apex row to its seed shape, and keep the other
+          // static rows rendering with their saved details.
           setDenied(deniedStatus);
+          setRows((prev) => {
+            const seed = buildRegistrySeed();
+            if (prev === null) return seed;
+            const seedApex = seed.find((row) => row.id === "apex");
+            if (!seedApex) return prev;
+            return prev.map((row) => (row.id === "apex" ? seedApex : row));
+          });
           return;
         }
         setRows((prev) =>

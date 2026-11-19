@@ -80,7 +80,10 @@ export function RegistryRow({ record }: { record: RegistryRecord }) {
             {view.homeUrl}
           </a>
         ) : (
-          <span aria-label="No home link">-</span>
+          <>
+            <span aria-hidden="true">-</span>{" "}
+            <span className="oasis-sr-only">No home link</span>
+          </>
         )}
       </p>
 

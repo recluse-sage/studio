@@ -100,7 +100,7 @@
   color: var(--oasis-text);
 }
 
-.registry-scope .registry-nav-tab:disabled {
+.registry-scope .registry-nav-tab[data-disabled] {
   cursor: not-allowed;
   opacity: 0.65;
 }

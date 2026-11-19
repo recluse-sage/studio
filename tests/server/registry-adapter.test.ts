@@ -101,7 +101,7 @@ describe("registry seed plus lifetime headlines", () => {
     expect(next.lastReportAt).toBe(servedAt);
     expect(next.lastSuccessfulFetchAt).toBe(servedAt);
     const serialized = JSON.stringify(next);
-    expect(serialized).not.toContain("Not yet");
+    expect(serialized).not.toContain(REGISTRY_COPY.noReport);
     expect(serialized).not.toContain("Unconnected");
   });
 
@@ -258,7 +258,7 @@ describe("registry seed plus lifetime headlines", () => {
       }
     }
     const serialized = JSON.stringify(view);
-    expect(serialized).not.toContain("Not yet");
+    expect(serialized).not.toContain(REGISTRY_COPY.noReport);
   });
 
   it("keeps last known and shows down notice on fetch failure", () => {

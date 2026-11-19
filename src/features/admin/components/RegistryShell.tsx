@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tabs } from "@base-ui-components/react/tabs";
 import type { DeniedStatus } from "../types";
 
@@ -8,9 +8,17 @@ import type { DeniedStatus } from "../types";
 
 export type RegistryTheme = "light" | "dark";
 
-const THEME_STORAGE_KEY = "mantine-color-scheme";
+const THEME_STORAGE_KEY = "mantine-color-scheme-value";
 
 function readTheme(): RegistryTheme {
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored === "light" || stored === "dark") return stored;
+    } catch {
+      /* fall through to DOM attribute */
+    }
+  }
   if (typeof document === "undefined") return "dark";
   return document.documentElement.getAttribute("data-mantine-color-scheme") ===
     "light"
@@ -39,7 +47,9 @@ export type RegistryShellProps = {
 
 /* Plain denied notice with the same copy as SecureAccessState, written in
    plain elements so new registry views import no Mantine. Server checks own
-   the real gate; this screen only explains the denial. */
+   the real gate; this screen only explains the denial. On denial the shell
+   keeps all rows rendering and this notice explains that only the apex
+   numbers are suppressed. */
 function RegistryDeniedNotice({
   status,
   onRetry,
@@ -55,6 +65,10 @@ function RegistryDeniedNotice({
         {forbidden
           ? "This admin area is limited to the studio owner. If you should have access, check your Cloudflare Access session and try again."
           : "Your session has expired or is missing. Sign in through Cloudflare Access to continue."}
+      </p>
+      <p className="registry-muted">
+        Apex numbers are unavailable. The other rows below still show their
+        saved registry details.
       </p>
       <p className="registry-muted">
         Admin checks run on the server. This screen does not grant access by
@@ -84,7 +98,14 @@ export function RegistryShell({
   onRetry,
   children,
 }: RegistryShellProps) {
-  const [theme, setTheme] = useState<RegistryTheme>(() => readTheme());
+  /* Theme starts dark to match ColorSchemeScript defaultColorScheme. The
+     stored value applies in an effect so server and client render the same
+     label and hydration stays clean. */
+  const [theme, setTheme] = useState<RegistryTheme>("dark");
+
+  useEffect(() => {
+    setTheme(readTheme());
+  }, []);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
@@ -155,7 +176,10 @@ export function RegistryShell({
         >
           <Tabs.Panel value="registry" className="mt-6">
             {denied ? (
-              <RegistryDeniedNotice status={denied} onRetry={onRetry} />
+              <>
+                <RegistryDeniedNotice status={denied} onRetry={onRetry} />
+                {children}
+              </>
             ) : (
               children
             )}
