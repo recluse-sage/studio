@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Registry route scope. Uses Oasis tokens only. No global reset here. */
+/* Registry route scope. Uses Oasis tokens only. Note: @tailwind base emits
+   preflight; the scoping decision stays with task 4. */
 
 .registry-scope {
   background: var(--oasis-bg);
