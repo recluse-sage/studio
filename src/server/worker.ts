@@ -16,6 +16,7 @@ import {
   handlePublicWorkItems,
 } from "./handlers/admin.ts";
 import { handleAdminPosts, handlePublicPosts } from "./handlers/posts.ts";
+import { handleAdminRegistry } from "./handlers/registry.ts";
 
 // Single integration entry for the Worker entrypoint.
 // Parent wires: import { handleApiRequest } from "../server/worker.ts"
@@ -73,6 +74,9 @@ export async function handleApiRequest(
   }
   if (path.startsWith("/api/admin/proof-notes")) {
     return handleAdminProofNotes(request, env);
+  }
+  if (path === "/api/admin/registry" || path.startsWith("/api/admin/registry/")) {
+    return handleAdminRegistry(request, env);
   }
   if (path.startsWith("/api/")) {
     return safeError("Not found.", 404, "not-found");

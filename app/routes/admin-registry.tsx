@@ -44,18 +44,40 @@ function storyFromParams(params: URLSearchParams): RegistryStory {
   return "apex";
 }
 
-/* Phase 1 fetcher. No metrics endpoint or Cloudflare fetch is added in this
-   phase, so the committed fixture is the live-or-fixture payload and it runs
-   through the same parse plus apply path as a live report would. */
+/* Phase 1 fetcher. The apex story reads the live Access-gated dashboard
+   API with same-origin credentials and no browser credential header. The
+   fixture path stays for the seed and offline stories so captures and unit
+   tests stay deterministic. */
 function createPhase1Fetcher(story: RegistryStory): () => Promise<unknown> {
   let calls = 0;
   return async () => {
     calls += 1;
     if (story === "seed") return null;
-    if (story === "offline" && calls > 1) {
-      throw new Error("Apex reporter unreachable (offline story)");
+    if (story === "offline") {
+      if (calls > 1) {
+        throw new Error("Apex reporter unreachable (offline story)");
+      }
+      return fixture;
     }
-    return fixture;
+    let res: Response;
+    try {
+      res = await fetch("/api/admin/registry", {
+        credentials: "same-origin",
+      });
+    } catch {
+      throw new Error("Apex reporter unreachable (network)");
+    }
+    if (res.status === 401 || res.status === 403) {
+      const denied = new Error(
+        res.status === 403 ? "Access restricted." : "Sign in required.",
+      ) as Error & { status: 401 | 403 };
+      denied.status = res.status;
+      throw denied;
+    }
+    if (!res.ok) {
+      throw new Error("Apex reporter unreachable (status " + res.status + ")");
+    }
+    return (await res.json()) as unknown;
   };
 }
 
