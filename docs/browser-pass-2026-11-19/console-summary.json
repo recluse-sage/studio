@@ -1,0 +1,131 @@
+[
+  {
+    "story": "registry",
+    "url": "http://127.0.0.1:5174/admin/registry",
+    "initial": {
+      "attr": "dark",
+      "stored": null,
+      "toggleLabel": "Light theme",
+      "toggleAria": "Switch to light theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nLight theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nNo report yet\nApex\nmarketing site\n\nNo report yet\n\nNo report yet\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "afterToggle": {
+      "attr": "light",
+      "stored": "light",
+      "toggleLabel": "Dark theme",
+      "toggleAria": "Switch to dark theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nDark theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nNo report yet\nApex\nmarketing site\n\nNo report yet\n\nNo report yet\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "afterReload": {
+      "attr": "light",
+      "stored": "light",
+      "toggleLabel": "Dark theme",
+      "toggleAria": "Switch to dark theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nDark theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nNo report yet\nApex\nmarketing site\n\nNo report yet\n\nNo report yet\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "toggleBack": {
+      "attr": "dark",
+      "stored": "dark",
+      "toggleLabel": "Light theme",
+      "toggleAria": "Switch to light theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nLight theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nNo report yet\nApex\nmarketing site\n\nNo report yet\n\nNo report yet\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "consoleErrors": [
+      "[console.error] Failed to load resource: the server responded with a status of 404 ()",
+      "[console.error] Failed to load resource: the server responded with a status of 404 ()",
+      "[console.error] Failed to load resource: the server responded with a status of 404 ()",
+      "[console.error] Failed to load resource: the server responded with a status of 404 ()",
+      "[console.error] Failed to load resource: the server responded with a status of 404 ()",
+      "[console.error] Failed to load resource: the server responded with a status of 404 ()"
+    ],
+    "pageErrors": [],
+    "failedRequests": [],
+    "darkPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/registry-dark.png",
+    "lightPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/registry-light.png",
+    "reloadedPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/registry-light-reloaded.png"
+  },
+  {
+    "story": "seed",
+    "url": "http://127.0.0.1:5174/admin/registry?story=seed",
+    "initial": {
+      "attr": "dark",
+      "stored": null,
+      "toggleLabel": "Light theme",
+      "toggleAria": "Switch to light theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nLight theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nNo report yet\nApex\nmarketing site\n\nNo report yet\n\nNo report yet\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "afterToggle": {
+      "attr": "light",
+      "stored": "light",
+      "toggleLabel": "Dark theme",
+      "toggleAria": "Switch to dark theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nDark theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nNo report yet\nApex\nmarketing site\n\nNo report yet\n\nNo report yet\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "afterReload": {
+      "attr": "light",
+      "stored": "light",
+      "toggleLabel": "Dark theme",
+      "toggleAria": "Switch to dark theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nDark theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nNo report yet\nApex\nmarketing site\n\nNo report yet\n\nNo report yet\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "toggleBack": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [],
+    "darkPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/seed-dark.png",
+    "lightPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/seed-light.png",
+    "reloadedPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/seed-light-reloaded.png"
+  },
+  {
+    "story": "offline",
+    "url": "http://127.0.0.1:5174/admin/registry?story=offline",
+    "initial": {
+      "attr": "dark",
+      "stored": null,
+      "toggleLabel": "Light theme",
+      "toggleAria": "Switch to light theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nLight theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nReporter up\nApex\nmarketing site\n\nLast report 2026-10-31T21:03:32.584Z · stale · Fetched 2026-11-19T14:16:46.645Z\n\nBLOG POSTS\n\n16\n\nlifetime\n\nUpdated 2026-10-31T21:03:32.584Z\n\nINBOUND NOTES\n\n0\n\nlifetime\n\nUpdated 2026-10-31T21:03:32.584Z\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "afterToggle": {
+      "attr": "light",
+      "stored": "light",
+      "toggleLabel": "Dark theme",
+      "toggleAria": "Switch to dark theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nDark theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nReporter up\nApex\nmarketing site\n\nLast report 2026-10-31T21:03:32.584Z · stale · Fetched 2026-11-19T14:16:46.645Z\n\nBLOG POSTS\n\n16\n\nlifetime\n\nUpdated 2026-10-31T21:03:32.584Z\n\nINBOUND NOTES\n\n0\n\nlifetime\n\nUpdated 2026-10-31T21:03:32.584Z\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "afterReload": {
+      "attr": "light",
+      "stored": "light",
+      "toggleLabel": "Dark theme",
+      "toggleAria": "Switch to dark theme",
+      "rows": 5,
+      "bodyText": "Skip to registry content\n\nOWNER ADMIN\n\nProperty registry\nDark theme\nRegistry\nForage\nUnconnected\nApex\nUnconnected\nCatalog\nNot entered yet\nReporter up\nApex\nmarketing site\n\nLast report 2026-10-31T21:03:32.584Z · stale · Fetched 2026-11-19T14:16:54.893Z\n\nBLOG POSTS\n\n16\n\nlifetime\n\nUpdated 2026-10-31T21:03:32.584Z\n\nINBOUND NOTES\n\n0\n\nlifetime\n\nUpdated 2026-10-31T21:03:32.584Z\n\nhttps://selimabdulsalam.com\n\nMarketing site plus Berry Blast checkout. First live reporter in phase 1.\n\nReport detail\nNo report yet\nForage\nproduct\n\nNo report yet\n\nREQUESTS\n\nUnconnected Cloudflare zone feed not connected\n\nTOOL RUNS\n\nUnconnected Metrics endpoint not connected\n\nhttps://foragebyoasis.tech\n\nProduct vault. Live reporter planned in phase 2, manual row until then.\n\nReport detail\nNo report yet\nUpwork catalog\ncatalog\n\nNo report yet\n\nPROFILE VIEWS\n\nNot entered yet\n\nINVITES\n\nNot entered yet\n\n-\nNo home link\n\n4 listings. Stats entered by hand for now, no public API.\n\nReport detail\nNo report yet\ndesigntaste by Oasis\nskill\n\nNo report yet\n\nSkill. No live surface to link yet.\n\n-\nNo home link\n\nReport detail\nNo report yet\nShopify app\napp\nplanned\n\nNo report yet\n\nPlanned. Not built yet. Born reporting when the app exists.\n\n-\nNo home link\n\nReport detail",
+      "unstyledFlash": "ok"
+    },
+    "toggleBack": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [],
+    "darkPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/offline-dark.png",
+    "lightPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/offline-light.png",
+    "reloadedPath": "/Users/selim/Desktop/Personal/oasis.dev/docs/browser-pass-2026-11-19/offline-light-reloaded.png"
+  }
+]

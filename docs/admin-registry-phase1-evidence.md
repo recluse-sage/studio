@@ -87,3 +87,60 @@ with wrangler and a browser: start wrangler dev, sign in via Access,
 visit /admin/registry, /admin/registry?story=seed, and
 /admin/registry?story=offline in both themes, screenshot each, and paste
 the console log showing zero errors into this file.
+
+## Browser pass 2026-11-19 (spike harness, local only)
+
+Ran: npx vite --config vite.spike.config.ts --port 5174 --host 127.0.0.1
+(vite 7.3.7, plain vite, no Cloudflare plugin, no workerd, no deploy).
+Browser: headless system Chrome 150.0.7871.187 via puppeteer-core,
+viewport 1280x900. URLs: /admin/registry, /admin/registry?story=seed,
+/admin/registry?story=offline.
+
+Procedure per URL: clear localStorage, load (expect dark default),
+screenshot dark, click .registry-theme-toggle, screenshot light, reload,
+confirm localStorage mantine-color-scheme-value still light and
+data-mantine-color-scheme matches, screenshot light-reloaded. Registry
+story adds toggle-back to dark plus reload. Full DOM state plus console
+logs saved in docs/browser-pass-2026-11-19/console-summary.json.
+
+What passed:
+
+- registry dark plus light plus light-reloaded plus dark-reloaded:
+  docs/browser-pass-2026-11-19/registry-dark.png,
+  registry-light.png, registry-light-reloaded.png,
+  registry-dark-reloaded.png. 5 rows render styled in both themes.
+  Toggle flips data-mantine-color-scheme and localStorage between dark
+  and light. Reload keeps the chosen value. No unstyled flash.
+- seed dark plus light plus light-reloaded: seed-dark.png,
+  seed-light.png, seed-light-reloaded.png. Zero console errors, zero
+  pageerrors. Apex shows No report yet with pending slot. Persistence
+  passes.
+- offline dark plus light plus light-reloaded: offline-dark.png,
+  offline-light.png, offline-light-reloaded.png. Zero console errors,
+  zero pageerrors. Apex shows 16 blog posts and 0 inbound notes with
+  stale freshness and both timestamps. Reload keeps numbers.
+  Persistence passes.
+
+Console verdict:
+
+- seed: 0 console errors, 0 pageerrors. Pass.
+- offline: 0 console errors, 0 pageerrors. Pass.
+- registry (default apex story): 6 console errors, 0 pageerrors. Each
+  load logs 2x Failed to load resource 404 for /api/admin/registry.
+  Cause: spike has no Workers runtime so /api returns 404, and React
+  dev StrictMode issues the fetch twice per mount. The client catches
+  the failure and keeps all 5 rows with No report yet. No crash, no
+  unstyled flash. This is the expected spike gap, not an app bug. No
+  code change made because silencing the browser network log would hide
+  the real fetch.
+
+What remains worker-only:
+
+- Real Access app login and session flow.
+- Runtime 401 plus 403 partial denial with Try again (unit-covered in
+  tests/server/admin-registry-access.test.ts, not browser-proven here).
+- Real network poll with live reporter payload and fresh servedAt plus
+  lastSuccessfulFetchAt.
+- Offline down notice after second fetch (Reporter down, showing last
+  known) needs the 15 minute poll. Unit-covered, not browser-waited in
+  this pass. Offline captures here show the first-fetch fixture state.
