@@ -1,9 +1,14 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Registry route scope. Uses Oasis tokens only. Note: @tailwind base emits
-   preflight; the scoping decision stays with task 4. */
+/* Registry route scope. Uses Oasis tokens only.
+   Preflight decision (task 4): no `@tailwind base` here. Base emits a global
+   preflight reset which would restyle the page while this route is mounted
+   and unload on navigation back to the old Mantine admin, risking a flash and
+   a restyle of shared elements. Phase 1 uses Tailwind for layout and spacing
+   only (flex, grid, gap, padding, type size), which do not need preflight.
+   Borders, colors, and radii come from the token classes below, each with an
+   explicit style so nothing depends on preflight defaults. */
 
 .registry-scope {
   background: var(--oasis-bg);
@@ -55,4 +60,81 @@
   color: var(--oasis-pill-text);
   border-radius: 9999px;
   font-family: var(--oasis-font-mono);
+}
+
+/* Shell chrome. Skip link, view nav, theme toggle, denied notice. */
+
+.registry-scope .registry-skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 50;
+  background: var(--oasis-accent);
+  color: var(--oasis-accent-contrast);
+  border-radius: var(--oasis-radius-sm);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.registry-scope .registry-skip:focus-visible {
+  top: 1rem;
+}
+
+.registry-scope .registry-nav-tab {
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  padding: 0.375rem 0.875rem;
+  font-family: var(--oasis-font-mono);
+  font-size: 0.8125rem;
+  color: var(--oasis-text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.registry-scope .registry-nav-tab[data-active] {
+  background: var(--oasis-surface-raised);
+  border-style: solid;
+  border-color: var(--oasis-border);
+  color: var(--oasis-text);
+}
+
+.registry-scope .registry-nav-tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.registry-scope .registry-nav-hint {
+  font-size: 0.75rem;
+  color: var(--oasis-text-muted);
+}
+
+.registry-scope .registry-theme-toggle {
+  border: 1px solid var(--oasis-border);
+  border-radius: 9999px;
+  background: var(--oasis-surface-raised);
+  color: var(--oasis-text);
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.registry-scope .registry-denied {
+  border: 1px solid var(--oasis-border);
+  border-left: 4px solid var(--oasis-warning);
+  border-style: solid;
+  border-radius: var(--oasis-radius-md);
+  background: var(--oasis-surface-raised);
+  padding: 1.25rem;
+}
+
+.registry-scope .registry-retry {
+  border: 1px solid var(--oasis-accent-border);
+  border-style: solid;
+  border-radius: 9999px;
+  background: var(--oasis-accent-soft);
+  color: var(--oasis-text);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
 }

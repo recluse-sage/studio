@@ -13,6 +13,10 @@ export default [
   route("know-how/:slug", "routes/know-how-article.tsx"),
   // Private owner admin. Client rendered, never prerendered, never in sitemap.
   // Worker gates this path with Cloudflare Access before serving the shell.
+  // Phase 1 parallel registry on the new stack. Listed before admin/* because
+  // the splat would otherwise swallow /admin/registry. Worker run_worker_first
+  // already covers /admin/*, so this path inherits the same Access gate.
+  route("admin/registry", "routes/admin-registry.tsx"),
   route("admin/*", "routes/admin.tsx"),
   // TEMPORARY spike 1 harness. Delete before merging the spike.
   route("spike-properties", "routes/spike-properties.tsx"),
