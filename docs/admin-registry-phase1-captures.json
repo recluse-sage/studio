@@ -1,0 +1,147 @@
+{
+  "generatedAt": "2026-11-19T08:03:48.112Z",
+  "seedOrder": [
+    "apex",
+    "forage",
+    "upwork-catalog",
+    "designtaste-by-oasis",
+    "shopify-app"
+  ],
+  "seedApex": {
+    "id": "apex",
+    "name": "Apex",
+    "kind": "marketing site",
+    "lifecycle": "live",
+    "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "dot": "unknown",
+    "lastReportLine": "No report yet",
+    "downNotice": null,
+    "servedAt": null,
+    "lastSuccessfulFetchAt": null,
+    "homeUrl": "https://selimabdulsalam.com",
+    "slots": [
+      {
+        "kind": "pending"
+      }
+    ]
+  },
+  "emptyStates": {
+    "noReport": "No report yet",
+    "notEntered": "Not entered yet",
+    "unconnected": "Unconnected"
+  },
+  "homeUrls": {
+    "apex": "https://selimabdulsalam.com",
+    "forage": "https://foragebyoasis.tech",
+    "upwork-catalog": null,
+    "designtaste-by-oasis": null,
+    "shopify-app": null
+  },
+  "notes": {
+    "apex": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "forage": "Product vault. Live reporter planned in phase 2, manual row until then.",
+    "upwork-catalog": "4 listings. Stats entered by hand for now, no public API.",
+    "designtaste-by-oasis": "Skill. No live surface to link yet.",
+    "shopify-app": "Planned. Not built yet. Born reporting when the app exists."
+  },
+  "validZero": {
+    "id": "apex",
+    "name": "Apex",
+    "kind": "marketing site",
+    "lifecycle": "live",
+    "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "dot": "up",
+    "lastReportLine": "Last report 2026-11-19T08:00:00.000Z · fresh · Fetched 2026-11-19T08:05:00.000Z",
+    "downNotice": null,
+    "servedAt": "2026-11-19T08:00:00.000Z",
+    "lastSuccessfulFetchAt": "2026-11-19T08:05:00.000Z",
+    "homeUrl": "https://selimabdulsalam.com",
+    "slots": [
+      {
+        "kind": "numbers",
+        "items": [
+          {
+            "label": "Blog posts",
+            "value": 0,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": null
+          },
+          {
+            "label": "Inbound notes",
+            "value": 0,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": "0 contact notes plus 0 Berry Blast orders"
+          }
+        ]
+      }
+    ]
+  },
+  "offlineDown": {
+    "id": "apex",
+    "name": "Apex",
+    "kind": "marketing site",
+    "lifecycle": "live",
+    "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+    "dot": "down",
+    "lastReportLine": "Last report 2026-11-19T08:00:00.000Z · stale · Fetched 2026-11-19T08:05:00.000Z",
+    "downNotice": "Reporter down, showing last known",
+    "servedAt": "2026-11-19T08:00:00.000Z",
+    "lastSuccessfulFetchAt": "2026-11-19T08:05:00.000Z",
+    "homeUrl": "https://selimabdulsalam.com",
+    "slots": [
+      {
+        "kind": "numbers",
+        "items": [
+          {
+            "label": "Blog posts",
+            "value": 16,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": null
+          },
+          {
+            "label": "Inbound notes",
+            "value": 12,
+            "window": "lifetime",
+            "updatedAt": "2026-11-19T08:00:00.000Z",
+            "source": "reporter",
+            "tooltip": "7 contact notes plus 5 Berry Blast orders"
+          }
+        ]
+      }
+    ]
+  },
+  "deniedPartial": {
+    "notice": "Apex numbers are unavailable. The other rows below still show their saved registry details.",
+    "rows": [
+      "apex",
+      "forage",
+      "upwork-catalog",
+      "designtaste-by-oasis",
+      "shopify-app"
+    ],
+    "apex": {
+      "id": "apex",
+      "name": "Apex",
+      "kind": "marketing site",
+      "lifecycle": "live",
+      "notes": "Marketing site plus Berry Blast checkout. First live reporter in phase 1.",
+      "dot": "unknown",
+      "lastReportLine": "No report yet",
+      "downNotice": null,
+      "servedAt": null,
+      "lastSuccessfulFetchAt": null,
+      "homeUrl": "https://selimabdulsalam.com",
+      "slots": [
+        {
+          "kind": "pending"
+        }
+      ]
+    }
+  }
+}
