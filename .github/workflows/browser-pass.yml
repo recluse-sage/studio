@@ -1,0 +1,105 @@
+name: browser-pass
+
+# Phase 1 browser pass evidence. Manual plus registry-scoped PR runs only.
+# Isolation notes:
+# - Fixture-backed handler only. Seed and offline stories never touch the network API.
+# - No database writes. The script only reads rendered rows and localStorage theme.
+# - No credentials. No Cloudflare account access. No secrets are referenced here.
+# - Local wrangler dev only. No --remote flag. No deploy step anywhere in this file.
+# - If /admin/* HTML returns 403 locally, the rows check fails by design and the
+#   summary names the gate. The first real run must confirm local dev serves the
+#   registry shell without an Access session, or switch the pass to react-router dev.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "app/routes/admin-registry.tsx"
+      - "app/routes/admin.tsx"
+      - "src/features/admin/**"
+      - "src/server/handlers/registry.ts"
+      - "scripts/ci/browser-pass.mjs"
+      - ".github/workflows/browser-pass.yml"
+
+concurrency:
+  group: browser-pass-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  browser-pass:
+    name: browser-pass
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        # Playwright is installed with --no-save so package.json stays untouched.
+        # The browser install includes system deps for the GitHub runner.
+        run: |
+          npm install --no-save playwright@latest
+          npx playwright install --with-deps chromium
+
+      - name: Start wrangler dev locally
+        # Assumed flags and port for the first real run to confirm:
+        # --local serves D1 and assets locally, --port 8787, --ip 127.0.0.1.
+        # No --remote flag, no account, no token. Log kept for the artifact.
+        run: |
+          npx wrangler dev --local --port 8787 --ip 127.0.0.1 > wrangler.log 2>&1 &
+          echo $! > wrangler.pid
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8787/ > /dev/null; then
+              echo "wrangler dev is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "wrangler dev did not start in time"
+          cat wrangler.log || true
+          exit 1
+
+      - name: Run registry browser pass
+        env:
+          BROWSER_PASS_BASE_URL: http://127.0.0.1:8787
+          BROWSER_PASS_OUT_DIR: browser-pass-results
+        run: node scripts/ci/browser-pass.mjs
+
+      - name: Write step summary
+        if: always()
+        run: |
+          if [ -f browser-pass-results/summary.md ]; then
+            cat browser-pass-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Browser pass produced no summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload evidence bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-pass-evidence
+          path: |
+            browser-pass-results/
+            wrangler.log
+          if-no-files-found: warn
+
+      - name: Stop wrangler dev
+        if: always()
+        run: |
+          if [ -f wrangler.pid ]; then
+            kill "$(cat wrangler.pid)" || true
+          fi
