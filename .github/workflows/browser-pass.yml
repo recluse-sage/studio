@@ -49,9 +49,13 @@ jobs:
 
       - name: Install Playwright Chromium
         # Playwright is installed with --no-save so package.json stays untouched.
+        # Pinned to an exact version so CI browsers are reproducible.
+        # Chromium-only rule: agents never use system Chrome. CI uses the
+        # Playwright bundled Chromium pinned here, installed by the matching
+        # `npx playwright install` below (same package version, so same browser build).
         # The browser install includes system deps for the GitHub runner.
         run: |
-          npm install --no-save playwright@latest
+          npm install --no-save playwright@1.65.1
           npx playwright install --with-deps chromium
 
       - name: Start wrangler dev locally
