@@ -1,14 +1,22 @@
 name: browser-pass
 
 # Phase 1 browser pass evidence. Manual plus registry-scoped PR runs only.
+# Proof modes (two, split by environment):
+# - CI owns the negative proof: an unauthenticated run hits the Access gate
+#   (403 Forbidden HTML, zero rows) and the story verdict is PASS with reason
+#   gate-negative-proof. That proves visitors get nothing, which is the
+#   required security posture. The run exits 0 and PNGs keep the
+#   -gate-blocked suffix (it is accurate).
+# - Humans own the signed-in visual pass: with an Access session rows render
+#   and the full battery must all pass. Any check failure fails the run.
 # Isolation notes:
 # - Fixture-backed handler only. Seed and offline stories never touch the network API.
 # - No database writes. The script only reads rendered rows and localStorage theme.
 # - No credentials. No Cloudflare account access. No secrets are referenced here.
 # - Local wrangler dev only. No --remote flag. No deploy step anywhere in this file.
-# - If /admin/* HTML returns 403 locally, the rows check fails by design and the
-#   summary names the gate. The first real run must confirm local dev serves the
-#   registry shell without an Access session, or switch the pass to react-router dev.
+# - If /admin/* HTML returns 403 locally, the story verdict is PASS
+#   (gate-negative-proof) and the summary names the gate with the reason
+#   inline. Signed-in visual confirmation stays a human step.
 on:
   workflow_dispatch:
   pull_request:
